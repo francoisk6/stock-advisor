@@ -1,0 +1,14 @@
+{
+  "@@locale": "en",
+  "appTitle": "Stock Adviser",
+  "homeWelcome": "Welcome to your AI market copilot",
+  "homeSubtitle": "Follow stocks and crypto you care about, with daily insights in plain language.",
+  "disclaimer": "Educational information only — not financial advice.",
+  "backendStatusTitle": "Server status",
+  "backendStatusOk": "Connected ({environment})",
+  "@backendStatusOk": {
+    "placeholders": { "environment": { "type": "String" } }
+  },
+  "backendStatusError": "Cannot reach the server",
+  "retry": "Retry"
+}
