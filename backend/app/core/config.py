@@ -28,6 +28,30 @@ class Settings(BaseSettings):
         default_factory=lambda: ["http://localhost:8210", "http://127.0.0.1:8210"]
     )
 
+    # Auth
+    jwt_secret: str = ""
+    jwt_algorithm: str = "HS256"
+    access_token_minutes: int = 15
+    refresh_token_days: int = 30
+    email_verify_token_hours: int = 48
+    password_reset_token_minutes: int = 60
+
+    # Google Sign-In: OAuth client IDs accepted as ID-token audience (web + android).
+    google_client_ids: list[str] = Field(default_factory=list)
+
+    # Links in emails point to the Flutter web app.
+    frontend_url: str = "http://localhost:8210"
+
+    # Email: "outbox" writes .eml files to email_outbox_dir (dev), "smtp" sends, "memory" (tests).
+    email_backend: str = "outbox"
+    email_from: str = "Stock Adviser <no-reply@localhost>"
+    email_outbox_dir: str = "var/outbox"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_starttls: bool = True
+
     @cached_property
     def database_url(self) -> str:
         return (
@@ -37,3 +61,6 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+if len(settings.jwt_secret) < 32:
+    raise RuntimeError("JWT_SECRET must be set in backend/.env (at least 32 characters)")

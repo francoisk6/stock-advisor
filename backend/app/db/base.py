@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, MetaData, func
+from sqlalchemy import DateTime, MetaData, func, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 # Deterministic constraint names so Alembic migrations are stable and reviewable.
@@ -17,15 +17,19 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 
+# MySQL only accepts expression defaults in parentheses.
+UTC_NOW_DEFAULT = text("(UTC_TIMESTAMP())")
+
+
 class TimestampMixin:
     """created_at / updated_at stored in UTC."""
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.utc_timestamp(), nullable=False
+        DateTime, server_default=UTC_NOW_DEFAULT, nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        server_default=func.utc_timestamp(),
+        server_default=UTC_NOW_DEFAULT,
         onupdate=func.utc_timestamp(),
         nullable=False,
     )

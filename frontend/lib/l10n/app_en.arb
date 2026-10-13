@@ -1,14 +1,184 @@
 {
   "@@locale": "en",
   "appTitle": "Stock Adviser",
-  "homeWelcome": "Welcome to your AI market copilot",
+  "homeGreeting": "Hi, {name}",
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "homeSubtitle": "Follow stocks and crypto you care about, with daily insights in plain language.",
+  "homeComingSoonTitle": "Coming next",
+  "homeComingSoonBody": "Market data, watchlists and live charts arrive in the next phase.",
   "disclaimer": "Educational information only — not financial advice.",
   "backendStatusTitle": "Server status",
   "backendStatusOk": "Connected ({environment})",
   "@backendStatusOk": {
-    "placeholders": { "environment": { "type": "String" } }
+    "placeholders": {
+      "environment": {
+        "type": "String"
+      }
+    }
   },
   "backendStatusError": "Cannot reach the server",
-  "retry": "Retry"
+  "retry": "Retry",
+  "save": "Save",
+  "cancel": "Cancel",
+  "orDivider": "or",
+  "errorUnexpected": "Something went wrong. Please try again.",
+  "errorNetwork": "Can't reach the server. Check your internet connection and try again.",
+  "errorValidation": "Some information looks wrong. Please check and try again.",
+  "errorTooManyAttempts": "Too many attempts. Please wait a few minutes and try again.",
+  "errorServer": "Our server had a problem. Please try again in a moment.",
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "fullNameLabel": "Your name",
+  "newPasswordLabel": "New password",
+  "confirmPasswordLabel": "Confirm password",
+  "currentPasswordLabel": "Current password",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "passwordRulesHint": "At least 8 characters, with a letter and a number.",
+  "validationEmailRequired": "Please enter your email.",
+  "validationEmailInvalid": "This doesn't look like a valid email.",
+  "validationPasswordRequired": "Please enter your password.",
+  "validationPasswordRules": "Use at least 8 characters, with a letter and a number.",
+  "validationPasswordsDontMatch": "The passwords don't match.",
+  "validationNameRequired": "Please enter your name.",
+  "loginTitle": "Welcome back",
+  "loginSubtitle": "Sign in to see your markets and insights.",
+  "loginButton": "Sign in",
+  "loginForgotPassword": "Forgot password?",
+  "loginNoAccount": "New here?",
+  "loginCreateAccount": "Create an account",
+  "loginGoogleHint": "Signed up with Google? Use the Google button.",
+  "googleContinue": "Continue with Google",
+  "registerTitle": "Create your account",
+  "registerSubtitle": "Free plan. No credit card needed.",
+  "registerButton": "Create account",
+  "registerHaveAccount": "Already have an account?",
+  "registerSignIn": "Sign in",
+  "registerTerms": "By creating an account you understand that this app gives educational information only, not financial advice.",
+  "forgotTitle": "Reset your password",
+  "forgotSubtitle": "Enter your email and we'll send you a link to choose a new password.",
+  "forgotButton": "Send reset link",
+  "backToLogin": "Back to sign in",
+  "resetTitle": "Choose a new password",
+  "resetButton": "Save new password",
+  "resetSuccess": "Your password was changed. You can now sign in.",
+  "linkIncomplete": "This link is incomplete. Please open the link from your email again.",
+  "verifyInProgress": "Confirming your email…",
+  "verifySuccessTitle": "Email confirmed!",
+  "verifySuccessBody": "Thanks — your account is now secured.",
+  "verifyFailedTitle": "Link not valid",
+  "continueButton": "Continue",
+  "verifyBannerText": "Please confirm your email ({email}). Check your inbox for our link.",
+  "@verifyBannerText": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyBannerResend": "Resend email",
+  "onboardingTitle": "Let's personalize your copilot",
+  "onboardingEditTitle": "Edit your investing profile",
+  "onboardingStepOf": "Step {current} of {total}",
+  "@onboardingStepOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingNext": "Next",
+  "onboardingBack": "Back",
+  "onboardingFinish": "Finish",
+  "onboardingWhy": "Your answers help the AI explain things at the right level. You can change them anytime.",
+  "onboardingMultiHint": "Choose one or more.",
+  "onboardingExperienceQuestion": "How much do you know about investing?",
+  "expBeginnerTitle": "I'm new to this",
+  "expBeginnerDesc": "Explain things simply, step by step.",
+  "expBeginnerShort": "Beginner",
+  "expIntermediateTitle": "I know the basics",
+  "expIntermediateDesc": "I understand stocks, crypto and charts a little.",
+  "expIntermediateShort": "Intermediate",
+  "expAdvancedTitle": "I invest regularly",
+  "expAdvancedDesc": "Give me the details and the numbers.",
+  "expAdvancedShort": "Advanced",
+  "onboardingRiskQuestion": "Imagine your investment drops 20% in one month. What would you do?",
+  "riskConservativeTitle": "Sell, to avoid losing more",
+  "riskConservativeDesc": "Protecting my money matters most.",
+  "riskConservativeShort": "Careful",
+  "riskBalancedTitle": "Wait and see",
+  "riskBalancedDesc": "Ups and downs are normal; I stay calm.",
+  "riskBalancedShort": "Balanced",
+  "riskAggressiveTitle": "Buy more while it's cheaper",
+  "riskAggressiveDesc": "I accept big swings for bigger possible gains.",
+  "riskAggressiveShort": "Bold",
+  "onboardingHorizonQuestion": "When might you need this money?",
+  "horizonShortTitle": "Within a year",
+  "horizonShortDesc": "Short-term: stability matters more.",
+  "horizonMediumTitle": "In 1 to 5 years",
+  "horizonMediumDesc": "Medium-term: some ups and downs are OK.",
+  "horizonLongTitle": "In more than 5 years",
+  "horizonLongDesc": "Long-term: time can smooth out the swings.",
+  "onboardingAssetsQuestion": "What would you like to follow?",
+  "assetStocks": "Stocks",
+  "assetStocksDesc": "Shares of companies",
+  "assetCrypto": "Crypto",
+  "assetCryptoDesc": "Bitcoin, Ethereum and more",
+  "assetEtfs": "ETFs & funds",
+  "assetEtfsDesc": "Many investments in one basket",
+  "assetCommodities": "Commodities",
+  "assetCommoditiesDesc": "Gold, oil, silver…",
+  "assetForex": "Currencies",
+  "assetForexDesc": "Exchange rates like EUR/USD",
+  "onboardingRegionsQuestion": "Which markets interest you?",
+  "regionGlobal": "Global",
+  "regionNorthAmerica": "North America",
+  "regionEurope": "Europe",
+  "regionMiddleEast": "Middle East",
+  "regionAsiaPacific": "Asia-Pacific",
+  "regionLatinAmerica": "Latin America",
+  "regionAfrica": "Africa",
+  "profileTitle": "Profile",
+  "profileAccount": "Account",
+  "profileEmailVerified": "Verified",
+  "profileEmailNotVerified": "Not verified",
+  "profilePlan": "{plan} plan",
+  "@profilePlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "profileSignInMethods": "Sign-in methods",
+  "profileMethodPassword": "Email & password",
+  "profileMethodGoogle": "Google",
+  "profileInvesting": "Your investing profile",
+  "profileEdit": "Edit",
+  "profileExperience": "Experience",
+  "profileRisk": "Risk comfort",
+  "profileHorizon": "Time horizon",
+  "profileInterests": "Interests",
+  "profileMarkets": "Markets",
+  "profileSecurity": "Security",
+  "profileChangePassword": "Change password",
+  "profileSetPassword": "Set a password",
+  "profileSignOut": "Sign out",
+  "profileDeleteAccount": "Delete account",
+  "profileEditName": "Edit name",
+  "profileNameUpdated": "Name updated.",
+  "passwordChanged": "Password saved. Your other devices were signed out.",
+  "deleteAccountTitle": "Delete your account?",
+  "deleteAccountBody": "This permanently deletes your account, your profile and all your data. This cannot be undone.",
+  "deleteAccountConfirmPassword": "Enter your password to confirm",
+  "deleteAccountButton": "Delete permanently"
 }

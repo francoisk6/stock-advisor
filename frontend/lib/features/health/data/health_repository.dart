@@ -7,9 +7,9 @@ class HealthStatus {
   const HealthStatus({required this.status, required this.environment});
 
   factory HealthStatus.fromJson(Map<String, dynamic> json) => HealthStatus(
-        status: json['status'] as String,
-        environment: json['environment'] as String,
-      );
+    status: json['status'] as String,
+    environment: json['environment'] as String,
+  );
 
   final String status;
   final String environment;
@@ -27,7 +27,7 @@ class HealthRepository {
 }
 
 final healthRepositoryProvider = Provider<HealthRepository>(
-  (ref) => HealthRepository(ref.watch(dioProvider)),
+  (ref) => HealthRepository(ref.watch(publicDioProvider)),
 );
 
 final healthStatusProvider = FutureProvider.autoDispose<HealthStatus>(

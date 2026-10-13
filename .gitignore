@@ -26,3 +26,6 @@ frontend/ios/Pods/
 .idea/
 .DS_Store
 *.log
+
+# Local runtime data (dev email outbox, etc.)
+backend/var/
