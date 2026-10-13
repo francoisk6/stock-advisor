@@ -10,6 +10,8 @@ import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/auth/presentation/verify_email_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/market/presentation/asset_screen.dart';
+import '../../features/market/presentation/search_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
@@ -69,6 +71,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'profile',
             builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: 'search',
+            builder: (context, state) => const SearchScreen(),
+          ),
+          GoRoute(
+            path: 'assets/:id',
+            builder: (context, state) =>
+                // A malformed id falls through to the API's friendly "not found".
+                AssetScreen(
+                  assetId: int.tryParse(state.pathParameters['id']!) ?? 0,
+                ),
           ),
         ],
       ),

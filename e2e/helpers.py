@@ -44,6 +44,30 @@ def fill(page: Page, label: str, value: str) -> None:
     page.wait_for_timeout(200)
 
 
+def wait_for_text(page: Page, pattern: str, timeout: float = 30) -> None:
+    """Wait until text appears anywhere in the accessibility tree.
+
+    Flutter often merges neighbouring texts into one label, so plain get_by_text() misses them.
+    """
+    regex = re.compile(pattern)
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if regex.search(page.locator("body").aria_snapshot()):
+            return
+        page.wait_for_timeout(300)
+    raise AssertionError(f"text {pattern!r} not found on {page.url}")
+
+
+def wait_for_no_text(page: Page, pattern: str, timeout: float = 15) -> None:
+    regex = re.compile(pattern)
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if not regex.search(page.locator("body").aria_snapshot()):
+            return
+        page.wait_for_timeout(300)
+    raise AssertionError(f"text {pattern!r} still shown on {page.url}")
+
+
 def button(page: Page, name: str):
     return page.get_by_role("button", name=name, exact=True)
 

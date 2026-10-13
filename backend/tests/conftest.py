@@ -6,6 +6,7 @@ os.environ["DB_NAME"] = "stock_advisor_test"
 os.environ["EMAIL_BACKEND"] = "memory"
 os.environ["GOOGLE_CLIENT_IDS"] = '["test-client-id"]'
 
+import asyncio  # noqa: E402
 import re  # noqa: E402
 from collections.abc import AsyncIterator, Iterator  # noqa: E402
 from pathlib import Path  # noqa: E402
@@ -19,8 +20,9 @@ from sqlalchemy import text  # noqa: E402
 from alembic import command  # noqa: E402
 from app.core.config import settings  # noqa: E402
 from app.core.rate_limit import limiter  # noqa: E402
-from app.db.session import engine  # noqa: E402
+from app.db.session import SessionLocal, engine  # noqa: E402
 from app.main import app  # noqa: E402
+from app.market_data.seed import seed_catalog  # noqa: E402
 from app.services.email import memory_outbox  # noqa: E402
 
 assert settings.db_name == "stock_advisor_test", "tests must never touch the dev database"
@@ -46,7 +48,13 @@ def migrated_db() -> Iterator[None]:
     """
     cfg = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
     command.upgrade(cfg, "head")
+    asyncio.run(_seed_catalog())
     yield
+
+
+async def _seed_catalog() -> None:
+    async with SessionLocal() as session:
+        await seed_catalog(session)
 
 
 @pytest.fixture(autouse=True)
@@ -55,6 +63,8 @@ async def clean_state() -> AsyncIterator[None]:
         # DELETE, not TRUNCATE: TRUNCATE is DDL in MySQL and is slow on a shared server.
         for table in _RESET_TABLES:
             await conn.execute(text(f"DELETE FROM `{table}`"))
+        # Keep the curated catalog; drop assets that tests added through search.
+        await conn.execute(text("DELETE FROM assets WHERE popularity IS NULL"))
     memory_outbox.clear()
     limiter.reset()
     yield
@@ -65,6 +75,26 @@ async def client() -> AsyncIterator[AsyncClient]:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test/api/v1") as c:
         yield c
+
+
+async def onboard(
+    client: AsyncClient,
+    tokens: dict,
+    assets: list[str] | None = None,
+    regions: list[str] | None = None,
+) -> None:
+    response = await client.put(
+        "/users/me/profile",
+        headers=bearer(tokens),
+        json={
+            "experience_level": "beginner",
+            "risk_profile": "balanced",
+            "investment_horizon": "long",
+            "asset_interests": assets or ["stocks"],
+            "region_interests": regions or ["global"],
+        },
+    )
+    assert response.status_code == 200, response.text
 
 
 async def register(

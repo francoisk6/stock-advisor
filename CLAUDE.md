@@ -33,7 +33,8 @@ cyberia/idm/sodetel/terranet bot workers, mailbot). Stock Adviser must never deg
 - MySQL: use **own databases only** (`stock_advisor_dev`, later `stock_advisor_prod`) with a
   **dedicated MySQL user** granted on those DBs only. Never touch other schemas or global config.
 - Ports: never use 80, 8000, 8008, 8080, 8100, 3306. Our range is **8200–8299**:
-  backend API `8200`, Flutter web dev `8210`, SearXNG `8220`. Ollama stays on `127.0.0.1:11434`.
+  backend API `8200`, Flutter web dev `8210`, SearXNG `8220`, e2e API/web `8290`/`8291`.
+  Ollama stays on `127.0.0.1:11434`.
   Bind dev services to `127.0.0.1` only.
 - Resource limits (14 GB RAM, 8 cores, shared):
   - Ollama: `OLLAMA_MAX_LOADED_MODELS=1`, `OLLAMA_NUM_PARALLEL=1`, short `OLLAMA_KEEP_ALIVE`
@@ -91,6 +92,21 @@ Flutter app ──HTTPS/WS──▶ FastAPI
 - Web search: self-hosted **SearXNG** (free, no API key) behind the `web_search` tool.
 
 ### Market data sources (free tiers first, behind adapters)
+
+Implemented (Phase 2) in `backend/app/market_data/`:
+- `providers/yahoo.py` (yfinance) for stocks, ETFs, indices, forex, commodities;
+  `providers/coingecko.py` (keyless) for crypto. Both implement `providers/base.py`.
+  **yfinance is unofficial and Yahoo's terms forbid commercial use — replace with a licensed
+  provider (Twelve Data / Finnhub / …) before Pro launches.**
+- Keyless CoinGecko: ≤365 days of history → crypto offers 1D–1Y only; calls are spaced 1.5 s.
+  Search keeps only ranked coins (drops "tokenized stock" junk).
+- `assets` table = catalog. `catalog.json` is the curated list (`popularity` set), loaded by
+  `python -m app.market_data.seed` (idempotent; run after migrations on every environment).
+  Provider search hits are upserted with `popularity = NULL`.
+- No prices in the DB yet: `TTLCache` in `service.py` (quotes 60 s, history 2 min–1 h, search
+  10 min), one fetch per key at a time, last good value served for 6 h if a source fails.
+  Persisted daily bars come with the Phase 5 ingest jobs.
+- Yahoo calls are blocking → `asyncio.to_thread` behind a semaphore of 2 (shared server).
 
 Markets are **global and driven by user interest** — no hard-coded exchange list. The asset
 catalog stores exchange, country, currency, and asset type; adapters are chosen per asset.
@@ -157,8 +173,10 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       tokens, email verification, password reset/change, profile, 5-step onboarding quiz,
       account deletion, Free plan on signup. Verified: unit + browser e2e, Gmail SMTP, real
       Google sign-in by the owner (2026-10-14).
-- [ ] **Phase 2 — Market data:** adapters (crypto + stocks), asset catalog, search, quotes,
-      history, caching; asset detail screen with charts.
+- [x] **Phase 2 — Market data:** Yahoo (stocks/ETFs/indices/forex/commodities) + CoinGecko
+      (crypto) adapters, curated catalog (78 assets, all regions), search, quotes, details, history
+      (1D–5Y), shared cache with stale fallback; home "Popular in your markets", search screen,
+      asset page with line/candle charts and explained key figures. Verified unit + live e2e.
 - [ ] **Phase 3 — Watchlists & live:** watchlists, subscriptions, WebSocket live prices, alerts.
 - [ ] **Phase 4 — AI copilot v1:** Ollama provider, tool calling, agent loop, streaming chat,
       app-action tools, guardrails + disclaimer.
@@ -176,6 +194,7 @@ stock-advisor-dev/
 ├── CLAUDE.md
 ├── backend/            FastAPI app (app/, alembic/, tests/, pyproject.toml, .env)
 │   └── app/            api/v1/ (routers) · core/ (config) · db/ (base, session, models/) · services/
+│                       · market_data/ (providers/, cache, catalog.json, seed, service)
 ├── frontend/           Flutter app — web + android (lib/core, lib/features, lib/l10n, test/)
 ├── e2e/                Playwright browser flows (run.sh starts backend + web build, cleans up)
 ├── infra/              mysql/ setup script; later docker-compose (SearXNG), Ollama service
@@ -210,7 +229,8 @@ stock-advisor-dev/
   Gmail app passwords must be pasted without spaces.
   Never turn on smtplib debug output — it prints the AUTH credentials.
 - Tests run against `stock_advisor_test` (forced in `tests/conftest.py`); rows are cleared with
-  `DELETE`, never `TRUNCATE` (DDL is slow on the shared server).
+  `DELETE`, never `TRUNCATE` (DDL is slow on the shared server). The catalog is seeded once per
+  session. Market tests use `tests/fakes.py` providers — never call real APIs in unit tests.
 
 ### Frontend (Flutter)
 - Feature-first folders (`lib/features/<feature>/{data,domain,presentation}`); shared code in
@@ -228,6 +248,10 @@ stock-advisor-dev/
   production hosting must fall back to `index.html` for unknown paths.
 - Google button: `google_sign_in_button.dart` conditionally exports the web version (Google's
   rendered button) or the mobile version — never import `google_sign_in_web` elsewhere.
+- Up/down prices: always arrow + sign + color (`PriceChange`, `changeColor`) — never color only.
+  Currencies: `$ € £ ¥ ₹` symbols, otherwise the code ("SAR 25.78") via `core/format/numbers.dart`.
+- Every key figure needs a plain-language explanation (`statText` in `market/presentation/labels.dart`).
+- Section titles use `Semantics(header: true)`; decorative avatars use `ExcludeSemantics`.
 
 ## Environment (dev machine)
 - Ubuntu 22.04, Python 3.10, Flutter 3.41 at `/opt/flutter`, MySQL 8.0 (shared with evolution).
@@ -269,14 +293,15 @@ cd backend && virtualenv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/ruff check . && .venv/bin/ruff format .
 .venv/bin/alembic revision --autogenerate -m "describe change"        # then REVIEW the file
 .venv/bin/alembic upgrade head
+.venv/bin/python -m app.market_data.seed                               # after migrations
 
 # --- frontend (from frontend/) ---
 flutter run -d web-server --web-hostname 127.0.0.1 --web-port 8210 \
   --dart-define=GOOGLE_WEB_CLIENT_ID=<id>   # optional; same id as GOOGLE_CLIENT_IDS
 flutter build web --dart-define=GOOGLE_WEB_CLIENT_ID=<id>
 
-# --- end-to-end (from repo root; ports 8200/8210 must be free) ---
-bash e2e/run.sh            # SKIP_BUILD=1 to reuse frontend/build/web
+# --- end-to-end (from repo root; own ports 8290/8291, safe while dev servers run) ---
+bash e2e/run.sh            # SKIP_BUILD=1 reuses the build; E2E_TESTS=test_market_flow.py
 flutter analyze && flutter test
 nice -n 19 flutter build web        # low priority: shared server
 ```
@@ -294,3 +319,6 @@ nice -n 19 flutter build web        # low priority: shared server
   Signing in with Google onto an unverified password account drops that password
   (anti account-pre-hijacking). Seeded Free limits: 25 watchlist assets, 30 AI msgs/day,
   10 alerts, 1 digest/day.
+- 2026-10-14 — Phase 2: Yahoo (yfinance) for non-crypto in dev despite ToS (swap before Pro);
+  CoinGecko keyless for crypto (1Y max history). Prices cached in memory, not stored yet.
+  Market endpoints require sign-in (protects free API quotas).

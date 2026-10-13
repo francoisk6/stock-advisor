@@ -1,8 +1,18 @@
 """Import every model module here so Alembic autogenerate sees it on Base.metadata."""
 
+from app.db.models.asset import Asset
 from app.db.models.plan import Plan, UserPlan
 from app.db.models.profile import UserProfile
 from app.db.models.token import EmailToken, RefreshToken
 from app.db.models.user import OAuthAccount, User
 
-__all__ = ["EmailToken", "OAuthAccount", "Plan", "RefreshToken", "User", "UserPlan", "UserProfile"]
+__all__ = [
+    "Asset",
+    "EmailToken",
+    "OAuthAccount",
+    "Plan",
+    "RefreshToken",
+    "User",
+    "UserPlan",
+    "UserProfile",
+]

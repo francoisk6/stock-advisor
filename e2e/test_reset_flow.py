@@ -6,7 +6,7 @@ from playwright.sync_api import expect, sync_playwright
 
 from helpers import (
     ARTIFACTS, BASE, api, button, delete_account, enable_semantics, fill, link_from_outbox,
-    step, unique_email,
+    step, unique_email, wait_for_text,
 )
 
 EMAIL = unique_email("reset")
@@ -30,7 +30,7 @@ with sync_playwright() as p:
         fill(page, "New password", NEW_PASSWORD)
         fill(page, "Confirm password", "Mismatch456")
         button(page, "Save new password").click()
-        expect(page.get_by_text("The passwords don't match.")).to_be_visible(timeout=5000)
+        wait_for_text(page, "The passwords don't match.", timeout=5)
         fill(page, "Confirm password", NEW_PASSWORD)
         button(page, "Save new password").click()
         expect(page.get_by_text(re.compile("Your password was changed"))).to_be_visible(

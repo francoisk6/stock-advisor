@@ -9,6 +9,7 @@ import '../../../core/widgets/password_field.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../auth/domain/user.dart';
+import '../../health/presentation/backend_status_card.dart';
 import '../../onboarding/presentation/profile_options.dart';
 import '../data/user_api.dart';
 
@@ -160,7 +161,8 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const BackendStatusCard(),
+              const SizedBox(height: 16),
               Text(
                 l10n.disclaimer,
                 style: theme.textTheme.bodySmall,

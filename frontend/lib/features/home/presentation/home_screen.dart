@@ -2,19 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/errors/api_error.dart';
+import '../../../core/widgets/error_text.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../auth/presentation/widgets/verify_email_banner.dart';
-import '../../health/presentation/backend_status_card.dart';
+import '../../market/data/market_api.dart';
+import '../../market/presentation/labels.dart';
+import '../../market/presentation/widgets/asset_tile.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  String? _type; // null = all of the user's interests
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final user = ref.watch(authControllerProvider).user;
+    final popular = ref.watch(popularAssetsProvider(_type));
+    final filters = interestFilters(l10n, user?.profile.assetInterests ?? []);
 
     return Scaffold(
       appBar: AppBar(
@@ -31,38 +44,136 @@ class HomeScreen extends ConsumerWidget {
         children: [
           const VerifyEmailBanner(),
           Expanded(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 640),
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Text(
-                      user == null
-                          ? l10n.appTitle
-                          : l10n.homeGreeting(user.displayName),
-                      style: theme.textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(l10n.homeSubtitle, style: theme.textTheme.bodyLarge),
-                    const SizedBox(height: 24),
-                    Card(
-                      color: theme.colorScheme.secondaryContainer,
-                      child: ListTile(
-                        leading: const Icon(Icons.upcoming_outlined),
-                        title: Text(l10n.homeComingSoonTitle),
-                        subtitle: Text(l10n.homeComingSoonBody),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(popularAssetsProvider(_type));
+                await ref.read(popularAssetsProvider(_type).future);
+              },
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 720),
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Semantics(
+                              header: true,
+                              child: Text(
+                                user == null
+                                    ? l10n.appTitle
+                                    : l10n.homeGreeting(user.displayName),
+                                style: theme.textTheme.headlineSmall,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              l10n.homeSubtitle,
+                              style: theme.textTheme.bodyLarge,
+                            ),
+                            const SizedBox(height: 16),
+                            SearchBar(
+                              hintText: l10n.searchHint,
+                              leading: const Icon(Icons.search),
+                              elevation: const WidgetStatePropertyAll(0),
+                              onTap: () => context.go('/search'),
+                              // Opens the search screen; typing happens there.
+                              keyboardType: TextInputType.none,
+                            ),
+                            const SizedBox(height: 24),
+                            Semantics(
+                              header: true,
+                              child: Text(
+                                l10n.popularTitle,
+                                style: theme.textTheme.titleLarge,
+                              ),
+                            ),
+                            Text(
+                              l10n.popularSubtitle,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            if (filters.length > 1)
+                              Wrap(
+                                spacing: 6,
+                                children: [
+                                  ChoiceChip(
+                                    label: Text(l10n.filterAll),
+                                    selected: _type == null,
+                                    onSelected: (_) =>
+                                        setState(() => _type = null),
+                                  ),
+                                  for (final (type, label) in filters)
+                                    ChoiceChip(
+                                      label: Text(label),
+                                      selected: _type == type,
+                                      onSelected: (_) =>
+                                          setState(() => _type = type),
+                                    ),
+                                ],
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    const BackendStatusCard(),
-                    const SizedBox(height: 24),
-                    Text(
-                      l10n.disclaimer,
-                      style: theme.textTheme.bodySmall,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      ...popular.when(
+                        loading: () => const [
+                          Padding(
+                            padding: EdgeInsets.all(32),
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                        ],
+                        error: (e, _) => [
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              children: [
+                                ErrorText(apiErrorMessage(e, l10n)),
+                                OutlinedButton(
+                                  onPressed: () => ref.invalidate(
+                                    popularAssetsProvider(_type),
+                                  ),
+                                  child: Text(l10n.retry),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        data: (assets) => assets.isEmpty
+                            ? [
+                                Padding(
+                                  padding: const EdgeInsets.all(24),
+                                  child: Text(
+                                    l10n.popularEmpty,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ]
+                            : [
+                                for (final asset in assets)
+                                  AssetTile(
+                                    asset: asset,
+                                    onTap: () =>
+                                        context.go('/assets/${asset.id}'),
+                                  ),
+                              ],
+                      ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          l10n.disclaimer,
+                          style: theme.textTheme.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

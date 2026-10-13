@@ -21,13 +21,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Follow stocks and crypto you care about, with daily insights in plain language.';
 
   @override
-  String get homeComingSoonTitle => 'Coming next';
-
-  @override
-  String get homeComingSoonBody =>
-      'Market data, watchlists and live charts arrive in the next phase.';
-
-  @override
   String get disclaimer =>
       'Educational information only — not financial advice.';
 
@@ -465,4 +458,256 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountButton => 'Delete permanently';
+
+  @override
+  String get searchHint => 'Search stocks, crypto, currencies…';
+
+  @override
+  String get searchPrompt =>
+      'Try a company name, a ticker like AAPL, or a coin like Bitcoin.';
+
+  @override
+  String searchEmpty(String query) {
+    return 'No results for “$query”. Check the spelling or try the company\'s full name.';
+  }
+
+  @override
+  String get popularTitle => 'Popular in your markets';
+
+  @override
+  String get popularSubtitle =>
+      'Based on what you told us you\'re interested in.';
+
+  @override
+  String get popularEmpty => 'Nothing to show here yet.';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get priceUnavailable => 'Price unavailable';
+
+  @override
+  String get typeStock => 'Stock';
+
+  @override
+  String get typeEtf => 'ETF';
+
+  @override
+  String get typeIndex => 'Index';
+
+  @override
+  String get typeFund => 'Fund';
+
+  @override
+  String get typeCrypto => 'Crypto';
+
+  @override
+  String get typeForex => 'Currency';
+
+  @override
+  String get typeCommodity => 'Commodity';
+
+  @override
+  String get filterStocks => 'Stocks';
+
+  @override
+  String get filterEtfs => 'ETFs';
+
+  @override
+  String get filterCrypto => 'Crypto';
+
+  @override
+  String get filterCommodities => 'Commodities';
+
+  @override
+  String get filterForex => 'Currencies';
+
+  @override
+  String get marketOpen => 'Market open';
+
+  @override
+  String get marketClosed => 'Market closed';
+
+  @override
+  String updatedAt(String time) {
+    return 'Updated $time';
+  }
+
+  @override
+  String get chartLine => 'Line';
+
+  @override
+  String get chartCandles => 'Candles';
+
+  @override
+  String get chartCandlesHelp =>
+      'Each candle shows one period: the body spans the opening and closing price, the thin lines show the highest and lowest price. Green means the price rose, red means it fell.';
+
+  @override
+  String get chartEmpty => 'No price data for this period.';
+
+  @override
+  String rangeChange(String change, String period) {
+    return '$change over $period';
+  }
+
+  @override
+  String get period1D => 'the last day';
+
+  @override
+  String get period1W => 'the past week';
+
+  @override
+  String get period1M => 'the past month';
+
+  @override
+  String get period6M => 'the past 6 months';
+
+  @override
+  String get period1Y => 'the past year';
+
+  @override
+  String get period5Y => 'the past 5 years';
+
+  @override
+  String get keyFigures => 'Key figures';
+
+  @override
+  String get keyFiguresHint => 'Tap a figure to see what it means.';
+
+  @override
+  String get aboutTitle => 'About';
+
+  @override
+  String get readMore => 'Read more';
+
+  @override
+  String get showLess => 'Show less';
+
+  @override
+  String dataSourceNote(String source) {
+    return 'Data: $source. Prices may be delayed.';
+  }
+
+  @override
+  String get gotIt => 'Got it';
+
+  @override
+  String get statMarketCap => 'Market cap';
+
+  @override
+  String get statMarketCapHelp =>
+      'The total value of all the company\'s shares (or all coins in existence). Bigger usually means a larger, more established business.';
+
+  @override
+  String get statPeRatio => 'P/E ratio';
+
+  @override
+  String get statPeRatioHelp =>
+      'Share price divided by one year of profit per share — roughly how many years of today\'s profits you pay for. A high number can mean investors expect growth, or that the stock is expensive.';
+
+  @override
+  String get statDividendYield => 'Dividend yield';
+
+  @override
+  String get statDividendYieldHelp =>
+      'Cash the company pays its shareholders each year, shown as a percentage of the share price.';
+
+  @override
+  String get statExpenseRatio => 'Expense ratio';
+
+  @override
+  String get statExpenseRatioHelp =>
+      'The yearly fee a fund charges, as a percentage of your investment. Lower is better for you.';
+
+  @override
+  String get statDayRange => 'Day range';
+
+  @override
+  String get statDayRangeHelp =>
+      'The lowest and highest price during the latest trading day.';
+
+  @override
+  String get statDayRange24h => '24h range';
+
+  @override
+  String get statDayRange24hHelp =>
+      'The lowest and highest price in the last 24 hours. Crypto trades all day, every day.';
+
+  @override
+  String get statWeek52Range => '52-week range';
+
+  @override
+  String get statWeek52RangeHelp =>
+      'The lowest and highest price over the past year. It shows how much the price has moved.';
+
+  @override
+  String get statAvgVolume => 'Average volume';
+
+  @override
+  String get statAvgVolumeHelp =>
+      'How many shares change hands on a typical day. Higher volume usually makes it easier to buy and sell.';
+
+  @override
+  String get statBeta => 'Beta';
+
+  @override
+  String get statBetaHelp =>
+      'How much the price tends to move compared with the overall market. 1 = like the market, above 1 = bigger swings, below 1 = calmer.';
+
+  @override
+  String get statSector => 'Sector';
+
+  @override
+  String get statSectorHelp =>
+      'The part of the economy the company works in, such as Technology or Energy.';
+
+  @override
+  String get statIndustry => 'Industry';
+
+  @override
+  String get statIndustryHelp => 'A more specific group within the sector.';
+
+  @override
+  String get statRank => 'Rank';
+
+  @override
+  String get statRankHelp =>
+      'Position among all cryptocurrencies by market cap. #1 is the largest.';
+
+  @override
+  String get statVolume24h => '24h volume';
+
+  @override
+  String get statVolume24hHelp =>
+      'The total value traded in the last 24 hours. Higher means more people are buying and selling.';
+
+  @override
+  String get statCirculatingSupply => 'Circulating supply';
+
+  @override
+  String get statCirculatingSupplyHelp =>
+      'How many coins exist and can be traded right now.';
+
+  @override
+  String get statMaxSupply => 'Max supply';
+
+  @override
+  String get statMaxSupplyHelp =>
+      'The most coins that will ever exist. Some coins have no limit.';
+
+  @override
+  String get statAllTimeHigh => 'All-time high';
+
+  @override
+  String get statAllTimeHighHelp =>
+      'The highest price this asset has ever reached.';
+
+  @override
+  String get statFromAllTimeHigh => 'From all-time high';
+
+  @override
+  String get statFromAllTimeHighHelp =>
+      'How far today\'s price is from its highest price ever. −50% means it is at half its peak.';
 }

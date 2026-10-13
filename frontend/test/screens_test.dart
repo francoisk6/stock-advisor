@@ -40,16 +40,41 @@ void main() {
     expect(find.text("This doesn't look like a valid email."), findsOneWidget);
   });
 
-  testWidgets('home greets the user and shows the disclaimer', (tester) async {
-    await pumpApp(tester, AuthState.authenticated(testUser()));
+  testWidgets('home greets the user and lists popular assets', (tester) async {
+    await pumpApp(
+      tester,
+      AuthState.authenticated(testUser(interests: ['stocks', 'crypto'])),
+      popular: [
+        testAsset(),
+        testAsset(
+          id: 2,
+          symbol: 'BTC',
+          name: 'Bitcoin',
+          type: 'crypto',
+          price: 83338,
+          changePercent: -2.25,
+          currency: 'USD',
+        ),
+      ],
+    );
 
     expect(find.text('Hi, Ana'), findsOneWidget);
+    expect(find.text('Popular in your markets'), findsOneWidget);
+    expect(find.text('Saudi Arabian Oil Company'), findsOneWidget);
+    expect(find.text('+1.50%'), findsOneWidget);
+    expect(find.text('Bitcoin'), findsOneWidget);
+    expect(find.text('-2.25%'), findsOneWidget);
     expect(
       find.text('Educational information only — not financial advice.'),
       findsOneWidget,
     );
-    expect(find.text('Connected (test)'), findsOneWidget);
     expect(find.textContaining('Please confirm your email'), findsNothing);
+
+    // Interest filters narrow the list.
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Crypto'));
+    await tester.pumpAndSettle();
+    expect(find.text('Bitcoin'), findsOneWidget);
+    expect(find.text('Saudi Arabian Oil Company'), findsNothing);
   });
 
   testWidgets('unverified users see a reminder banner', (tester) async {

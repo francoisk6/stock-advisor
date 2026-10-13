@@ -112,18 +112,6 @@ abstract class AppLocalizations {
   /// **'Follow stocks and crypto you care about, with daily insights in plain language.'**
   String get homeSubtitle;
 
-  /// No description provided for @homeComingSoonTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming next'**
-  String get homeComingSoonTitle;
-
-  /// No description provided for @homeComingSoonBody.
-  ///
-  /// In en, this message translates to:
-  /// **'Market data, watchlists and live charts arrive in the next phase.'**
-  String get homeComingSoonBody;
-
   /// No description provided for @disclaimer.
   ///
   /// In en, this message translates to:
@@ -951,6 +939,456 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete permanently'**
   String get deleteAccountButton;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search stocks, crypto, currencies…'**
+  String get searchHint;
+
+  /// No description provided for @searchPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a company name, a ticker like AAPL, or a coin like Bitcoin.'**
+  String get searchPrompt;
+
+  /// No description provided for @searchEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No results for “{query}”. Check the spelling or try the company\'s full name.'**
+  String searchEmpty(String query);
+
+  /// No description provided for @popularTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular in your markets'**
+  String get popularTitle;
+
+  /// No description provided for @popularSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on what you told us you\'re interested in.'**
+  String get popularSubtitle;
+
+  /// No description provided for @popularEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to show here yet.'**
+  String get popularEmpty;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @priceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Price unavailable'**
+  String get priceUnavailable;
+
+  /// No description provided for @typeStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get typeStock;
+
+  /// No description provided for @typeEtf.
+  ///
+  /// In en, this message translates to:
+  /// **'ETF'**
+  String get typeEtf;
+
+  /// No description provided for @typeIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'Index'**
+  String get typeIndex;
+
+  /// No description provided for @typeFund.
+  ///
+  /// In en, this message translates to:
+  /// **'Fund'**
+  String get typeFund;
+
+  /// No description provided for @typeCrypto.
+  ///
+  /// In en, this message translates to:
+  /// **'Crypto'**
+  String get typeCrypto;
+
+  /// No description provided for @typeForex.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get typeForex;
+
+  /// No description provided for @typeCommodity.
+  ///
+  /// In en, this message translates to:
+  /// **'Commodity'**
+  String get typeCommodity;
+
+  /// No description provided for @filterStocks.
+  ///
+  /// In en, this message translates to:
+  /// **'Stocks'**
+  String get filterStocks;
+
+  /// No description provided for @filterEtfs.
+  ///
+  /// In en, this message translates to:
+  /// **'ETFs'**
+  String get filterEtfs;
+
+  /// No description provided for @filterCrypto.
+  ///
+  /// In en, this message translates to:
+  /// **'Crypto'**
+  String get filterCrypto;
+
+  /// No description provided for @filterCommodities.
+  ///
+  /// In en, this message translates to:
+  /// **'Commodities'**
+  String get filterCommodities;
+
+  /// No description provided for @filterForex.
+  ///
+  /// In en, this message translates to:
+  /// **'Currencies'**
+  String get filterForex;
+
+  /// No description provided for @marketOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Market open'**
+  String get marketOpen;
+
+  /// No description provided for @marketClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Market closed'**
+  String get marketClosed;
+
+  /// No description provided for @updatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {time}'**
+  String updatedAt(String time);
+
+  /// No description provided for @chartLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Line'**
+  String get chartLine;
+
+  /// No description provided for @chartCandles.
+  ///
+  /// In en, this message translates to:
+  /// **'Candles'**
+  String get chartCandles;
+
+  /// No description provided for @chartCandlesHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Each candle shows one period: the body spans the opening and closing price, the thin lines show the highest and lowest price. Green means the price rose, red means it fell.'**
+  String get chartCandlesHelp;
+
+  /// No description provided for @chartEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No price data for this period.'**
+  String get chartEmpty;
+
+  /// No description provided for @rangeChange.
+  ///
+  /// In en, this message translates to:
+  /// **'{change} over {period}'**
+  String rangeChange(String change, String period);
+
+  /// No description provided for @period1D.
+  ///
+  /// In en, this message translates to:
+  /// **'the last day'**
+  String get period1D;
+
+  /// No description provided for @period1W.
+  ///
+  /// In en, this message translates to:
+  /// **'the past week'**
+  String get period1W;
+
+  /// No description provided for @period1M.
+  ///
+  /// In en, this message translates to:
+  /// **'the past month'**
+  String get period1M;
+
+  /// No description provided for @period6M.
+  ///
+  /// In en, this message translates to:
+  /// **'the past 6 months'**
+  String get period6M;
+
+  /// No description provided for @period1Y.
+  ///
+  /// In en, this message translates to:
+  /// **'the past year'**
+  String get period1Y;
+
+  /// No description provided for @period5Y.
+  ///
+  /// In en, this message translates to:
+  /// **'the past 5 years'**
+  String get period5Y;
+
+  /// No description provided for @keyFigures.
+  ///
+  /// In en, this message translates to:
+  /// **'Key figures'**
+  String get keyFigures;
+
+  /// No description provided for @keyFiguresHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a figure to see what it means.'**
+  String get keyFiguresHint;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutTitle;
+
+  /// No description provided for @readMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Read more'**
+  String get readMore;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLess;
+
+  /// No description provided for @dataSourceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Data: {source}. Prices may be delayed.'**
+  String dataSourceNote(String source);
+
+  /// No description provided for @gotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get gotIt;
+
+  /// No description provided for @statMarketCap.
+  ///
+  /// In en, this message translates to:
+  /// **'Market cap'**
+  String get statMarketCap;
+
+  /// No description provided for @statMarketCapHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The total value of all the company\'s shares (or all coins in existence). Bigger usually means a larger, more established business.'**
+  String get statMarketCapHelp;
+
+  /// No description provided for @statPeRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'P/E ratio'**
+  String get statPeRatio;
+
+  /// No description provided for @statPeRatioHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share price divided by one year of profit per share — roughly how many years of today\'s profits you pay for. A high number can mean investors expect growth, or that the stock is expensive.'**
+  String get statPeRatioHelp;
+
+  /// No description provided for @statDividendYield.
+  ///
+  /// In en, this message translates to:
+  /// **'Dividend yield'**
+  String get statDividendYield;
+
+  /// No description provided for @statDividendYieldHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash the company pays its shareholders each year, shown as a percentage of the share price.'**
+  String get statDividendYieldHelp;
+
+  /// No description provided for @statExpenseRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense ratio'**
+  String get statExpenseRatio;
+
+  /// No description provided for @statExpenseRatioHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The yearly fee a fund charges, as a percentage of your investment. Lower is better for you.'**
+  String get statExpenseRatioHelp;
+
+  /// No description provided for @statDayRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Day range'**
+  String get statDayRange;
+
+  /// No description provided for @statDayRangeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The lowest and highest price during the latest trading day.'**
+  String get statDayRangeHelp;
+
+  /// No description provided for @statDayRange24h.
+  ///
+  /// In en, this message translates to:
+  /// **'24h range'**
+  String get statDayRange24h;
+
+  /// No description provided for @statDayRange24hHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The lowest and highest price in the last 24 hours. Crypto trades all day, every day.'**
+  String get statDayRange24hHelp;
+
+  /// No description provided for @statWeek52Range.
+  ///
+  /// In en, this message translates to:
+  /// **'52-week range'**
+  String get statWeek52Range;
+
+  /// No description provided for @statWeek52RangeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The lowest and highest price over the past year. It shows how much the price has moved.'**
+  String get statWeek52RangeHelp;
+
+  /// No description provided for @statAvgVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Average volume'**
+  String get statAvgVolume;
+
+  /// No description provided for @statAvgVolumeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How many shares change hands on a typical day. Higher volume usually makes it easier to buy and sell.'**
+  String get statAvgVolumeHelp;
+
+  /// No description provided for @statBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get statBeta;
+
+  /// No description provided for @statBetaHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How much the price tends to move compared with the overall market. 1 = like the market, above 1 = bigger swings, below 1 = calmer.'**
+  String get statBetaHelp;
+
+  /// No description provided for @statSector.
+  ///
+  /// In en, this message translates to:
+  /// **'Sector'**
+  String get statSector;
+
+  /// No description provided for @statSectorHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The part of the economy the company works in, such as Technology or Energy.'**
+  String get statSectorHelp;
+
+  /// No description provided for @statIndustry.
+  ///
+  /// In en, this message translates to:
+  /// **'Industry'**
+  String get statIndustry;
+
+  /// No description provided for @statIndustryHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'A more specific group within the sector.'**
+  String get statIndustryHelp;
+
+  /// No description provided for @statRank.
+  ///
+  /// In en, this message translates to:
+  /// **'Rank'**
+  String get statRank;
+
+  /// No description provided for @statRankHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Position among all cryptocurrencies by market cap. #1 is the largest.'**
+  String get statRankHelp;
+
+  /// No description provided for @statVolume24h.
+  ///
+  /// In en, this message translates to:
+  /// **'24h volume'**
+  String get statVolume24h;
+
+  /// No description provided for @statVolume24hHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The total value traded in the last 24 hours. Higher means more people are buying and selling.'**
+  String get statVolume24hHelp;
+
+  /// No description provided for @statCirculatingSupply.
+  ///
+  /// In en, this message translates to:
+  /// **'Circulating supply'**
+  String get statCirculatingSupply;
+
+  /// No description provided for @statCirculatingSupplyHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How many coins exist and can be traded right now.'**
+  String get statCirculatingSupplyHelp;
+
+  /// No description provided for @statMaxSupply.
+  ///
+  /// In en, this message translates to:
+  /// **'Max supply'**
+  String get statMaxSupply;
+
+  /// No description provided for @statMaxSupplyHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The most coins that will ever exist. Some coins have no limit.'**
+  String get statMaxSupplyHelp;
+
+  /// No description provided for @statAllTimeHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'All-time high'**
+  String get statAllTimeHigh;
+
+  /// No description provided for @statAllTimeHighHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The highest price this asset has ever reached.'**
+  String get statAllTimeHighHelp;
+
+  /// No description provided for @statFromAllTimeHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'From all-time high'**
+  String get statFromAllTimeHigh;
+
+  /// No description provided for @statFromAllTimeHighHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How far today\'s price is from its highest price ever. −50% means it is at half its peak.'**
+  String get statFromAllTimeHighHelp;
 }
 
 class _AppLocalizationsDelegate
