@@ -43,6 +43,7 @@ def fake_smtp(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(settings, "smtp_host", "smtp.example.com")
     monkeypatch.setattr(settings, "smtp_user", "bot@example.com")
     monkeypatch.setattr(settings, "smtp_starttls", True)
+    monkeypatch.setattr(settings, "smtp_ssl", None)
 
 
 def _message() -> EmailMessage:
@@ -69,6 +70,17 @@ def test_port_587_upgrades_with_starttls(monkeypatch: pytest.MonkeyPatch) -> Non
     (client,) = FakeSMTP.instances
     assert not isinstance(client, FakeSMTPSSL)
     assert client.calls == ["starttls", "login:bot@example.com", "send:ana@example.com", "quit"]
+
+
+@pytest.mark.usefixtures("fake_smtp")
+def test_explicit_ssl_flag_overrides_port(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(settings, "smtp_port", 2465)
+    monkeypatch.setattr(settings, "smtp_ssl", True)
+    email_service._send_smtp(_message())
+
+    (client,) = FakeSMTP.instances
+    assert isinstance(client, FakeSMTPSSL)
+    assert "starttls" not in client.calls
 
 
 def test_verification_email_escapes_name_in_html() -> None:

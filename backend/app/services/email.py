@@ -37,13 +37,12 @@ def _build_message(email: OutgoingEmail) -> EmailMessage:
 
 
 def _send_smtp(msg: EmailMessage) -> None:
-    # Port 465 speaks TLS from the first byte; other ports upgrade with STARTTLS if enabled.
-    if settings.smtp_port == 465:
+    if settings.smtp_use_ssl:
         client: smtplib.SMTP = smtplib.SMTP_SSL(settings.smtp_host, settings.smtp_port, timeout=30)
     else:
         client = smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=30)
     with client as smtp:
-        if settings.smtp_port != 465 and settings.smtp_starttls:
+        if not settings.smtp_use_ssl and settings.smtp_starttls:
             smtp.starttls()
         if settings.smtp_user:
             smtp.login(settings.smtp_user, settings.smtp_password)

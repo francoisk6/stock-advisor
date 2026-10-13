@@ -50,7 +50,14 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
+    # Like EMAIL_USE_SSL / EMAIL_USE_TLS elsewhere: SSL = TLS from the first byte (port 465),
+    # STARTTLS = plain connection upgraded to TLS (port 587). SSL unset -> true on port 465.
+    smtp_ssl: bool | None = None
     smtp_starttls: bool = True
+
+    @property
+    def smtp_use_ssl(self) -> bool:
+        return self.smtp_ssl if self.smtp_ssl is not None else self.smtp_port == 465
 
     @cached_property
     def database_url(self) -> str:

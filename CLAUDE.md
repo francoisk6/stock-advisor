@@ -155,9 +155,9 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       tooling.
 - [~] **Phase 1 — Users:** email+password and Google sign-in, JWT access + rotating refresh
       tokens, email verification, password reset/change, profile, 5-step onboarding quiz,
-      account deletion, Free plan on signup. *Done and tested (unit + browser e2e). Open items:
-      Google web client must allow origin `http://localhost:8210`; Gmail SMTP login is rejected
-      (dev uses the outbox until fixed).*
+      account deletion, Free plan on signup. *Done and tested (unit + browser e2e). Gmail SMTP sends
+      (verified). Google button renders with allowed origins; awaiting a manual Google sign-in
+      test by the owner.*
 - [ ] **Phase 2 — Market data:** adapters (crypto + stocks), asset catalog, search, quotes,
       history, caching; asset detail screen with charts.
 - [ ] **Phase 3 — Watchlists & live:** watchlists, subscriptions, WebSocket live prices, alerts.
@@ -206,7 +206,9 @@ stock-advisor-dev/
   after a 10 s grace revokes the whole family. Email tokens are single-use and hashed.
   Login errors never reveal whether an email exists. Rate limits are in-memory (one worker).
 - Emails: `EMAIL_BACKEND=outbox` (dev) writes `.eml` files to `backend/var/outbox/`;
-  `smtp` sends (port 465 = implicit SSL, 587 = STARTTLS); `memory` is used by tests.
+  `smtp` sends; `memory` is used by tests. Dev sends real mail via Gmail (`SMTP_SSL=true`,
+  port 465 — same as evolution's `EMAIL_USE_SSL=True`); `e2e/run.sh` forces the outbox.
+  Gmail app passwords must be pasted without spaces.
   Never turn on smtplib debug output — it prints the AUTH credentials.
 - Tests run against `stock_advisor_test` (forced in `tests/conftest.py`); rows are cleared with
   `DELETE`, never `TRUNCATE` (DDL is slow on the shared server).
@@ -239,8 +241,8 @@ stock-advisor-dev/
 
 ## Google Sign-In setup
 
-Status: web client id is in `backend/.env`; the button renders but Google answered
-"origin not allowed" until step 2's origins are saved (changes can take a few minutes).
+Status: web client id is in `backend/.env`; origins `http://localhost` + `http://localhost:8210`
+are allowed and the button renders (verified 2026-10-14).
 
 1. Google Cloud Console → create project → *OAuth consent screen* (External, app name
    "Stock Adviser", support email).
