@@ -153,11 +153,10 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
 - [x] **Phase 0 — Foundation:** monorepo layout, git, FastAPI skeleton, MySQL + Alembic,
       config/.env, Flutter skeleton (routing, state mgmt, theming, i18n), health check, lint/test
       tooling.
-- [~] **Phase 1 — Users:** email+password and Google sign-in, JWT access + rotating refresh
+- [x] **Phase 1 — Users:** email+password and Google sign-in, JWT access + rotating refresh
       tokens, email verification, password reset/change, profile, 5-step onboarding quiz,
-      account deletion, Free plan on signup. *Done and tested (unit + browser e2e). Gmail SMTP sends
-      (verified). Google button renders with allowed origins; awaiting a manual Google sign-in
-      test by the owner.*
+      account deletion, Free plan on signup. Verified: unit + browser e2e, Gmail SMTP, real
+      Google sign-in by the owner (2026-10-14).
 - [ ] **Phase 2 — Market data:** adapters (crypto + stocks), asset catalog, search, quotes,
       history, caching; asset detail screen with charts.
 - [ ] **Phase 3 — Watchlists & live:** watchlists, subscriptions, WebSocket live prices, alerts.
@@ -248,7 +247,9 @@ are allowed and the button renders (verified 2026-10-14).
    "Stock Adviser", support email).
 2. *Credentials → Create OAuth client ID → Web application*. Authorized JavaScript origins:
    `http://localhost` **and** `http://localhost:8210` (dev), later the production domain.
-   Dev is opened via VS Code port forwarding of 8210 + 8200, so the origin stays `localhost`.
+   Dev is opened via VS Code port forwarding of 8210 + 8200. **Open `http://localhost:8210`,
+   not `127.0.0.1:8210`** (VS Code's "Open in Browser" uses 127.0.0.1) — otherwise Google
+   answers `Error 400: origin_mismatch`.
 3. Later for Android: another OAuth client of type *Android* with package
    `com.universalstockadvisor.stock_adviser` and the signing key's SHA-1.
 4. Backend `.env`: `GOOGLE_CLIENT_IDS=["<web-client-id>"]` (add the Android id later).
