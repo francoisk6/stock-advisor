@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     cors_origins: list[str] = Field(
         default_factory=lambda: ["http://localhost:8210", "http://127.0.0.1:8210"]
     )
+    # Dev convenience: also accept origins matching this regex (e.g. the server's LAN IP).
+    cors_origin_regex: str | None = None
 
     # Auth
     jwt_secret: str = ""

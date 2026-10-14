@@ -9,7 +9,9 @@ import '../../../core/config/app_config.dart';
 class GoogleSignInService {
   Future<void>? _init;
 
-  bool get enabled => AppConfig.googleWebClientId.isNotEmpty;
+  bool get enabled =>
+      AppConfig.googleWebClientId.isNotEmpty &&
+      AppConfig.googleSignInAllowedHere;
 
   Future<void> ensureInitialized() {
     return _init ??= GoogleSignIn.instance.initialize(

@@ -35,7 +35,8 @@ cyberia/idm/sodetel/terranet bot workers, mailbot). Stock Adviser must never deg
 - Ports: never use 80, 8000, 8008, 8080, 8100, 3306. Our range is **8200–8299**:
   backend API `8200`, Flutter web dev `8210`, SearXNG `8220`, e2e API/web `8290`/`8291`.
   Ollama stays on `127.0.0.1:11434`.
-  Bind dev services to `127.0.0.1` only.
+  Dev services bind to `127.0.0.1` by default; use `0.0.0.0` only for LAN testing (see
+  "LAN access"). `0.0.0.0` also exposes them on the WireGuard interface (10.0.0.2).
 - Resource limits (14 GB RAM, 8 cores, shared):
   - Ollama: `OLLAMA_MAX_LOADED_MODELS=1`, `OLLAMA_NUM_PARALLEL=1`, short `OLLAMA_KEEP_ALIVE`
     (e.g. 5m) so the model unloads when idle, limited threads (≤4), run at low priority
@@ -280,6 +281,15 @@ are allowed and the button renders (verified 2026-10-14).
    Frontend: `--dart-define=GOOGLE_WEB_CLIENT_ID=<web-client-id>`. Without it the Google button
    is hidden and everything else works.
 
+## LAN access (open the dev app by IP, e.g. http://192.168.150.101:8210)
+
+- Start both servers with `--host 0.0.0.0` / `--web-hostname 0.0.0.0` (commands below).
+- Web builds without `API_BASE_URL` call port 8200 on the host the page came from.
+- Backend accepts LAN origins via `CORS_ORIGIN_REGEX` in `.env` (dev only).
+- Plain `http://IP` is not a browser "secure context": tokens fall back from secure storage to
+  normal browser storage (`TokenStore`), and the Google button is hidden (Google rejects IP
+  origins). Email links still use `FRONTEND_URL` (localhost).
+
 ## Commands
 
 ```bash
@@ -289,6 +299,7 @@ cd backend && virtualenv .venv && .venv/bin/pip install -e ".[dev]"
 
 # --- backend (from backend/) ---
 .venv/bin/uvicorn app.main:app --reload --host 127.0.0.1 --port 8200   # docs: /docs
+.venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8200     # + LAN access
 .venv/bin/pytest -q
 .venv/bin/ruff check . && .venv/bin/ruff format .
 .venv/bin/alembic revision --autogenerate -m "describe change"        # then REVIEW the file
@@ -298,6 +309,8 @@ cd backend && virtualenv .venv && .venv/bin/pip install -e ".[dev]"
 # --- frontend (from frontend/) ---
 flutter run -d web-server --web-hostname 127.0.0.1 --web-port 8210 \
   --dart-define=GOOGLE_WEB_CLIENT_ID=<id>   # optional; same id as GOOGLE_CLIENT_IDS
+flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8210 \
+  --dart-define=GOOGLE_WEB_CLIENT_ID=<id>   # + LAN access (Google only via localhost)
 flutter build web --dart-define=GOOGLE_WEB_CLIENT_ID=<id>
 
 # --- end-to-end (from repo root; own ports 8290/8291, safe while dev servers run) ---
