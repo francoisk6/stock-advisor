@@ -285,5 +285,92 @@
   "statAllTimeHighHelp": "The highest price this asset has ever reached.",
   "statFromAllTimeHigh": "From all-time high",
   "statFromAllTimeHighHelp": "How far today's price is from its highest price ever. −50% means it is at half its peak.",
-  "errorNotAvailable": "This feature isn't available on the server yet. Please try again later."
+  "errorNotAvailable": "This feature isn't available on the server yet. Please try again later.",
+  "watchlistTitle": "Your watchlist",
+  "watchlistEmpty": "Tap ☆ on any stock, coin or currency to follow it here.",
+  "watchlistAdd": "Add to watchlist",
+  "watchlistRemove": "Remove from watchlist",
+  "watchlistAdded": "Added to your watchlist.",
+  "watchlistRemoved": "Removed from your watchlist.",
+  "notificationsTitle": "Notifications",
+  "notificationsEmpty": "No notifications yet. Create a price alert on any asset and we'll let you know here.",
+  "markAllRead": "Mark all as read",
+  "viewAction": "View",
+  "unreadBadge": "{count} unread",
+  "@unreadBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertsTitle": "Price alerts",
+  "alertsIntro": "Alerts let you follow prices without watching the screen all day.",
+  "alertsEmpty": "You have no alerts yet. Open any asset and tap “Create alert”.",
+  "alertCreate": "Create alert",
+  "alertKindPriceAbove": "Price goes above",
+  "alertKindPriceBelow": "Price goes below",
+  "alertKindMoveUp": "Rises by % in a day",
+  "alertKindMoveDown": "Falls by % in a day",
+  "alertDescPriceAbove": "Price goes above {price}",
+  "@alertDescPriceAbove": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDescPriceBelow": "Price goes below {price}",
+  "@alertDescPriceBelow": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDescMoveUp": "Rises {percent} or more in a day",
+  "@alertDescMoveUp": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDescMoveDown": "Falls {percent} or more in a day",
+  "@alertDescMoveDown": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "alertTargetPrice": "Target price",
+  "alertDailyMove": "Daily move (%)",
+  "alertCurrentPrice": "Current price: {price}",
+  "@alertCurrentPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "alertEmail": "Also send me an email",
+  "alertEmailUnverified": "Confirm your email address to get alerts by email.",
+  "alertOneShotNote": "Price alerts switch off after they fire once.",
+  "alertMoveNote": "Daily-move alerts can fire at most once per day.",
+  "alertCreated": "Alert created. We'll let you know.",
+  "alertDeleted": "Alert deleted.",
+  "alertOn": "Alert on",
+  "alertOffLabel": "Switched off",
+  "alertLastFired": "Last fired {date}",
+  "@alertLastFired": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDelete": "Delete alert",
+  "alertThresholdInvalid": "Please enter a number greater than zero.",
+  "profileAlertsSection": "Alerts & notifications"
 }

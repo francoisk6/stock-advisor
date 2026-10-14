@@ -57,12 +57,23 @@ def _with_currency(quote: Quote, asset: Asset) -> Quote:
     return quote
 
 
-async def quotes_for(assets: list[Asset]) -> dict[int, Quote | None]:
-    """Latest quotes, one upstream call per provider for whatever isn't cached."""
+# Fresher prices for screens that are open right now (live updates), per provider:
+# CoinGecko's keyless limits are tight, Yahoo tolerates more.
+LIVE_QUOTE_TTL = {"yahoo": 15, "coingecko": 30}
+
+
+async def quotes_for(
+    assets: list[Asset], max_age: dict[str, float] | None = None
+) -> dict[int, Quote | None]:
+    """Latest quotes, one upstream call per provider for whatever isn't cached.
+
+    `max_age` (seconds per provider) overrides the default 60 s freshness.
+    """
     result: dict[int, Quote | None] = {}
     by_provider: dict[str, list[Asset]] = {}
     for asset in assets:
-        cached = cache.peek(f"q:{asset.provider}:{asset.provider_symbol}", QUOTE_TTL)
+        ttl = (max_age or {}).get(asset.provider, QUOTE_TTL)
+        cached = cache.peek(f"q:{asset.provider}:{asset.provider_symbol}", ttl)
         if cached is not None:
             result[asset.id] = cached
         else:
@@ -96,7 +107,11 @@ async def details_for(session: AsyncSession, asset: Asset) -> Details:
             lambda: _provider(asset).details(asset.provider_symbol),
         )
     except ProviderError as exc:
-        raise MarketDataUnavailable(UNAVAILABLE) from exc
+        # Degrade instead of failing: a recent price is still useful without key figures.
+        last_quote = cache.peek(f"q:{asset.provider}:{asset.provider_symbol}", STALE_SECONDS)
+        if last_quote is None:
+            raise MarketDataUnavailable(UNAVAILABLE) from exc
+        return Details(quote=last_quote, stats=[])
     if details.quote is not None:
         if details.quote.currency and not asset.currency:
             asset.currency = details.quote.currency  # search hits arrive without a currency

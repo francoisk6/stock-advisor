@@ -8,11 +8,14 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.errors import register_error_handlers
 from app.db.session import engine
+from app.jobs import runner
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    tasks = runner.start()
     yield
+    await runner.stop(tasks)
     await engine.dispose()
 
 

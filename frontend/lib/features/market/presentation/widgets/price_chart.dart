@@ -46,6 +46,7 @@ class PriceChart extends StatelessWidget {
     minY -= pad == 0 ? minY.abs() * 0.01 + 1e-9 : pad;
     maxY += pad == 0 ? maxY.abs() * 0.01 + 1e-9 : pad;
     final maxX = (candles.length - 1).toDouble();
+    final labelStep = math.max(1, (maxX / 3).floor());
 
     String price(double v) => formatPrice(v, history.currency, forex: forex);
 
@@ -75,10 +76,15 @@ class PriceChart extends StatelessWidget {
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 28,
-          interval: math.max(1, (maxX / 3).floorToDouble()),
+          interval: labelStep.toDouble(),
           getTitlesWidget: (value, meta) {
             final i = value.round();
-            if (i < 0 || i >= candles.length || value != i.toDouble()) {
+            // fl_chart also asks for a label at the very end; skipping it avoids two
+            // labels drawn on top of each other.
+            if (i < 0 ||
+                i >= candles.length ||
+                value != i.toDouble() ||
+                i % labelStep != 0) {
               return const SizedBox.shrink();
             }
             return SideTitleWidget(

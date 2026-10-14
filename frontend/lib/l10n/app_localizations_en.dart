@@ -714,4 +714,140 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorNotAvailable =>
       'This feature isn\'t available on the server yet. Please try again later.';
+
+  @override
+  String get watchlistTitle => 'Your watchlist';
+
+  @override
+  String get watchlistEmpty =>
+      'Tap ☆ on any stock, coin or currency to follow it here.';
+
+  @override
+  String get watchlistAdd => 'Add to watchlist';
+
+  @override
+  String get watchlistRemove => 'Remove from watchlist';
+
+  @override
+  String get watchlistAdded => 'Added to your watchlist.';
+
+  @override
+  String get watchlistRemoved => 'Removed from your watchlist.';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get notificationsEmpty =>
+      'No notifications yet. Create a price alert on any asset and we\'ll let you know here.';
+
+  @override
+  String get markAllRead => 'Mark all as read';
+
+  @override
+  String get viewAction => 'View';
+
+  @override
+  String unreadBadge(int count) {
+    return '$count unread';
+  }
+
+  @override
+  String get alertsTitle => 'Price alerts';
+
+  @override
+  String get alertsIntro =>
+      'Alerts let you follow prices without watching the screen all day.';
+
+  @override
+  String get alertsEmpty =>
+      'You have no alerts yet. Open any asset and tap “Create alert”.';
+
+  @override
+  String get alertCreate => 'Create alert';
+
+  @override
+  String get alertKindPriceAbove => 'Price goes above';
+
+  @override
+  String get alertKindPriceBelow => 'Price goes below';
+
+  @override
+  String get alertKindMoveUp => 'Rises by % in a day';
+
+  @override
+  String get alertKindMoveDown => 'Falls by % in a day';
+
+  @override
+  String alertDescPriceAbove(String price) {
+    return 'Price goes above $price';
+  }
+
+  @override
+  String alertDescPriceBelow(String price) {
+    return 'Price goes below $price';
+  }
+
+  @override
+  String alertDescMoveUp(String percent) {
+    return 'Rises $percent or more in a day';
+  }
+
+  @override
+  String alertDescMoveDown(String percent) {
+    return 'Falls $percent or more in a day';
+  }
+
+  @override
+  String get alertTargetPrice => 'Target price';
+
+  @override
+  String get alertDailyMove => 'Daily move (%)';
+
+  @override
+  String alertCurrentPrice(String price) {
+    return 'Current price: $price';
+  }
+
+  @override
+  String get alertEmail => 'Also send me an email';
+
+  @override
+  String get alertEmailUnverified =>
+      'Confirm your email address to get alerts by email.';
+
+  @override
+  String get alertOneShotNote =>
+      'Price alerts switch off after they fire once.';
+
+  @override
+  String get alertMoveNote =>
+      'Daily-move alerts can fire at most once per day.';
+
+  @override
+  String get alertCreated => 'Alert created. We\'ll let you know.';
+
+  @override
+  String get alertDeleted => 'Alert deleted.';
+
+  @override
+  String get alertOn => 'Alert on';
+
+  @override
+  String get alertOffLabel => 'Switched off';
+
+  @override
+  String alertLastFired(String date) {
+    return 'Last fired $date';
+  }
+
+  @override
+  String get alertDelete => 'Delete alert';
+
+  @override
+  String get alertThresholdInvalid =>
+      'Please enter a number greater than zero.';
+
+  @override
+  String get profileAlertsSection => 'Alerts & notifications';
 }

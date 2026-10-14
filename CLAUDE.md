@@ -108,6 +108,20 @@ Implemented (Phase 2) in `backend/app/market_data/`:
   10 min), one fetch per key at a time, last good value served for 6 h if a source fails.
   Persisted daily bars come with the Phase 5 ingest jobs.
 - Yahoo calls are blocking → `asyncio.to_thread` behind a semaphore of 2 (shared server).
+- CoinGecko keyless is the tightest limit: after a 429 the provider stops calling for ~60 s
+  (cooldown) and stale cache is served; a coin's market data from any batch call answers its
+  detail page for 60 s; details fall back to the last known price instead of a 503.
+
+### Live updates & background jobs (Phase 3)
+- `app/realtime/hub.py`: one WebSocket per open app at `/api/v1/ws` (protocol in the module
+  docstring): first message authenticates, then `subscribe` to asset ids; server pushes changed
+  quotes (`LIVE_PRICE_SECONDS`, provider TTL 15 s Yahoo / 30 s CoinGecko) and notifications.
+- `app/jobs/runner.py`: in-process loops started in the FastAPI lifespan — alert check every
+  `ALERT_CHECK_SECONDS` (60) and live price push. **Requires a single API worker**; move to a
+  separate worker process (and a shared pub/sub) before scaling out. `BACKGROUND_JOBS=false`
+  in tests (they call `run_alert_check()` directly).
+- Alerts (`app/services/alerts.py`): price_above/below fire once then switch off; move_up/down
+  at most once per UTC day. In-app notification always; email only to confirmed addresses.
 
 Markets are **global and driven by user interest** — no hard-coded exchange list. The asset
 catalog stores exchange, country, currency, and asset type; adapters are chosen per asset.
@@ -178,7 +192,10 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       (crypto) adapters, curated catalog (78 assets, all regions), search, quotes, details, history
       (1D–5Y), shared cache with stale fallback; home "Popular in your markets", search screen,
       asset page with line/candle charts and explained key figures. Verified unit + live e2e.
-- [ ] **Phase 3 — Watchlists & live:** watchlists, subscriptions, WebSocket live prices, alerts.
+- [x] **Phase 3 — Watchlists & live:** watchlist (☆ on asset page, Home section), price alerts
+      (above/below one-shot, daily move once/day) delivered in-app + email (confirmed emails
+      only), notifications inbox + bell badge, WebSocket for live prices + instant alert
+      pop-ups, Free-plan limits enforced. Verified unit + live e2e. Push notifications: Android phase.
 - [ ] **Phase 4 — AI copilot v1:** Ollama provider, tool calling, agent loop, streaming chat,
       app-action tools, guardrails + disclaimer.
 - [ ] **Phase 5 — Daily insights:** news ingestion, SearXNG web search, batch digest
@@ -252,7 +269,11 @@ stock-advisor-dev/
 - Up/down prices: always arrow + sign + color (`PriceChange`, `changeColor`) — never color only.
   Currencies: `$ € £ ¥ ₹` symbols, otherwise the code ("SAR 25.78") via `core/format/numbers.dart`.
 - Every key figure needs a plain-language explanation (`statText` in `market/presentation/labels.dart`).
-- Section titles use `Semantics(header: true)`; decorative avatars use `ExcludeSemantics`.
+- Section titles use `Semantics(header: true, container: true)` — without `container` Flutter
+  merges the heading with the text next to it. Decorative avatars use `ExcludeSemantics`.
+- Live prices: wrap screens in `LiveInterest(name, assetIds)` and read prices with
+  `liveQuote(ref, asset)`; `LiveController` owns the socket (reconnect + token refresh).
+- Messages: `showSnack(messenger, text)` replaces the current SnackBar (no queueing).
 
 ## Environment (dev machine)
 - Ubuntu 22.04, Python 3.10, Flutter 3.41 at `/opt/flutter`, MySQL 8.0 (shared with evolution).
@@ -315,6 +336,9 @@ flutter build web --dart-define=GOOGLE_WEB_CLIENT_ID=<id>
 
 # --- end-to-end (from repo root; own ports 8290/8291, safe while dev servers run) ---
 bash e2e/run.sh            # SKIP_BUILD=1 reuses the build; E2E_TESTS=test_market_flow.py
+                           # (backend runs with ALERT_CHECK_SECONDS=3 for the alerts flow)
+# e2e text checks: use helpers.wait_for_text — Flutter merges neighbouring texts into one label;
+# while the mouse hovers a button its tooltip text is appended to the button's name.
 flutter analyze && flutter test
 nice -n 19 flutter build web        # low priority: shared server
 ```
@@ -335,3 +359,5 @@ nice -n 19 flutter build web        # low priority: shared server
 - 2026-10-14 — Phase 2: Yahoo (yfinance) for non-crypto in dev despite ToS (swap before Pro);
   CoinGecko keyless for crypto (1Y max history). Prices cached in memory, not stored yet.
   Market endpoints require sign-in (protects free API quotas).
+- 2026-10-15 — Phase 3: alerts in-app + email now; phone push with Firebase in the Android
+  phase. Background jobs run inside the API process (single worker) for now.

@@ -216,3 +216,20 @@ async def test_search_ranks_exact_and_name_matches_first(
     ]
     hits = (await client.get("/assets/search", params={"q": "nvidia"}, headers=bearer(user))).json()
     assert [h["symbol"] for h in hits] == ["NVDA", "NVD.DE", "NVDX"]
+
+
+async def test_detail_degrades_to_last_price_when_source_fails(
+    client: AsyncClient, user: dict, fake_providers: dict
+) -> None:
+    await onboard(client, user, assets=["crypto"], regions=["global"])
+    await client.get("/assets/popular", headers=bearer(user))  # caches quotes
+    btc = await _asset_id(client, user, "btc")
+    fake_providers["coingecko"].fail = True
+
+    response = await client.get(f"/assets/{btc}", headers=bearer(user))
+    assert response.status_code == 200
+    assert response.json()["quote"]["price"] == 110.0
+    assert response.json()["stats"] == []
+
+    service.cache.clear()  # nothing known at all -> friendly 503
+    assert (await client.get(f"/assets/{btc}", headers=bearer(user))).status_code == 503

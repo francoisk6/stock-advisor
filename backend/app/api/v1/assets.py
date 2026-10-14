@@ -18,11 +18,12 @@ from app.schemas.market import (
     QuoteOut,
     StatOut,
 )
+from app.services import watchlist as watchlist_service
 
 router = APIRouter(prefix="/assets", tags=["assets"])
 
 
-def _quote_out(quote: Quote | None) -> QuoteOut | None:
+def quote_out(quote: Quote | None) -> QuoteOut | None:
     if quote is None:
         return None
     return QuoteOut(
@@ -36,7 +37,16 @@ def _quote_out(quote: Quote | None) -> QuoteOut | None:
     )
 
 
-async def _get_asset(session: SessionDep, asset_id: int) -> Asset:
+def with_quotes(assets: list[Asset], quotes: dict[int, Quote | None]) -> list[AssetWithQuoteOut]:
+    return [
+        AssetWithQuoteOut(
+            **AssetOut.model_validate(a).model_dump(), quote=quote_out(quotes.get(a.id))
+        )
+        for a in assets
+    ]
+
+
+async def get_asset(session: SessionDep, asset_id: int) -> Asset:
     asset = await assets_repo.get(session, asset_id)
     if asset is None:
         raise NotFoundError("We couldn't find this asset.")
@@ -60,22 +70,17 @@ async def popular_assets(
     type: AssetType | None = None,  # noqa: A002 - public query parameter name
 ) -> list[AssetWithQuoteOut]:
     assets = await service.popular_for(session, user.profile, type)
-    quotes = await service.quotes_for(assets)
-    return [
-        AssetWithQuoteOut(
-            **AssetOut.model_validate(a).model_dump(), quote=_quote_out(quotes.get(a.id))
-        )
-        for a in assets
-    ]
+    return with_quotes(assets, await service.quotes_for(assets))
 
 
 @router.get("/{asset_id}", response_model=AssetDetailOut)
 async def asset_detail(asset_id: int, user: CurrentUser, session: SessionDep) -> AssetDetailOut:
-    asset = await _get_asset(session, asset_id)
+    asset = await get_asset(session, asset_id)
     details = await service.details_for(session, asset)
     return AssetDetailOut(
         **AssetOut.model_validate(asset).model_dump(),
-        quote=_quote_out(details.quote),
+        quote=quote_out(details.quote),
+        in_watchlist=await watchlist_service.contains(session, user, asset.id),
         stats=[StatOut(key=s.key, value=s.value, unit=s.unit) for s in details.stats],
         description=details.description,
         ranges=[r.value for r in service.ranges_for(asset)],
@@ -90,7 +95,7 @@ async def asset_history(
     session: SessionDep,
     range: Range = Range.m1,  # noqa: A002 - public query parameter name
 ) -> HistoryOut:
-    asset = await _get_asset(session, asset_id)
+    asset = await get_asset(session, asset_id)
     candles = await service.history_for(asset, range)
     return HistoryOut(
         range=range.value,

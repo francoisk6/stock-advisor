@@ -41,6 +41,9 @@ void main() {
   });
 
   testWidgets('home greets the user and lists popular assets', (tester) async {
+    tester.view.physicalSize = const Size(900, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     await pumpApp(
       tester,
       AuthState.authenticated(testUser(interests: ['stocks', 'crypto'])),

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stock_adviser/app.dart';
 import 'package:stock_adviser/features/auth/application/auth_controller.dart';
@@ -7,6 +8,9 @@ import 'package:stock_adviser/features/auth/domain/user.dart';
 import 'package:stock_adviser/features/health/data/health_repository.dart';
 import 'package:stock_adviser/features/market/data/market_api.dart';
 import 'package:stock_adviser/features/market/domain/market.dart';
+import 'package:stock_adviser/features/notifications/data/notifications_api.dart';
+import 'package:stock_adviser/features/notifications/domain/app_notification.dart';
+import 'package:stock_adviser/features/watchlist/data/watchlist_api.dart';
 
 User testUser({
   bool onboarded = true,
@@ -34,6 +38,46 @@ User testUser({
   'plan': {'code': 'free', 'name': 'Free', 'limits': <String, dynamic>{}},
 });
 
+class FakeWatchlistController extends WatchlistController {
+  FakeWatchlistController(this.items);
+
+  final List<Asset> items;
+
+  @override
+  Future<Watchlist> build() async =>
+      Watchlist(name: 'My watchlist', limit: 25, items: items);
+
+  @override
+  Future<void> add(int assetId) async => state = AsyncData(
+    Watchlist(
+      name: 'My watchlist',
+      limit: 25,
+      items: [
+        ...items,
+        testAsset(id: assetId),
+      ],
+    ),
+  );
+
+  @override
+  Future<void> remove(int assetId) async => state = AsyncData(
+    Watchlist(
+      name: 'My watchlist',
+      limit: 25,
+      items: items.where((a) => a.id != assetId).toList(),
+    ),
+  );
+}
+
+class FakeNotificationsController extends NotificationsController {
+  FakeNotificationsController(this.inbox);
+
+  final NotificationInbox inbox;
+
+  @override
+  Future<NotificationInbox> build() async => inbox;
+}
+
 /// Auth controller with a fixed starting state and no network/storage access.
 class FakeAuthController extends AuthController {
   FakeAuthController(this._initial);
@@ -49,10 +93,19 @@ Future<void> pumpApp(
   AuthState auth, {
   List overrides = const [],
   List<Asset> popular = const [],
+  List<Asset> watchlist = const [],
+  NotificationInbox inbox = const NotificationInbox(unreadCount: 0, items: []),
 }) async {
   await tester.pumpWidget(
     ProviderScope(
+      retry: (_, _) => null, // no background retries (pending timers) in tests
       overrides: [
+        watchlistProvider.overrideWith(
+          () => FakeWatchlistController(watchlist),
+        ),
+        notificationsProvider.overrideWith(
+          () => FakeNotificationsController(inbox),
+        ),
         authControllerProvider.overrideWith(() => FakeAuthController(auth)),
         healthStatusProvider.overrideWith(
           (ref) async => const HealthStatus(status: 'ok', environment: 'test'),
@@ -102,3 +155,9 @@ Asset testAsset({
           'market_open': true,
         },
 });
+
+/// In-memory secure storage for tests.
+class FakeSecureStorage implements FlutterSecureStorage {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => Future<void>.value();
+}

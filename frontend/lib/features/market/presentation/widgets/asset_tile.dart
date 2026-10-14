@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/format/numbers.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../live/live_controller.dart';
 import '../../domain/market.dart';
 import '../labels.dart';
 import 'asset_avatar.dart';
 import 'price_change.dart';
 
-class AssetTile extends StatelessWidget {
+class AssetTile extends ConsumerWidget {
   const AssetTile({super.key, required this.asset, required this.onTap});
 
   final Asset asset;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final quote = asset.quote;
+    final quote = liveQuote(ref, asset);
     final subtitle = assetSubtitle(l10n, asset);
 
     return ListTile(

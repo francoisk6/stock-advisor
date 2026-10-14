@@ -36,6 +36,11 @@ RANGE_DAYS: dict[Range, int] = {
 
 # Space out calls; the keyless API rate-limits aggressively.
 MIN_INTERVAL_SECONDS = 1.5
+# After a 429, stop calling for a while: retrying only extends the block.
+RATE_LIMIT_COOLDOWN_SECONDS = 60
+MAX_COOLDOWN_SECONDS = 120
+# A coin's full market data from any batch call also answers its detail page for this long.
+MARKETS_REUSE_SECONDS = 60
 
 
 def _utc_ms(ms: float) -> datetime:
@@ -119,8 +124,12 @@ class CoinGeckoProvider:
     def __init__(self) -> None:
         self._lock = asyncio.Lock()
         self._last_call = 0.0
+        self._cooldown_until = 0.0
+        self._markets: dict[str, tuple[float, Details]] = {}
 
     async def _get(self, path: str, params: dict[str, Any]) -> Any:
+        if time.monotonic() < self._cooldown_until:
+            raise ProviderError("CoinGecko rate limit reached (cooling down)")
         async with self._lock:
             wait = MIN_INTERVAL_SECONDS - (time.monotonic() - self._last_call)
             if wait > 0:
@@ -133,6 +142,11 @@ class CoinGeckoProvider:
             finally:
                 self._last_call = time.monotonic()
         if response.status_code == 429:
+            try:
+                wait = float(response.headers.get("retry-after", RATE_LIMIT_COOLDOWN_SECONDS))
+            except ValueError:
+                wait = RATE_LIMIT_COOLDOWN_SECONDS
+            self._cooldown_until = time.monotonic() + min(max(wait, 1), MAX_COOLDOWN_SECONDS)
             raise ProviderError("CoinGecko rate limit reached")
         if response.status_code >= 400:
             raise ProviderError(f"CoinGecko error {response.status_code}")
@@ -143,7 +157,10 @@ class CoinGeckoProvider:
             "/coins/markets",
             {"vs_currency": VS_CURRENCY, "ids": ",".join(ids), "per_page": 250},
         )
-        return {item["id"]: parse_market(item) for item in payload}
+        markets = {item["id"]: parse_market(item) for item in payload}
+        now = time.monotonic()
+        self._markets.update({coin: (now, details) for coin, details in markets.items()})
+        return markets
 
     async def quotes(self, symbols: list[str]) -> dict[str, Quote]:
         if not symbols:
@@ -152,6 +169,9 @@ class CoinGeckoProvider:
         return {coin: d.quote for coin, d in markets.items() if d.quote is not None}
 
     async def details(self, symbol: str) -> Details:
+        recent = self._markets.get(symbol)
+        if recent and time.monotonic() - recent[0] < MARKETS_REUSE_SECONDS:
+            return recent[1]  # e.g. fetched moments ago for the popular list
         markets = await self.markets([symbol])
         if symbol not in markets:
             raise ProviderError(f"No data for {symbol}")

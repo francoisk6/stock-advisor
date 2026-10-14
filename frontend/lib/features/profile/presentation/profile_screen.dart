@@ -123,6 +123,23 @@ class ProfileScreen extends ConsumerWidget {
                 ],
               ),
               _Section(
+                title: l10n.profileAlertsSection,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.notifications_active_outlined),
+                    title: Text(l10n.alertsTitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.go('/alerts'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.inbox_outlined),
+                    title: Text(l10n.notificationsTitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.go('/notifications'),
+                  ),
+                ],
+              ),
+              _Section(
                 title: l10n.profileSecurity,
                 children: [
                   ListTile(

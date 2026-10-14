@@ -141,3 +141,47 @@ def test_coingecko_search_keeps_ranked_coins_only() -> None:
         }
     )
     assert [f.symbol for f in found] == ["BTC", "DOGE"]
+
+
+class _FakeResponse:
+    def __init__(self, status: int, payload: object = None, headers: dict | None = None):
+        self.status_code = status
+        self._payload = payload
+        self.headers = headers or {}
+
+    def json(self) -> object:
+        return self._payload
+
+
+async def test_coingecko_cools_down_after_rate_limit_and_reuses_batches(monkeypatch) -> None:
+    calls: list[str] = []
+    responses: list[_FakeResponse] = []
+
+    class FakeClient:
+        def __init__(self, **_: object) -> None: ...
+
+        async def __aenter__(self) -> "FakeClient":
+            return self
+
+        async def __aexit__(self, *_: object) -> None: ...
+
+        async def get(self, path: str, params: dict) -> _FakeResponse:
+            calls.append(path)
+            return responses.pop(0)
+
+    monkeypatch.setattr(coingecko.httpx, "AsyncClient", FakeClient)
+    monkeypatch.setattr(coingecko, "MIN_INTERVAL_SECONDS", 0)
+    provider = coingecko.CoinGeckoProvider()
+    market = {"id": "bitcoin", "current_price": 100.0, "price_change_24h": 1.0}
+
+    responses.append(_FakeResponse(200, [market]))
+    await provider.quotes(["bitcoin"])
+    details = await provider.details("bitcoin")  # served from the batch, no new call
+    assert details.quote.price == 100.0 and calls == ["/coins/markets"]
+
+    responses.append(_FakeResponse(429, headers={"retry-after": "30"}))
+    with pytest.raises(ProviderError):
+        await provider.history("bitcoin", coingecko.Range.d1)
+    with pytest.raises(ProviderError):  # cooling down: no request sent at all
+        await provider.history("bitcoin", coingecko.Range.d1)
+    assert calls == ["/coins/markets", "/coins/bitcoin/ohlc"]

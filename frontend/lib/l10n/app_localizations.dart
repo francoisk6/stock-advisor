@@ -1395,6 +1395,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This feature isn\'t available on the server yet. Please try again later.'**
   String get errorNotAvailable;
+
+  /// No description provided for @watchlistTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your watchlist'**
+  String get watchlistTitle;
+
+  /// No description provided for @watchlistEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap ☆ on any stock, coin or currency to follow it here.'**
+  String get watchlistEmpty;
+
+  /// No description provided for @watchlistAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to watchlist'**
+  String get watchlistAdd;
+
+  /// No description provided for @watchlistRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from watchlist'**
+  String get watchlistRemove;
+
+  /// No description provided for @watchlistAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to your watchlist.'**
+  String get watchlistAdded;
+
+  /// No description provided for @watchlistRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from your watchlist.'**
+  String get watchlistRemoved;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsTitle;
+
+  /// No description provided for @notificationsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet. Create a price alert on any asset and we\'ll let you know here.'**
+  String get notificationsEmpty;
+
+  /// No description provided for @markAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get markAllRead;
+
+  /// No description provided for @viewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get viewAction;
+
+  /// No description provided for @unreadBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread'**
+  String unreadBadge(int count);
+
+  /// No description provided for @alertsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Price alerts'**
+  String get alertsTitle;
+
+  /// No description provided for @alertsIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts let you follow prices without watching the screen all day.'**
+  String get alertsIntro;
+
+  /// No description provided for @alertsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no alerts yet. Open any asset and tap “Create alert”.'**
+  String get alertsEmpty;
+
+  /// No description provided for @alertCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create alert'**
+  String get alertCreate;
+
+  /// No description provided for @alertKindPriceAbove.
+  ///
+  /// In en, this message translates to:
+  /// **'Price goes above'**
+  String get alertKindPriceAbove;
+
+  /// No description provided for @alertKindPriceBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'Price goes below'**
+  String get alertKindPriceBelow;
+
+  /// No description provided for @alertKindMoveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Rises by % in a day'**
+  String get alertKindMoveUp;
+
+  /// No description provided for @alertKindMoveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Falls by % in a day'**
+  String get alertKindMoveDown;
+
+  /// No description provided for @alertDescPriceAbove.
+  ///
+  /// In en, this message translates to:
+  /// **'Price goes above {price}'**
+  String alertDescPriceAbove(String price);
+
+  /// No description provided for @alertDescPriceBelow.
+  ///
+  /// In en, this message translates to:
+  /// **'Price goes below {price}'**
+  String alertDescPriceBelow(String price);
+
+  /// No description provided for @alertDescMoveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Rises {percent} or more in a day'**
+  String alertDescMoveUp(String percent);
+
+  /// No description provided for @alertDescMoveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Falls {percent} or more in a day'**
+  String alertDescMoveDown(String percent);
+
+  /// No description provided for @alertTargetPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Target price'**
+  String get alertTargetPrice;
+
+  /// No description provided for @alertDailyMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily move (%)'**
+  String get alertDailyMove;
+
+  /// No description provided for @alertCurrentPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Current price: {price}'**
+  String alertCurrentPrice(String price);
+
+  /// No description provided for @alertEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Also send me an email'**
+  String get alertEmail;
+
+  /// No description provided for @alertEmailUnverified.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your email address to get alerts by email.'**
+  String get alertEmailUnverified;
+
+  /// No description provided for @alertOneShotNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Price alerts switch off after they fire once.'**
+  String get alertOneShotNote;
+
+  /// No description provided for @alertMoveNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily-move alerts can fire at most once per day.'**
+  String get alertMoveNote;
+
+  /// No description provided for @alertCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert created. We\'ll let you know.'**
+  String get alertCreated;
+
+  /// No description provided for @alertDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert deleted.'**
+  String get alertDeleted;
+
+  /// No description provided for @alertOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert on'**
+  String get alertOn;
+
+  /// No description provided for @alertOffLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Switched off'**
+  String get alertOffLabel;
+
+  /// No description provided for @alertLastFired.
+  ///
+  /// In en, this message translates to:
+  /// **'Last fired {date}'**
+  String alertLastFired(String date);
+
+  /// No description provided for @alertDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete alert'**
+  String get alertDelete;
+
+  /// No description provided for @alertThresholdInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a number greater than zero.'**
+  String get alertThresholdInvalid;
+
+  /// No description provided for @profileAlertsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts & notifications'**
+  String get profileAlertsSection;
 }
 
 class _AppLocalizationsDelegate

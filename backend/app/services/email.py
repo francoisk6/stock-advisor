@@ -135,3 +135,20 @@ def password_reset_email(to: str, name: str, url: str) -> OutgoingEmail:
             "If you didn't ask for this, you can safely ignore this email.</p>",
         ),
     )
+
+
+def alert_email(to: str, name: str, title: str, body: str, url: str) -> OutgoingEmail:
+    greeting = f"Hi {name}," if name else "Hi,"
+    return OutgoingEmail(
+        to=to,
+        subject=f"Price alert: {title}",
+        text=(
+            f"{greeting}\n\n{body}\n\nSee the chart: {url}\n\n"
+            "Educational information only — not financial advice."
+        ),
+        html=_layout(
+            html.escape(title),
+            f"<p>{html.escape(greeting)}</p><p>{html.escape(body)}</p>"
+            + _button(url, "See the chart"),
+        ),
+    )

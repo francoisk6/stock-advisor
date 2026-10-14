@@ -41,6 +41,7 @@ fi
 # exec: the recorded PID is uvicorn itself, so cleanup really stops it.
 (cd "$ROOT/backend" && EMAIL_BACKEND=outbox EMAIL_OUTBOX_DIR="$E2E_OUTBOX" \
   FRONTEND_URL="$E2E_BASE_URL" CORS_ORIGINS="[\"$E2E_BASE_URL\"]" \
+  ALERT_CHECK_SECONDS=3 LIVE_PRICE_SECONDS=5 \
   exec nice -n 10 .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port $API_PORT \
   >"$WORK/api.log" 2>&1) &
 PIDS+=($!)

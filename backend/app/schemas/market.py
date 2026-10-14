@@ -39,6 +39,7 @@ class StatOut(BaseModel):
 
 class AssetDetailOut(AssetOut):
     quote: QuoteOut | None
+    in_watchlist: bool
     stats: list[StatOut]
     description: str | None
     ranges: list[str]
@@ -58,3 +59,10 @@ class HistoryOut(BaseModel):
     range: str
     currency: str | None
     candles: list[CandleOut]
+
+
+class WatchlistOut(BaseModel):
+    id: int
+    name: str
+    limit: int | None
+    items: list[AssetWithQuoteOut]

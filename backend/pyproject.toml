@@ -48,3 +48,7 @@ select = ["E", "F", "W", "I", "B", "UP", "ASYNC", "SIM"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
+filterwarnings = [
+    # Starlette's TestClient (WebSocket tests) nags about its own httpx dependency.
+    "ignore:Using `httpx` with `starlette.testclient`",
+]

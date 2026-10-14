@@ -61,6 +61,11 @@ class Settings(BaseSettings):
     def smtp_use_ssl(self) -> bool:
         return self.smtp_ssl if self.smtp_ssl is not None else self.smtp_port == 465
 
+    # Background loops in the API process (single worker): alert checks and live price pushes.
+    background_jobs: bool = True
+    alert_check_seconds: int = 60
+    live_price_seconds: int = 15
+
     @cached_property
     def database_url(self) -> str:
         return (

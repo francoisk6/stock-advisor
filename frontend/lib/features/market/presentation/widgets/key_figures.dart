@@ -87,6 +87,7 @@ class KeyFiguresCard extends StatelessWidget {
             ListTile(
               title: Semantics(
                 header: true,
+                container: true,
                 child: Text(
                   l10n.keyFigures,
                   style: theme.textTheme.titleMedium,

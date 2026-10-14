@@ -3,9 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/errors/api_error.dart';
+import '../../../core/widgets/snack.dart';
 import '../../../core/format/numbers.dart';
 import '../../../core/widgets/error_text.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../alerts/data/alerts_api.dart';
+import '../../alerts/presentation/alert_tile.dart';
+import '../../alerts/presentation/create_alert_sheet.dart';
+import '../../live/live_controller.dart';
+import '../../live/live_interest.dart';
+import '../../watchlist/data/watchlist_api.dart';
 import '../data/market_api.dart';
 import '../domain/market.dart';
 import 'labels.dart';
@@ -34,40 +41,49 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
     final detail = ref.watch(assetDetailProvider(widget.assetId));
 
     return Scaffold(
-      appBar: AppBar(title: Text(detail.value?.asset.symbol ?? '')),
+      appBar: AppBar(
+        title: Text(detail.value?.asset.symbol ?? ''),
+        actions: [if (detail.value case final d?) _WatchlistStar(detail: d)],
+      ),
       body: detail.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => _Retry(
           message: apiErrorMessage(e, l10n),
           onRetry: () => ref.invalidate(assetDetailProvider(widget.assetId)),
         ),
-        data: (d) => RefreshIndicator(
-          onRefresh: () async {
-            ref.invalidate(assetDetailProvider(widget.assetId));
-            await ref.read(assetDetailProvider(widget.assetId).future);
-          },
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _Header(detail: d),
-                  const SizedBox(height: 16),
-                  _chartSection(context, d),
-                  const SizedBox(height: 16),
-                  KeyFiguresCard(figures: buildKeyFigures(l10n, d)),
-                  if (d.description != null) ...[
+        data: (d) => LiveInterest(
+          name: 'asset:${widget.assetId}',
+          assetIds: [widget.assetId],
+          child: RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(assetDetailProvider(widget.assetId));
+              await ref.read(assetDetailProvider(widget.assetId).future);
+            },
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _Header(detail: d),
                     const SizedBox(height: 16),
-                    _about(context, d.description!),
+                    _chartSection(context, d),
+                    const SizedBox(height: 16),
+                    _AlertsCard(asset: d.asset),
+                    const SizedBox(height: 16),
+                    KeyFiguresCard(figures: buildKeyFigures(l10n, d)),
+                    if (d.description != null) ...[
+                      const SizedBox(height: 16),
+                      _about(context, d.description!),
+                    ],
+                    const SizedBox(height: 16),
+                    Text(
+                      '${l10n.dataSourceNote(d.dataSource)}\n${l10n.disclaimer}',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                   ],
-                  const SizedBox(height: 16),
-                  Text(
-                    '${l10n.dataSourceNote(d.dataSource)}\n${l10n.disclaimer}',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -182,6 +198,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
           children: [
             Semantics(
               header: true,
+              container: true,
               child: Text(l10n.aboutTitle, style: theme.textTheme.titleMedium),
             ),
             const SizedBox(height: 8),
@@ -202,17 +219,17 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
   }
 }
 
-class _Header extends StatelessWidget {
+class _Header extends ConsumerWidget {
   const _Header({required this.detail});
 
   final AssetDetail detail;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final asset = detail.asset;
-    final quote = asset.quote;
+    final quote = liveQuote(ref, asset);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,6 +244,7 @@ class _Header extends StatelessWidget {
                 children: [
                   Semantics(
                     header: true,
+                    container: true,
                     child: Text(asset.name, style: theme.textTheme.titleLarge),
                   ),
                   Text(
@@ -306,6 +324,124 @@ class _Retry extends StatelessWidget {
           children: [
             ErrorText(message),
             OutlinedButton(onPressed: onRetry, child: Text(l10n.retry)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WatchlistStar extends ConsumerStatefulWidget {
+  const _WatchlistStar({required this.detail});
+
+  final AssetDetail detail;
+
+  @override
+  ConsumerState<_WatchlistStar> createState() => _WatchlistStarState();
+}
+
+class _WatchlistStarState extends ConsumerState<_WatchlistStar> {
+  bool _busy = false;
+
+  Future<void> _toggle(bool watched) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final controller = ref.read(watchlistProvider.notifier);
+    setState(() => _busy = true);
+    try {
+      if (watched) {
+        await controller.remove(widget.detail.asset.id);
+      } else {
+        await controller.add(widget.detail.asset.id);
+      }
+      showSnack(
+        messenger,
+        watched ? l10n.watchlistRemoved : l10n.watchlistAdded,
+      );
+    } catch (e) {
+      showSnack(messenger, apiErrorMessage(e, l10n));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final watchlist = ref.watch(watchlistProvider).value;
+    final watched =
+        watchlist?.contains(widget.detail.asset.id) ??
+        widget.detail.inWatchlist;
+    return IconButton(
+      tooltip: watched ? l10n.watchlistRemove : l10n.watchlistAdd,
+      icon: watched
+          ? Icon(Icons.star, color: Theme.of(context).colorScheme.primary)
+          : const Icon(Icons.star_border),
+      onPressed: _busy ? null : () => _toggle(watched),
+    );
+  }
+}
+
+class _AlertsCard extends ConsumerWidget {
+  const _AlertsCard({required this.asset});
+
+  final Asset asset;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final alerts = ref.watch(alertsProvider(asset.id));
+    final price = liveQuote(ref, asset)?.price;
+
+    return Card(
+      color: theme.colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ListTile(
+              title: Semantics(
+                header: true,
+                container: true,
+                child: Text(
+                  l10n.alertsTitle,
+                  style: theme.textTheme.titleMedium,
+                ),
+              ),
+              subtitle: Text(l10n.alertsIntro),
+            ),
+            ...alerts.when(
+              loading: () => const [LinearProgressIndicator()],
+              error: (e, _) => [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ErrorText(apiErrorMessage(e, l10n)),
+                ),
+              ],
+              data: (items) => [for (final a in items) AlertTile(alert: a)],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.add_alert_outlined),
+                label: Text(l10n.alertCreate),
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  final created = await CreateAlertSheet.show(
+                    context,
+                    asset,
+                    price,
+                  );
+                  if (created == true) {
+                    ref.invalidate(alertsProvider(asset.id));
+                    ref.invalidate(alertsProvider(null));
+                    showSnack(messenger, l10n.alertCreated);
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),

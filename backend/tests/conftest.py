@@ -5,6 +5,7 @@ os.environ["ENVIRONMENT"] = "test"
 os.environ["DB_NAME"] = "stock_advisor_test"
 os.environ["EMAIL_BACKEND"] = "memory"
 os.environ["GOOGLE_CLIENT_IDS"] = '["test-client-id"]'
+os.environ["BACKGROUND_JOBS"] = "false"  # tests run alert checks / live ticks explicitly
 
 import asyncio  # noqa: E402
 import re  # noqa: E402
@@ -29,6 +30,10 @@ assert settings.db_name == "stock_advisor_test", "tests must never touch the dev
 
 # Tables reset between tests (children first); plans keep their migration seed data.
 _RESET_TABLES = [
+    "notifications",
+    "alerts",
+    "watchlist_items",
+    "watchlists",
     "email_tokens",
     "refresh_tokens",
     "oauth_accounts",

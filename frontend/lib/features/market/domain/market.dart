@@ -62,6 +62,18 @@ class Asset {
   final String? currency;
   final String? logoUrl;
   final Quote? quote;
+
+  Asset withQuote(Quote? newQuote) => Asset(
+    id: id,
+    symbol: symbol,
+    name: name,
+    assetType: assetType,
+    exchange: exchange,
+    region: region,
+    currency: currency,
+    logoUrl: logoUrl,
+    quote: newQuote,
+  );
 }
 
 class Stat {
@@ -81,6 +93,7 @@ class Stat {
 class AssetDetail {
   const AssetDetail({
     required this.asset,
+    this.inWatchlist = false,
     required this.stats,
     required this.description,
     required this.ranges,
@@ -89,6 +102,7 @@ class AssetDetail {
 
   factory AssetDetail.fromJson(Map<String, dynamic> json) => AssetDetail(
     asset: Asset.fromJson(json),
+    inWatchlist: json['in_watchlist'] as bool? ?? false,
     stats: [
       for (final s in json['stats'] as List)
         Stat.fromJson(s as Map<String, dynamic>),
@@ -99,6 +113,7 @@ class AssetDetail {
   );
 
   final Asset asset;
+  final bool inWatchlist;
   final List<Stat> stats;
   final String? description;
   final List<String> ranges;
