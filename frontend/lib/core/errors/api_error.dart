@@ -18,11 +18,18 @@ String apiErrorMessage(Object error, AppLocalizations l10n) {
 
   final status = error.response?.statusCode;
   final detail = _detail(error.response?.data);
+  // The framework's own "Not Found"/"Method Not Allowed" (missing route, outdated server)
+  // is not written for users; our API's own errors are.
+  if ((status == 404 || status == 405) && _frameworkDetails.contains(detail)) {
+    return l10n.errorNotAvailable;
+  }
   if (status == 422) return l10n.errorValidation;
   if (status == 429) return detail ?? l10n.errorTooManyAttempts;
   if (status != null && status >= 500) return l10n.errorServer;
   return detail ?? l10n.errorUnexpected;
 }
+
+const _frameworkDetails = {null, 'Not Found', 'Method Not Allowed'};
 
 String? _detail(Object? data) {
   if (data is Map && data['detail'] is String) return data['detail'] as String;

@@ -710,4 +710,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get statFromAllTimeHighHelp =>
       'How far today\'s price is from its highest price ever. −50% means it is at half its peak.';
+
+  @override
+  String get errorNotAvailable =>
+      'This feature isn\'t available on the server yet. Please try again later.';
 }

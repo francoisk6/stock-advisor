@@ -284,5 +284,6 @@
   "statAllTimeHigh": "All-time high",
   "statAllTimeHighHelp": "The highest price this asset has ever reached.",
   "statFromAllTimeHigh": "From all-time high",
-  "statFromAllTimeHighHelp": "How far today's price is from its highest price ever. −50% means it is at half its peak."
+  "statFromAllTimeHighHelp": "How far today's price is from its highest price ever. −50% means it is at half its peak.",
+  "errorNotAvailable": "This feature isn't available on the server yet. Please try again later."
 }

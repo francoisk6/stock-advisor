@@ -1389,6 +1389,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How far today\'s price is from its highest price ever. −50% means it is at half its peak.'**
   String get statFromAllTimeHighHelp;
+
+  /// No description provided for @errorNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This feature isn\'t available on the server yet. Please try again later.'**
+  String get errorNotAvailable;
 }
 
 class _AppLocalizationsDelegate
