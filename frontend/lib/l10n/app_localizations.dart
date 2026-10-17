@@ -1797,6 +1797,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Undone'**
   String get actionUndone;
+
+  /// No description provided for @newsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest news'**
+  String get newsTitle;
+
+  /// No description provided for @newsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent news found.'**
+  String get newsEmpty;
+
+  /// No description provided for @newsSourceTime.
+  ///
+  /// In en, this message translates to:
+  /// **'{source} · {time}'**
+  String newsSourceTime(String source, String time);
+
+  /// No description provided for @timeMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 minute ago} other{{count} minutes ago}}'**
+  String timeMinutesAgo(int count);
+
+  /// No description provided for @timeHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 hour ago} other{{count} hours ago}}'**
+  String timeHoursAgo(int count);
+
+  /// No description provided for @timeDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{yesterday} other{{count} days ago}}'**
+  String timeDaysAgo(int count);
+
+  /// No description provided for @newsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Headlines from Google News. Opening one takes you to the publisher\'s site.'**
+  String get newsNote;
 }
 
 class _AppLocalizationsDelegate

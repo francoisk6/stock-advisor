@@ -74,6 +74,16 @@ class FakeMarketApi implements MarketApi {
 
   @override
   Future<List<Asset>> popular({String? type}) async => [];
+
+  @override
+  Future<List<NewsHeadline>> news(int id) async => [
+    NewsHeadline(
+      title: 'Aramco profit rises',
+      url: 'https://example.com/aramco',
+      source: 'Reuters',
+      publishedAt: DateTime.now().toUtc().subtract(const Duration(hours: 2)),
+    ),
+  ];
 }
 
 Future<FakeMarketApi> openAsset(WidgetTester tester) async {
@@ -136,6 +146,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.textContaining('Each candle shows one period'), findsOneWidget);
     expect(find.textContaining('Data: Yahoo Finance'), findsOneWidget);
+    expect(find.text('Aramco profit rises'), findsOneWidget);
+    expect(find.text('Reuters · 2 hours ago'), findsOneWidget);
   });
 
   testWidgets('search waits for typing to pause, then lists results', (

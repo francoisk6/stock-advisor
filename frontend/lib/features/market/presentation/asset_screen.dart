@@ -20,6 +20,7 @@ import '../domain/market.dart';
 import 'labels.dart';
 import 'widgets/asset_avatar.dart';
 import 'widgets/key_figures.dart';
+import 'widgets/news_card.dart';
 import 'widgets/price_change.dart';
 import 'widgets/price_chart.dart';
 
@@ -89,6 +90,8 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     _AlertsCard(asset: d.asset),
                     const SizedBox(height: 16),
                     KeyFiguresCard(figures: buildKeyFigures(l10n, d)),
+                    const SizedBox(height: 16),
+                    NewsCard(assetId: d.asset.id),
                     if (d.description != null) ...[
                       const SizedBox(height: 16),
                       _about(context, d.description!),

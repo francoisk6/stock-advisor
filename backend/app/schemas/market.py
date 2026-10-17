@@ -66,3 +66,10 @@ class WatchlistOut(BaseModel):
     name: str
     limit: int | None
     items: list[AssetWithQuoteOut]
+
+
+class NewsOut(BaseModel):
+    title: str
+    url: str
+    source: str
+    published_at: datetime

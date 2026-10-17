@@ -170,3 +170,24 @@ class PriceHistory {
     return (candles.last.close - candles.first.open) / candles.first.open * 100;
   }
 }
+
+class NewsHeadline {
+  const NewsHeadline({
+    required this.title,
+    required this.url,
+    required this.source,
+    required this.publishedAt,
+  });
+
+  factory NewsHeadline.fromJson(Map<String, dynamic> json) => NewsHeadline(
+    title: json['title'] as String,
+    url: json['url'] as String,
+    source: json['source'] as String,
+    publishedAt: DateTime.parse('${json['published_at']}Z'),
+  );
+
+  final String title;
+  final String url;
+  final String source;
+  final DateTime publishedAt;
+}

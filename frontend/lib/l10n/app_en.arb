@@ -474,5 +474,43 @@
     }
   },
   "actionUndo": "Undo",
-  "actionUndone": "Undone"
+  "actionUndone": "Undone",
+  "newsTitle": "Latest news",
+  "newsEmpty": "No recent news found.",
+  "newsSourceTime": "{source} · {time}",
+  "@newsSourceTime": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "timeMinutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeHoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeDaysAgo": "{count, plural, =1{yesterday} other{{count} days ago}}",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newsNote": "Headlines from Google News. Opening one takes you to the publisher's site."
 }

@@ -8,6 +8,7 @@ from app.core.rate_limit import enforce
 from app.db.models import Asset
 from app.market_data import service
 from app.market_data.types import AssetType, Quote, Range
+from app.news import service as news_service
 from app.repositories import assets as assets_repo
 from app.schemas.market import (
     AssetDetailOut,
@@ -15,6 +16,7 @@ from app.schemas.market import (
     AssetWithQuoteOut,
     CandleOut,
     HistoryOut,
+    NewsOut,
     QuoteOut,
     StatOut,
 )
@@ -104,3 +106,12 @@ async def asset_history(
             CandleOut(t=c.time, o=c.open, h=c.high, l=c.low, c=c.close, v=c.volume) for c in candles
         ],
     )
+
+
+@router.get("/{asset_id}/news", response_model=list[NewsOut])
+async def asset_news(asset_id: int, user: CurrentUser, session: SessionDep) -> list[NewsOut]:
+    asset = await get_asset(session, asset_id)
+    return [
+        NewsOut(title=a.title, url=a.url, source=a.source, published_at=a.published_at)
+        for a in await news_service.news_for(session, asset)
+    ]

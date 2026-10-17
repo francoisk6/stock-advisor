@@ -35,6 +35,14 @@ class MarketApi {
     return AssetDetail.fromJson(response.data!);
   }
 
+  Future<List<NewsHeadline>> news(int id) async {
+    final response = await _dio.get<List<dynamic>>('/assets/$id/news');
+    return [
+      for (final n in response.data!)
+        NewsHeadline.fromJson(n as Map<String, dynamic>),
+    ];
+  }
+
   Future<PriceHistory> history(int id, String range) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/assets/$id/history',
@@ -60,4 +68,9 @@ final assetDetailProvider = FutureProvider.autoDispose.family<AssetDetail, int>(
 final assetHistoryProvider = FutureProvider.autoDispose
     .family<PriceHistory, (int, String)>(
       (ref, key) => ref.watch(marketApiProvider).history(key.$1, key.$2),
+    );
+
+final assetNewsProvider = FutureProvider.autoDispose
+    .family<List<NewsHeadline>, int>(
+      (ref, id) => ref.watch(marketApiProvider).news(id),
     );

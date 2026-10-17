@@ -966,4 +966,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionUndone => 'Undone';
+
+  @override
+  String get newsTitle => 'Latest news';
+
+  @override
+  String get newsEmpty => 'No recent news found.';
+
+  @override
+  String newsSourceTime(String source, String time) {
+    return '$source · $time';
+  }
+
+  @override
+  String timeMinutesAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutes ago',
+      one: '1 minute ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeHoursAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeDaysAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days ago',
+      one: 'yesterday',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get newsNote =>
+      'Headlines from Google News. Opening one takes you to the publisher\'s site.';
 }
