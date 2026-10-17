@@ -512,5 +512,30 @@
       }
     }
   },
-  "newsNote": "Headlines from Google News. Opening one takes you to the publisher's site."
+  "newsNote": "Headlines from Google News. Opening one takes you to the publisher's site.",
+  "whyTitleUp": "Why is {symbol} up {percent} today?",
+  "@whyTitleUp": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "whyTitleDown": "Why is {symbol} down {percent} today?",
+  "@whyTitleDown": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "whyExplain": "Explain",
+  "whyLoading": "Reading today's news… this can take up to a minute.",
+  "whyNote": "AI summary of recent headlines — it can be incomplete or wrong. Not financial advice."
 }

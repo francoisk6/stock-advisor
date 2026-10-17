@@ -2,6 +2,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
+from app.ai import insights
+from app.ai.types import AIUnavailable
 from app.api.deps import CurrentUser, SessionDep
 from app.core.errors import NotFoundError
 from app.core.rate_limit import enforce
@@ -16,6 +18,7 @@ from app.schemas.market import (
     AssetWithQuoteOut,
     CandleOut,
     HistoryOut,
+    InsightOut,
     NewsOut,
     QuoteOut,
     StatOut,
@@ -115,3 +118,21 @@ async def asset_news(asset_id: int, user: CurrentUser, session: SessionDep) -> l
         NewsOut(title=a.title, url=a.url, source=a.source, published_at=a.published_at)
         for a in await news_service.news_for(session, asset)
     ]
+
+
+@router.post("/{asset_id}/why", response_model=InsightOut)
+async def why_did_it_move(asset_id: int, user: CurrentUser, session: SessionDep) -> InsightOut:
+    """Today's explanation (shared, cached); generating one takes ~20–40 s on this server."""
+    enforce(f"why:user:{user.id}", limit=20, window_seconds=3600)
+    asset = await get_asset(session, asset_id)
+    try:
+        insight = await insights.why_moved(session, asset)
+    except AIUnavailable as exc:
+        raise insights.InsightUnavailable(
+            "The explanation service is busy or offline. Please try again in a few minutes."
+        ) from exc
+    return InsightOut(
+        content=insight.content,
+        change_percent=None if insight.change_percent is None else float(insight.change_percent),
+        created_at=insight.created_at,
+    )

@@ -1839,6 +1839,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Headlines from Google News. Opening one takes you to the publisher\'s site.'**
   String get newsNote;
+
+  /// No description provided for @whyTitleUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Why is {symbol} up {percent} today?'**
+  String whyTitleUp(String symbol, String percent);
+
+  /// No description provided for @whyTitleDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Why is {symbol} down {percent} today?'**
+  String whyTitleDown(String symbol, String percent);
+
+  /// No description provided for @whyExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain'**
+  String get whyExplain;
+
+  /// No description provided for @whyLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading today\'s news… this can take up to a minute.'**
+  String get whyLoading;
+
+  /// No description provided for @whyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'AI summary of recent headlines — it can be incomplete or wrong. Not financial advice.'**
+  String get whyNote;
 }
 
 class _AppLocalizationsDelegate

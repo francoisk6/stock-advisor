@@ -412,7 +412,7 @@ async def test_news_and_web_answers_cite_real_links(user: dict, llm, fakes, monk
         ],
         say(
             "Aramco rose after results ([Reuters](n1)). P/E is price ÷ earnings "
-            "([guide](w1)). Also [Made up](n9)."
+            "([guide](w1)). Also [Made up](n9). Bare refs too [n1][n7]."
         ),
     )
     events = await ask(user, "Why did Aramco move, and what is P/E?")
@@ -433,6 +433,7 @@ async def test_news_and_web_answers_cite_real_links(user: dict, llm, fakes, monk
     assert "[Reuters](https://news.example/aramco)" in final
     assert "[guide](https://web.example/pe)" in final
     assert "Also Made up." in final  # an invented reference is not turned into a link
+    assert final.endswith("Bare refs too [Reuters](https://news.example/aramco).")
 
 
 async def test_invented_news_is_retracted_and_looked_up(

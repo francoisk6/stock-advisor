@@ -43,6 +43,15 @@ class MarketApi {
     ];
   }
 
+  /// Today's "why did it move?" explanation. Generating one can take up to a minute.
+  Future<String> whyMoved(int id) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/assets/$id/why',
+      options: Options(receiveTimeout: const Duration(seconds: 150)),
+    );
+    return response.data!['content'] as String;
+  }
+
   Future<PriceHistory> history(int id, String range) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/assets/$id/history',

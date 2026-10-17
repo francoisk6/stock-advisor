@@ -9,6 +9,9 @@ import 'package:stock_adviser/features/market/domain/market.dart';
 import 'helpers.dart';
 
 class FakeMarketApi implements MarketApi {
+  FakeMarketApi({this.changePercent = 1.5});
+
+  final double changePercent;
   final historyRequests = <String>[];
   final searches = <String>[];
 
@@ -28,7 +31,7 @@ class FakeMarketApi implements MarketApi {
     'quote': {
       'price': 25.78,
       'change': 0.38,
-      'change_percent': 1.5,
+      'change_percent': changePercent,
       'previous_close': 25.4,
       'currency': 'SAR',
       'as_of': '2026-10-13T12:00:00',
@@ -76,6 +79,10 @@ class FakeMarketApi implements MarketApi {
   Future<List<Asset>> popular({String? type}) async => [];
 
   @override
+  Future<String> whyMoved(int id) async =>
+      'Aramco rose after results, according to [Reuters](https://example.com/r).';
+
+  @override
   Future<List<NewsHeadline>> news(int id) async => [
     NewsHeadline(
       title: 'Aramco profit rises',
@@ -86,11 +93,14 @@ class FakeMarketApi implements MarketApi {
   ];
 }
 
-Future<FakeMarketApi> openAsset(WidgetTester tester) async {
+Future<FakeMarketApi> openAsset(
+  WidgetTester tester, {
+  double changePercent = 1.5,
+}) async {
   tester.view.physicalSize = const Size(900, 2400);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
-  final api = FakeMarketApi();
+  final api = FakeMarketApi(changePercent: changePercent);
   await pumpApp(
     tester,
     AuthState.authenticated(testUser()),
@@ -147,6 +157,10 @@ void main() {
     expect(find.textContaining('Each candle shows one period'), findsOneWidget);
     expect(find.textContaining('Data: Yahoo Finance'), findsOneWidget);
     expect(find.text('Aramco profit rises'), findsOneWidget);
+    expect(
+      find.textContaining('Why is'),
+      findsNothing,
+    ); // +1.5% is a normal day
     expect(find.text('Reuters · 2 hours ago'), findsOneWidget);
   });
 
@@ -170,5 +184,26 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
     expect(find.textContaining('No results for “zzzz”'), findsOneWidget);
+  });
+
+  testWidgets('big moves offer a "why did it move?" explanation', (
+    tester,
+  ) async {
+    await openAsset(tester, changePercent: 3.2);
+    final context = tester.element(find.byType(Scaffold).first);
+    GoRouterHelper(context).go('/assets/1');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Why is 2222.SR up 3.20% today?'), findsOneWidget);
+    await tester.tap(find.text('Explain'));
+    await tester.pumpAndSettle();
+    expect(
+      find.textContaining('Aramco rose after results, according to Reuters.'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('AI summary of recent headlines'),
+      findsOneWidget,
+    );
   });
 }

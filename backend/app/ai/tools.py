@@ -5,6 +5,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from typing import Any
+from urllib.parse import urlparse
 
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,15 +37,16 @@ class ToolResult:
 class ToolContext:
     session: AsyncSession
     user: User
-    # Short references the model cites ("n1", "w2") -> real URLs, swapped in after the answer.
-    sources: dict[str, str] = field(default_factory=dict)
+    # Short references the model cites ("n1", "w2") -> (url, source name), swapped in after
+    # the answer.
+    sources: dict[str, tuple[str, str]] = field(default_factory=dict)
 
-    def cite(self, prefix: str, url: str) -> str:
-        for ref, known in self.sources.items():
+    def cite(self, prefix: str, url: str, label: str) -> str:
+        for ref, (known, _) in self.sources.items():
             if known == url:
                 return ref
         ref = f"{prefix}{sum(r.startswith(prefix) for r in self.sources) + 1}"
-        self.sources[ref] = url
+        self.sources[ref] = (url, label)
         return ref
 
 
@@ -286,7 +288,7 @@ async def get_news(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
                         "title": a.title,
                         "source": a.source,
                         "published_utc": a.published_at.isoformat(timespec="minutes"),
-                        "link": ctx.cite("n", a.url),
+                        "link": ctx.cite("n", a.url, a.source),
                     }
                     for a in articles
                 ],
@@ -307,7 +309,11 @@ async def web_search(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     return ToolResult(
         {
             "results": [
-                {"title": r.title, "snippet": r.snippet, "link": ctx.cite("w", r.url)}
+                {
+                    "title": r.title,
+                    "snippet": r.snippet,
+                    "link": ctx.cite("w", r.url, urlparse(r.url).netloc.removeprefix("www.")),
+                }
                 for r in results
             ]
         }

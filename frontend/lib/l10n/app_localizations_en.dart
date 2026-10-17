@@ -1014,4 +1014,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get newsNote =>
       'Headlines from Google News. Opening one takes you to the publisher\'s site.';
+
+  @override
+  String whyTitleUp(String symbol, String percent) {
+    return 'Why is $symbol up $percent today?';
+  }
+
+  @override
+  String whyTitleDown(String symbol, String percent) {
+    return 'Why is $symbol down $percent today?';
+  }
+
+  @override
+  String get whyExplain => 'Explain';
+
+  @override
+  String get whyLoading =>
+      'Reading today\'s news… this can take up to a minute.';
+
+  @override
+  String get whyNote =>
+      'AI summary of recent headlines — it can be incomplete or wrong. Not financial advice.';
 }

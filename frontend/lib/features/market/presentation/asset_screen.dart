@@ -21,6 +21,7 @@ import 'labels.dart';
 import 'widgets/asset_avatar.dart';
 import 'widgets/key_figures.dart';
 import 'widgets/news_card.dart';
+import 'widgets/why_card.dart';
 import 'widgets/price_change.dart';
 import 'widgets/price_chart.dart';
 
@@ -85,6 +86,7 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    WhyCard(asset: d.asset),
                     _chartSection(context, d),
                     const SizedBox(height: 16),
                     _AlertsCard(asset: d.asset),

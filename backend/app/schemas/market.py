@@ -73,3 +73,9 @@ class NewsOut(BaseModel):
     url: str
     source: str
     published_at: datetime
+
+
+class InsightOut(BaseModel):
+    content: str
+    change_percent: float | None
+    created_at: datetime

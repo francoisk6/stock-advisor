@@ -1,6 +1,5 @@
 """One copilot turn: model ⇄ tools loop, streamed as events for the chat UI."""
 
-import asyncio
 import json
 import logging
 import re
@@ -10,6 +9,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai import slot as model_slot
 from app.ai import tools as toolbox
 from app.ai.ollama import OllamaProvider
 from app.ai.prompts import NEWS_RETRY, TURN_REMINDER, system_prompt
@@ -23,9 +23,6 @@ logger = logging.getLogger(__name__)
 
 provider: LLMProvider = OllamaProvider()
 
-# The model serves one request at a time (OLLAMA_NUM_PARALLEL=1); others wait their turn.
-_slot = asyncio.Semaphore(1)
-_waiting = 0
 
 TOO_MANY_STEPS = (
     "\n\nSorry, this question needed more steps than I can take at once. "
@@ -84,16 +81,25 @@ def needs_news_retry(question: str, answer: str, tools_used: set[str]) -> bool:
 
 
 _LINK = re.compile(r"\[([^\]\n]+)\]\(([a-z]\d+)\)")
+_BARE = re.compile(r"\[([a-z]\d+)\](?!\()")
 
 
-def resolve_citations(text: str, sources: dict[str, str]) -> str:
-    """[Reuters](n1) -> [Reuters](https://…). Unknown references become plain text."""
+def resolve_citations(text: str, sources: dict[str, tuple[str, str]]) -> str:
+    """Turn citation references into links. Sources map a reference to (url, source name).
+
+    [Reuters](n1) -> [Reuters](https://…); a bare [n1] (small models do that too) ->
+    [Reuters](https://…); unknown references become plain text / disappear.
+    """
 
     def swap(match: re.Match[str]) -> str:
-        url = sources.get(match.group(2))
-        return f"[{match.group(1)}]({url})" if url else match.group(1)
+        known = sources.get(match.group(2))
+        return f"[{match.group(1)}]({known[0]})" if known else match.group(1)
 
-    return _LINK.sub(swap, text)
+    def swap_bare(match: re.Match[str]) -> str:
+        known = sources.get(match.group(1))
+        return f"[{known[1]}]({known[0]})" if known else ""
+
+    return _BARE.sub(swap_bare, _LINK.sub(swap, text))
 
 
 async def _model_turn(
@@ -156,7 +162,6 @@ async def answer(
     context_asset: Asset | None = None,
 ) -> AsyncIterator[AgentEvent]:
     """Stream one answer. The question must already be saved; the answer is saved at the end."""
-    global _waiting
     history = await chat_service.recent_messages(
         session, conversation.id, settings.ai_history_messages + 1
     )
@@ -166,14 +171,16 @@ async def answer(
     ctx = toolbox.ToolContext(session, user)
     actions: list[dict[str, Any]] = []
 
-    queued = _slot.locked()
+    queued = model_slot.slot.locked()
     if queued:
-        _waiting += 1
-        yield Status(f"The copilot is helping someone else — you're number {_waiting} in line…")
+        model_slot.waiting += 1
+        yield Status(
+            f"The copilot is helping someone else — you're number {model_slot.waiting} in line…"
+        )
     try:
-        async with _slot:
+        async with model_slot.slot:
             if queued:
-                _waiting -= 1
+                model_slot.waiting -= 1
                 queued = False
             yield Status("Thinking…")
             text = ""
@@ -188,7 +195,7 @@ async def answer(
         return
     finally:
         if queued:  # cancelled while still waiting in line
-            _waiting -= 1
+            model_slot.waiting -= 1
     if not text:
         text = "Done." if actions else "Sorry, I couldn't come up with an answer. Please try again."
     text = resolve_citations(text, ctx.sources)
