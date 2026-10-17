@@ -68,6 +68,8 @@ async def handle(user_id: int, request: dict[str, Any]) -> AsyncIterator[dict[st
                 yield {"event": "status", "text": event.text}
             elif isinstance(event, agent.Delta):
                 yield {"event": "delta", "text": event.text}
+            elif isinstance(event, agent.Retract):
+                yield {"event": "retract"}
             elif isinstance(event, agent.Action):
                 yield {"event": "action", "card": event.card}
             elif isinstance(event, agent.Failed):

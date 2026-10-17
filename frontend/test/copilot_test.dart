@@ -90,6 +90,8 @@ void main() {
             'name': 'Saudi Arabian Oil Company',
           },
         },
+        {'event': 'delta', 'text': 'Something invented'},
+        {'event': 'retract'},
         {'event': 'delta', 'text': 'Done! **Aramco** is now on '},
         {'event': 'delta', 'text': 'your watchlist.'},
         {
@@ -121,6 +123,10 @@ void main() {
       findsNothing,
     ); // bold rendered, not shown raw
     expect(
+      find.textContaining('Something invented'),
+      findsNothing,
+    ); // retracted
+    expect(
       find.text('Added Saudi Arabian Oil Company to your watchlist'),
       findsOneWidget,
     );
@@ -144,16 +150,25 @@ void main() {
     expect(find.textContaining('Not connected right now'), findsOneWidget);
   });
 
-  testWidgets('answers render bullets and bold', (tester) async {
+  testWidgets('answers render bullets, bold and source links', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
-          body: RichAnswer('Two things:\n- **Price** is up\n* Volume is low'),
+          body: RichAnswer(
+            'Two things:\n- **Price** is up ([Reuters](https://news.example/a))\n'
+            '* Volume is low ([WSJ](n2))',
+          ),
         ),
       ),
     );
     expect(find.text('•'), findsNWidgets(2));
-    expect(find.textContaining('Price is up'), findsOneWidget);
+    expect(find.textContaining('Price is up (Reuters)'), findsOneWidget);
+    expect(
+      find.textContaining('Volume is low (WSJ)'),
+      findsOneWidget,
+    ); // pending ref
     expect(find.textContaining('**'), findsNothing);
+    expect(find.textContaining('https://'), findsNothing);
+    expect(find.textContaining('](n2)'), findsNothing);
   });
 }

@@ -83,7 +83,12 @@ async def refresh(session: AsyncSession, asset: Asset) -> None:
     fetched.put(key, True)
 
 
+def _title_key(title: str) -> str:
+    return " ".join(title.lower().split())
+
+
 async def latest(session: AsyncSession, asset: Asset, limit: int = 10) -> list[NewsArticle]:
+    """Newest first; the same story syndicated under several links appears once."""
     result = await session.execute(
         select(NewsArticle)
         .join(NewsArticleAsset, NewsArticleAsset.article_id == NewsArticle.id)
@@ -92,9 +97,12 @@ async def latest(session: AsyncSession, asset: Asset, limit: int = 10) -> list[N
             NewsArticle.published_at >= utcnow() - MAX_AGE,
         )
         .order_by(NewsArticle.published_at.desc())
-        .limit(limit)
+        .limit(limit * 3)
     )
-    return list(result.scalars())
+    unique: dict[str, NewsArticle] = {}
+    for article in result.scalars():
+        unique.setdefault(_title_key(article.title), article)
+    return list(unique.values())[:limit]
 
 
 async def news_for(session: AsyncSession, asset: Asset, limit: int = 10) -> list[NewsArticle]:

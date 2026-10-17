@@ -46,6 +46,19 @@ with sync_playwright() as p:
         watchlist = api("/watchlist", token=tokens["access_token"], method="GET")
         assert [i["symbol"] for i in watchlist["items"]] == ["2222.SR"], watchlist["items"]
         step("app action: Aramco really added, with an action card")
+
+        fill(page, "Ask about a stock, coin or market…", "Why did Bitcoin move today?")
+        page.keyboard.press("Enter")
+        wait_for_text(page, "27 questions left today", timeout=240)
+        snapshot = page.locator("body").aria_snapshot()
+        assert "](n" not in snapshot and "](w" not in snapshot, "unresolved citation shown"
+        convo = api("/chat/conversations", token=tokens["access_token"], method="GET")[0]
+        detail = api(f"/chat/conversations/{convo['id']}", token=tokens["access_token"],
+                     method="GET")
+        answer = detail["messages"][-1]["content"]
+        print("     answer:", " ".join(answer.split())[:500])
+        assert re.search(r"\]\(https?://", answer), "expected at least one cited source link"
+        step("news question answered with cited source links")
         page.screenshot(path=f"{ARTIFACTS}/e2e-copilot.png", full_page=True)
     except Exception:
         page.screenshot(path=f"{ARTIFACTS}/e2e-copilot-failure.png", full_page=True)

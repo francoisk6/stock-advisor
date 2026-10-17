@@ -71,6 +71,9 @@ class Settings(BaseSettings):
     ai_max_tool_rounds: int = 5
     ai_history_messages: int = 10
 
+    # Self-hosted SearXNG (infra/searxng), used by the copilot's web_search tool
+    searxng_url: str = "http://127.0.0.1:8220"
+
     # Background loops in the API process (single worker): alert checks and live price pushes.
     background_jobs: bool = True
     alert_check_seconds: int = 60

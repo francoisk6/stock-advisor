@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import re
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from typing import Any
@@ -11,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai import tools as toolbox
 from app.ai.ollama import OllamaProvider
-from app.ai.prompts import system_prompt
+from app.ai.prompts import NEWS_RETRY, TURN_REMINDER, system_prompt
 from app.ai.provider import LLMProvider
 from app.ai.types import AIUnavailable, ChatMessage, TextDelta, ToolCalls
 from app.core.config import settings
@@ -60,15 +61,52 @@ class Failed:
     detail: str
 
 
-AgentEvent = Status | Delta | Action | Done | Failed
+@dataclass
+class Retract:
+    """Discard the text streamed so far (the answer is being redone)."""
+
+
+AgentEvent = Status | Delta | Action | Done | Failed | Retract
+
+# Answers that talk about news/causes must be backed by a news or web lookup in the same turn.
+_NEWS_CLAIM = re.compile(
+    r"according to|report(s|ed)|news|headline|analysts? (say|said)|due to|because of|driven by",
+    re.IGNORECASE,
+)
+_WHY_QUESTION = re.compile(r"\bwhy\b|\bnews\b|what happened|what's happening", re.IGNORECASE)
+NEWS_TOOLS = {"get_news", "web_search"}
+
+
+def needs_news_retry(question: str, answer: str, tools_used: set[str]) -> bool:
+    if tools_used & NEWS_TOOLS:
+        return False
+    return bool(_NEWS_CLAIM.search(answer) or _WHY_QUESTION.search(question))
+
+
+_LINK = re.compile(r"\[([^\]\n]+)\]\(([a-z]\d+)\)")
+
+
+def resolve_citations(text: str, sources: dict[str, str]) -> str:
+    """[Reuters](n1) -> [Reuters](https://…). Unknown references become plain text."""
+
+    def swap(match: re.Match[str]) -> str:
+        url = sources.get(match.group(2))
+        return f"[{match.group(1)}]({url})" if url else match.group(1)
+
+    return _LINK.sub(swap, text)
 
 
 async def _model_turn(
-    messages: list[ChatMessage], ctx: toolbox.ToolContext, actions: list[dict[str, Any]]
+    messages: list[ChatMessage],
+    ctx: toolbox.ToolContext,
+    actions: list[dict[str, Any]],
+    question: str,
 ) -> AsyncIterator[AgentEvent | str]:
     """Run model rounds until it answers without tools. Yields events; the final yielded str is
     the full answer text."""
     answer = ""
+    tools_used: set[str] = set()
+    retried = False
     for _ in range(settings.ai_max_tool_rounds):
         round_text = ""
         calls = []
@@ -80,10 +118,20 @@ async def _model_turn(
                 calls = event.calls
         answer += round_text
         if not calls:
+            if not retried and needs_news_retry(question, answer, tools_used):
+                # Possibly invented news: take the answer back and make the model look it up.
+                retried = True
+                yield Retract()
+                yield Status("Checking the latest news…")
+                messages.append(ChatMessage("assistant", round_text))
+                messages.append(ChatMessage("system", NEWS_RETRY))
+                answer = ""
+                continue
             yield answer.strip()
             return
         messages.append(ChatMessage("assistant", round_text, tool_calls=calls))
         for call in calls:
+            tools_used.add(call.name)
             yield Status(toolbox.status_text(call))
             try:
                 result = await toolbox.run_tool(ctx, call)
@@ -114,6 +162,7 @@ async def answer(
     )
     messages = [ChatMessage("system", system_prompt(user, context_asset))]
     messages += [ChatMessage(m.role, m.content) for m in history]  # includes the question
+    messages.append(ChatMessage("system", TURN_REMINDER))
     ctx = toolbox.ToolContext(session, user)
     actions: list[dict[str, Any]] = []
 
@@ -128,7 +177,7 @@ async def answer(
                 queued = False
             yield Status("Thinking…")
             text = ""
-            async for event in _model_turn(messages, ctx, actions):
+            async for event in _model_turn(messages, ctx, actions, question):
                 if isinstance(event, str):
                     text = event
                 else:
@@ -142,5 +191,6 @@ async def answer(
             _waiting -= 1
     if not text:
         text = "Done." if actions else "Sorry, I couldn't come up with an answer. Please try again."
+    text = resolve_citations(text, ctx.sources)
     row = await chat_service.add_message(session, conversation, "assistant", text, actions)
     yield Done(row.id, text, actions)

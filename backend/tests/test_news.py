@@ -76,6 +76,7 @@ async def test_news_endpoint_stores_dedupes_and_caches(
         NewsItem("Aramco profit rises", "https://n/1", "Reuters", now - timedelta(hours=2)),
         NewsItem("Aramco profit rises", "https://n/1", "Reuters", now - timedelta(hours=2)),
         NewsItem("Oil climbs", "https://n/2", "WSJ", now - timedelta(hours=1)),
+        NewsItem("Oil  climbs", "https://n/2b", "WSJ", now - timedelta(hours=1)),  # syndicated
     ]
 
     first = (await client.get(f"/assets/{asset_id}/news", headers=bearer(user))).json()

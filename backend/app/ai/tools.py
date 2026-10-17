@@ -2,7 +2,7 @@
 app actions also return a card the chat shows (and the user can undo from)."""
 
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -13,7 +13,9 @@ from app.ai.types import ToolCall, ToolSpec
 from app.core.errors import AppError
 from app.db.models import Asset, User
 from app.market_data import service as market
-from app.market_data.types import Quote, Range
+from app.market_data.types import ProviderError, Quote, Range
+from app.news import service as news_service
+from app.news import web_search as web
 from app.repositories import assets as assets_repo
 from app.services import alerts as alerts_service
 from app.services import watchlist as watchlist_service
@@ -34,6 +36,16 @@ class ToolResult:
 class ToolContext:
     session: AsyncSession
     user: User
+    # Short references the model cites ("n1", "w2") -> real URLs, swapped in after the answer.
+    sources: dict[str, str] = field(default_factory=dict)
+
+    def cite(self, prefix: str, url: str) -> str:
+        for ref, known in self.sources.items():
+            if known == url:
+                return ref
+        ref = f"{prefix}{sum(r.startswith(prefix) for r in self.sources) + 1}"
+        self.sources[ref] = url
+        return ref
 
 
 Handler = Callable[[ToolContext, dict[str, Any]], Awaitable[ToolResult]]
@@ -259,6 +271,49 @@ async def create_alert(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     return await _with_asset(ctx, args, run)
 
 
+async def get_news(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
+    async def run(asset: Asset) -> ToolResult:
+        articles = await news_service.news_for(ctx.session, asset, limit=6)
+        if not articles:
+            return ToolResult(
+                {"asset": asset.symbol, "headlines": [], "note": "No news from the last 7 days."}
+            )
+        return ToolResult(
+            {
+                "asset": asset.symbol,
+                "headlines": [
+                    {
+                        "title": a.title,
+                        "source": a.source,
+                        "published_utc": a.published_at.isoformat(timespec="minutes"),
+                        "link": ctx.cite("n", a.url),
+                    }
+                    for a in articles
+                ],
+            }
+        )
+
+    return await _with_asset(ctx, args, run)
+
+
+async def web_search(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
+    query = str(args.get("query", "")).strip()
+    if not query:
+        return ToolResult({"error": "Please give a search query."})
+    try:
+        results = await web.search(query)
+    except ProviderError:
+        return ToolResult({"error": "Web search is unavailable right now."})
+    return ToolResult(
+        {
+            "results": [
+                {"title": r.title, "snippet": r.snippet, "link": ctx.cite("w", r.url)}
+                for r in results
+            ]
+        }
+    )
+
+
 async def list_alerts(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     alerts = await alerts_service.list_for_user(ctx.session, ctx.user)
     return ToolResult(
@@ -331,6 +386,28 @@ TOOLS: dict[str, Tool] = {
             ),
             get_price_history,
             lambda a: f"Looking at {a.get('asset', '')} over {a.get('range', '1M')}…",
+        ),
+        Tool(
+            _spec(
+                "get_news",
+                "Latest news headlines about one asset (last 7 days), with "
+                "source, time and a link reference to cite.",
+                {"asset": ASSET_PARAM},
+                ["asset"],
+            ),
+            get_news,
+            lambda a: f"Reading the latest news about {a.get('asset', '')}…",
+        ),
+        Tool(
+            _spec(
+                "web_search",
+                "Search the web for general questions (definitions, events, "
+                "companies). Returns titles, snippets and link references to cite.",
+                {"query": {"type": "string"}},
+                ["query"],
+            ),
+            web_search,
+            lambda a: f"Searching the web for “{a.get('query', '')}”…",
         ),
         Tool(
             _spec("get_watchlist", "The user's watchlist with latest prices.", {}, []),

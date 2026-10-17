@@ -121,6 +121,9 @@ class CopilotController extends Notifier<CopilotState> {
         );
       case 'status':
         _updateLast((m) => m.copyWith(status: event['text'] as String));
+      case 'retract':
+        // The server is redoing the answer (e.g. it must look the news up first).
+        _updateLast((m) => m.copyWith(text: ''));
       case 'delta':
         _updateLast(
           (m) => m.copyWith(text: m.text + (event['text'] as String)),

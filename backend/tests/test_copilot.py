@@ -108,7 +108,9 @@ async def test_plain_answer_is_streamed_and_saved(client: AsyncClient, user: dic
     assert (
         "experience beginner" in system.content and "Do not tell the user to buy" in system.content
     )
-    assert scripted.calls[0][-1] == ChatMessage("user", "hi there")
+    assert scripted.calls[0][-2] == ChatMessage("user", "hi there")
+    assert scripted.calls[0][-1].role == "system"  # per-turn reminder after the question
+    assert "THIS turn" in scripted.calls[0][-1].content
 
     convo = (
         await client.get(
@@ -247,7 +249,7 @@ async def test_follow_ups_use_history_and_context(
         user, "Does it pay dividends?", conversation_id=conversation_id, asset_id=aramco[0]["id"]
     )
     sent = scripted.calls[0]
-    assert [m.content for m in sent[1:]] == [
+    assert [m.content for m in sent[1:-1]] == [
         "What is Aramco?",
         "Aramco is an oil company.",
         "Does it pay dividends?",
@@ -371,3 +373,95 @@ async def test_common_names_resolve_to_the_curated_asset(
     added = json.loads(scripted.calls[1][-1].content)["added"]
     assert added["symbol"] == "2222.SR"
     assert added["name"] == "Saudi Aramco (Saudi Arabian Oil Company)"
+
+
+async def test_news_and_web_answers_cite_real_links(user: dict, llm, fakes, monkeypatch) -> None:
+    from datetime import timedelta
+
+    from app.core.time import utcnow
+    from app.news import service as news_service
+    from app.news import web_search
+    from app.news.google_news import NewsItem
+    from tests.test_news import FakeNews
+
+    news = FakeNews()
+    news.items = [
+        NewsItem(
+            "Aramco profit rises",
+            "https://news.example/aramco",
+            "Reuters",
+            utcnow() - timedelta(hours=1),
+        )
+    ]
+    monkeypatch.setattr(news_service, "provider", news)
+    news_service.fetched.clear()
+
+    async def fake_search(query: str, limit: int = 5):
+        return [web_search.WebResult("P/E explained", "https://web.example/pe", "Price ÷ EPS")]
+
+    monkeypatch.setattr(web_search, "search", fake_search)
+
+    scripted = llm(
+        [
+            ToolCalls(
+                [
+                    ToolCall("get_news", {"asset": "2222.SR"}),
+                    ToolCall("web_search", {"query": "what is p/e"}),
+                ]
+            )
+        ],
+        say(
+            "Aramco rose after results ([Reuters](n1)). P/E is price ÷ earnings "
+            "([guide](w1)). Also [Made up](n9)."
+        ),
+    )
+    events = await ask(user, "Why did Aramco move, and what is P/E?")
+
+    results = [json.loads(m.content) for m in scripted.calls[1] if m.role == "tool"]
+    assert results[0]["headlines"][0] == {
+        "title": "Aramco profit rises",
+        "source": "Reuters",
+        "published_utc": results[0]["headlines"][0]["published_utc"],
+        "link": "n1",
+    }
+    assert results[1]["results"][0]["link"] == "w1"  # short refs, not long URLs
+    statuses = [e["text"] for e in events if e["event"] == "status"]
+    assert "Reading the latest news about 2222.SR…" in statuses
+    assert "Searching the web for “what is p/e”…" in statuses
+
+    final = events[-1]["text"]
+    assert "[Reuters](https://news.example/aramco)" in final
+    assert "[guide](https://web.example/pe)" in final
+    assert "Also Made up." in final  # an invented reference is not turned into a link
+
+
+async def test_invented_news_is_retracted_and_looked_up(
+    user: dict, llm, fakes, monkeypatch
+) -> None:
+    from app.news import service as news_service
+    from tests.test_news import FakeNews
+
+    monkeypatch.setattr(news_service, "provider", FakeNews())
+    news_service.fetched.clear()
+    scripted = llm(
+        say("According to recent news, Bitcoin rose on ETF demand."),  # no lookup: invented
+        call("get_news", asset="BTC"),
+        say("I found no news about Bitcoin from the last 7 days."),
+    )
+    events = await ask(user, "Why did Bitcoin move today?")
+
+    kinds_seen = kinds(events)
+    assert "retract" in kinds_seen
+    assert kinds_seen.index("retract") < len(kinds_seen) - 1
+    assert (
+        scripted.calls[1][-1].role == "system"
+        and "may be invented" in scripted.calls[1][-1].content
+    )
+    assert events[-1]["text"] == "I found no news about Bitcoin from the last 7 days."
+
+
+async def test_plain_answers_are_not_retried(user: dict, llm) -> None:
+    scripted = llm(say("A P/E ratio compares a share price with yearly profit per share."))
+    events = await ask(user, "What is a P/E ratio?")
+    assert "retract" not in kinds(events)
+    assert len(scripted.calls) == 1
