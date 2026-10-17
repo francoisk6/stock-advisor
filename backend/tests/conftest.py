@@ -30,6 +30,8 @@ assert settings.db_name == "stock_advisor_test", "tests must never touch the dev
 
 # Tables reset between tests (children first); plans keep their migration seed data.
 _RESET_TABLES = [
+    "job_runs",
+    "price_bars_daily",
     "asset_insights",
     "news_article_assets",
     "news_articles",

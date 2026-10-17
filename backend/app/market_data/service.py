@@ -1,11 +1,15 @@
 """Market data for the API: catalog lookups + provider calls, behind a shared cache."""
 
 import asyncio
+from datetime import datetime, time, timedelta
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import AppError
-from app.db.models import Asset, UserProfile
+from app.core.time import utcnow
+from app.db.models import Asset, PriceBarDaily, UserProfile
+from app.db.session import SessionLocal
 from app.market_data.cache import TTLCache
 from app.market_data.providers.base import MarketDataProvider
 from app.market_data.providers.coingecko import CoinGeckoProvider
@@ -131,7 +135,40 @@ async def history_for(asset: Asset, range_: Range) -> list[Candle]:
             lambda: _provider(asset).history(asset.provider_symbol, range_),
         )
     except ProviderError as exc:
+        # Source down and nothing cached: fall back to the daily prices we store nightly.
+        stored = await stored_history(asset, range_)
+        if len(stored) >= 2:
+            return stored
         raise MarketDataUnavailable(UNAVAILABLE) from exc
+
+
+STORED_RANGES = {Range.m1: 31, Range.m6: 183, Range.y1: 366, Range.y5: 5 * 366}
+
+
+async def stored_history(asset: Asset, range_: Range) -> list[Candle]:
+    days = STORED_RANGES.get(range_)
+    if days is None:
+        return []  # intraday ranges need intraday data
+    since = utcnow().date() - timedelta(days=days)
+    async with SessionLocal() as db:
+        rows = (
+            await db.execute(
+                select(PriceBarDaily)
+                .where(PriceBarDaily.asset_id == asset.id, PriceBarDaily.day >= since)
+                .order_by(PriceBarDaily.day)
+            )
+        ).scalars()
+        return [
+            Candle(
+                time=datetime.combine(r.day, time.min),
+                open=float(r.open),
+                high=float(r.high),
+                low=float(r.low),
+                close=float(r.close),
+                volume=None if r.volume is None else float(r.volume),
+            )
+            for r in rows
+        ]
 
 
 async def search(session: AsyncSession, query: str, limit: int = 20) -> list[Asset]:

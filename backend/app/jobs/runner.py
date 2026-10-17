@@ -5,7 +5,9 @@ import logging
 from collections.abc import Awaitable, Callable
 
 from app.core.config import settings
+from app.core.time import utcnow
 from app.db.session import SessionLocal
+from app.jobs import daily
 from app.realtime.hub import hub
 from app.schemas.notifications import notification_out
 from app.services import alerts as alerts_service
@@ -13,6 +15,8 @@ from app.services import notifications as notifications_service
 from app.services.email import send_email
 
 logger = logging.getLogger(__name__)
+
+DAILY_CHECK_SECONDS = 300
 
 
 async def run_alert_check() -> int:
@@ -42,6 +46,13 @@ async def run_live_prices() -> None:
         await hub.push_quotes()
 
 
+async def run_daily_jobs() -> None:
+    """Called every few minutes; each job runs once per UTC day after its hour."""
+    now = utcnow()
+    if now.hour >= settings.daily_prices_hour_utc:
+        await daily.run_once_per_day("daily_prices", now.date(), daily.store_daily_prices)
+
+
 async def _loop(name: str, seconds: int, job: Callable[[], Awaitable[object]]) -> None:
     while True:
         try:
@@ -59,6 +70,7 @@ def start() -> list[asyncio.Task]:
     return [
         asyncio.create_task(_loop("alerts", settings.alert_check_seconds, run_alert_check)),
         asyncio.create_task(_loop("live-prices", settings.live_price_seconds, run_live_prices)),
+        asyncio.create_task(_loop("daily", DAILY_CHECK_SECONDS, run_daily_jobs)),
     ]
 
 

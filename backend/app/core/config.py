@@ -76,6 +76,9 @@ class Settings(BaseSettings):
 
     # Background loops in the API process (single worker): alert checks and live price pushes.
     background_jobs: bool = True
+    # Daily jobs (UTC hours; off-peak for the shared server). 03:00 UTC = 06:00 in Beirut.
+    daily_prices_hour_utc: int = 2
+    digest_hour_utc: int = 3
     alert_check_seconds: int = 60
     live_price_seconds: int = 15
 
