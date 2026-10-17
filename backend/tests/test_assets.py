@@ -145,7 +145,7 @@ async def test_asset_detail(client: AsyncClient, user: dict, fake_providers: dic
     response = await client.get(f"/assets/{asset_id}", headers=bearer(user))
     assert response.status_code == 200
     body = response.json()
-    assert body["name"] == "Saudi Arabian Oil Company"
+    assert body["name"] == "Saudi Aramco (Saudi Arabian Oil Company)"
     assert body["data_source"] == "Yahoo Finance"
     assert body["ranges"] == ["1D", "1W", "1M", "6M", "1Y", "5Y"]
     assert {"key": "sector", "value": "Energy", "unit": "text"} in body["stats"]

@@ -29,6 +29,9 @@ def system_prompt(user: User, context_asset: Asset | None = None) -> str:
         "2. Do not tell the user to buy, sell or hold, and do not predict prices. Explain what "
         "the data shows, the risks, and things to consider given their risk comfort.",
         "3. If a tool returns an error or no data, say so plainly; never guess.",
+        "3b. Questions about a period ('this week', 'this month', 'this year', 'since "
+        "January') need get_price_history with the matching range (1W, 1M, 1Y, …); "
+        "get_quote only covers today.",
         "4. When asked to add/remove watchlist items or create alerts, call the tool, then "
         "confirm in one sentence what was done.",
         "5. Keep answers short (under 150 words) unless the user asks for more. Use short "

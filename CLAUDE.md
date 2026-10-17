@@ -81,8 +81,10 @@ Flutter app ──HTTPS/WS──▶ FastAPI
   feeds results back. Only use Ollama models that support tool calling.
 - **Hardware constraint (dev machine):** 14 GB RAM, CPU-only (AMD iGPU, no CUDA). Expect
   ~5–10 tokens/s on a 7–8B Q4 model. Therefore:
-  - Default dev model: a ~4–8B tool-calling model (e.g. `qwen3:8b`, fall back to `qwen3:4b`).
-    Model name comes from config (`OLLAMA_MODEL`), never hard-coded.
+  - Model: **`qwen3:4b-instruct`** (config `OLLAMA_MODEL`). Measured 2026-10-17 on this CPU:
+    ~11 tokens/s, tool calls in 3–5 s, plain explanations ~13 s, model load ~15 s after 5 idle
+    minutes; 6/6 correct tool choices. Do **not** use `qwen3:4b`: that tag is the
+    always-thinking edition (30–130 s per answer, reasoning leaks into the reply).
   - **Daily insights are precomputed in batch jobs** and stored in DB; users read cached
     results instantly. Chat is the only synchronous LLM path — stream responses.
   - Keep the `LLMProvider` interface swappable (Ollama now; bigger GPU server or hosted API
@@ -123,6 +125,11 @@ Implemented (Phase 2) in `backend/app/market_data/`:
 - Stored: user questions and final answers + action cards (`chat_messages`), not tool traffic.
   Daily limit counts answered questions (`ai_messages_per_day`); failed answers don't count.
 - Tests use `ScriptedLLM` (tests/test_copilot.py) — never the real model in unit tests.
+  `e2e/test_copilot_flow.py` uses the real model (needs Ollama running; slow).
+- Asset names in tools resolve: exact symbol → **curated catalog** → provider search (Yahoo's
+  ranking put "Saudi Aramco Base Oil" above Aramco). Curated names use what people call
+  companies, e.g. "Saudi Aramco (Saudi Arabian Oil Company)", "Alphabet (Google)".
+- Prompt rules live in `app/ai/prompts.py`; period questions must use `get_price_history`.
 
 ### Live updates & background jobs (Phase 3)
 - `app/realtime/hub.py`: one WebSocket per open app at `/api/v1/ws` (protocol in the module
@@ -208,10 +215,9 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       (above/below one-shot, daily move once/day) delivered in-app + email (confirmed emails
       only), notifications inbox + bell badge, WebSocket for live prices + instant alert
       pop-ups, Free-plan limits enforced. Verified unit + live e2e. Push notifications: Android phase.
-- [~] **Phase 4 — AI copilot v1:** Ollama provider, tool calling, agent loop, streaming chat,
-      app-action tools, guardrails + disclaimer. *Built and tested with a scripted model;
-      remaining: install Ollama (`infra/ollama/install.sh`), measure speed + tool-calling
-      quality of qwen3:4b, live e2e.*
+- [x] **Phase 4 — AI copilot v1:** Ollama (qwen3:4b-instruct, CPU) with tool calling, agent
+      loop, streamed chat over the WebSocket, app actions with undo cards, past chats, daily
+      limit, guardrails + disclaimer. Verified: unit (scripted model) + live e2e (real model).
 - [ ] **Phase 5 — Daily insights:** news ingestion, SearXNG web search, batch digest
       generation, push notifications, "why did it move?".
 - [ ] **Phase 6 — Learning & practice:** glossary, explain-this, paper trading, portfolio.
@@ -295,8 +301,10 @@ stock-advisor-dev/
 - Ubuntu 22.04, Python 3.10, Flutter 3.41 at `/opt/flutter`, MySQL 8.0 (shared with evolution).
 - `python3-venv` is not installed (no passwordless sudo) — create venvs with `virtualenv`
   (`~/.local/bin/virtualenv`), not `python3 -m venv`.
-- Ollama: install with `sudo bash infra/ollama/install.sh` (pinned v0.35.1, CPU-only, no GPU
-  add-ons, systemd limits, pulls qwen3:4b). Not yet installed: Docker (approved; for SearXNG).
+- Ollama v0.35.1 installed 2026-10-17 via `sudo bash infra/ollama/install.sh` (CPU-only, no GPU
+  add-ons, systemd limits: Nice 10, ≤4 cores, MemoryMax 6G; models in /usr/share/ollama,
+  writable via ReadWritePaths). Manage models via the local API (`/api/pull`, `/api/delete`),
+  no sudo needed. Not yet installed: Docker (approved; for SearXNG).
 - Note: Docker modifies iptables — publish container ports on 127.0.0.1 only and verify
   evolution's networking (Apache, WireGuard vhosts) is unaffected after install.
 
@@ -377,3 +385,6 @@ nice -n 19 flutter build web        # low priority: shared server
   Market endpoints require sign-in (protects free API quotas).
 - 2026-10-15 — Phase 3: alerts in-app + email now; phone push with Firebase in the Android
   phase. Background jobs run inside the API process (single worker) for now.
+- 2026-10-17 — Phase 4: copilot on qwen3:4b-instruct (non-thinking) for speed on CPU; chat
+  streamed over the existing WebSocket; app actions run immediately with undo cards; web and
+  news search deferred to Phase 5.

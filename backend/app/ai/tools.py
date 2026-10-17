@@ -14,6 +14,7 @@ from app.core.errors import AppError
 from app.db.models import Asset, User
 from app.market_data import service as market
 from app.market_data.types import Quote, Range
+from app.repositories import assets as assets_repo
 from app.services import alerts as alerts_service
 from app.services import watchlist as watchlist_service
 
@@ -65,6 +66,12 @@ async def resolve_asset(session: AsyncSession, query: str) -> Asset | None:
     asset = result.scalar_one_or_none()
     if asset is not None:
         return asset
+    # Our curated catalog before the providers' search: "Saudi Aramco" must be 2222.SR, not a
+    # smaller company whose name happens to start with the same words.
+    local = await assets_repo.search_local(session, q, limit=5)
+    curated = [a for a in local if a.popularity is not None]
+    if curated or local:
+        return (curated or local)[0]
     hits = await market.search(session, q, limit=5)
     return hits[0] if hits else None
 
@@ -187,7 +194,7 @@ async def add_to_watchlist(ctx: ToolContext, args: dict[str, Any]) -> ToolResult
     async def run(asset: Asset) -> ToolResult:
         await watchlist_service.add(ctx.session, ctx.user, asset)
         return ToolResult(
-            {"done": True, "added": asset.symbol},
+            {"done": True, "added": _asset_brief(asset)},
             {
                 "type": "watchlist_added",
                 "asset_id": asset.id,
@@ -203,7 +210,7 @@ async def remove_from_watchlist(ctx: ToolContext, args: dict[str, Any]) -> ToolR
     async def run(asset: Asset) -> ToolResult:
         await watchlist_service.remove(ctx.session, ctx.user, asset.id)
         return ToolResult(
-            {"done": True, "removed": asset.symbol},
+            {"done": True, "removed": _asset_brief(asset)},
             {
                 "type": "watchlist_removed",
                 "asset_id": asset.id,
@@ -235,7 +242,7 @@ async def create_alert(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
                 "alert_id": alert.id,
                 "kind": kind.value,
                 "threshold": float(threshold),
-                "asset": asset.symbol,
+                "asset": _asset_brief(asset),
             },
             {
                 "type": "alert_created",

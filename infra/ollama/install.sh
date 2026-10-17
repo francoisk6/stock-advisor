@@ -12,7 +12,7 @@
 set -euo pipefail
 
 OLLAMA_VERSION="${OLLAMA_VERSION:-0.35.1}"
-MODEL="${OLLAMA_MODEL:-qwen3:4b}"
+MODEL="${OLLAMA_MODEL:-qwen3:4b-instruct}"
 PREFIX=/usr/local
 UNIT=/etc/systemd/system/ollama.service
 
@@ -79,11 +79,13 @@ IOWeight=20
 MemoryHigh=5G
 MemoryMax=6G
 
-# Hardening
+# Hardening. ProtectSystem=full makes /usr read-only, but the models live in the service
+# user's home under /usr/share, so that one directory stays writable.
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=full
 ProtectHome=yes
+ReadWritePaths=/usr/share/ollama
 
 [Install]
 WantedBy=multi-user.target
@@ -97,7 +99,12 @@ for _ in $(seq 1 30); do
   curl -sf http://127.0.0.1:11434/api/version >/dev/null && break
   sleep 1
 done
-curl -sf http://127.0.0.1:11434/api/version || { echo "Ollama did not start"; journalctl -u ollama -n 30; exit 1; }
+curl -sf http://127.0.0.1:11434/api/version || {
+  echo "Ollama did not start. Last log lines:"
+  journalctl -u ollama -n 15 --no-pager
+  systemctl stop ollama  # don't leave it restarting in a loop
+  exit 1
+}
 
 # 4. Model ---------------------------------------------------------------------------------
 say "Downloading model $MODEL (a few GB, one-time)"

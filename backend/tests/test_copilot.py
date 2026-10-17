@@ -252,7 +252,7 @@ async def test_follow_ups_use_history_and_context(
         "Aramco is an oil company.",
         "Does it pay dividends?",
     ]
-    assert "looking at Saudi Arabian Oil Company (2222.SR" in sent[0].content
+    assert "looking at Saudi Aramco (Saudi Arabian Oil Company) (2222.SR" in sent[0].content
 
     other = await register(client, email="bob@example.com")
     stolen = [
@@ -346,3 +346,28 @@ async def test_ollama_errors_become_unavailable() -> None:
     )
     with pytest.raises(AIUnavailable, match="model not found"):
         [e async for e in provider.stream_chat([ChatMessage("user", "x")], [])]
+
+
+async def test_common_names_resolve_to_the_curated_asset(
+    client: AsyncClient, user: dict, llm, fakes
+) -> None:
+    # Yahoo would rank "Saudi Aramco Base Oil Company" (2223.SR) first for this query.
+    from app.market_data.types import AssetType, FoundAsset
+
+    fakes["yahoo"].search_results = [
+        FoundAsset(
+            "yahoo",
+            "2223.SR",
+            "2223.SR",
+            "Saudi Aramco Base Oil Company",
+            AssetType.stock,
+            "Tadawul",
+            "middle_east",
+            "SA",
+        ),
+    ]
+    scripted = llm(call("add_to_watchlist", asset="Saudi Aramco"), say("Added."))
+    await ask(user, "add saudi aramco")
+    added = json.loads(scripted.calls[1][-1].content)["added"]
+    assert added["symbol"] == "2222.SR"
+    assert added["name"] == "Saudi Aramco (Saudi Arabian Oil Company)"

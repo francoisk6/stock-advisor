@@ -30,12 +30,12 @@ with sync_playwright() as p:
         expect(page.get_by_role("heading", name="Popular in your markets")).to_be_visible(
             timeout=15000
         )
-        wait_for_text(page, r"Saudi Arabian Oil Company .*SAR\u00a0?\s?\d+\.\d\d [+-]?\d+\.\d\d%")
+        wait_for_text(page, r"Saudi Aramco \(Saudi Arabian Oil Company\) .*SAR\u00a0?\s?\d+\.\d\d [+-]?\d+\.\d\d%")
         wait_for_text(page, r"Bitcoin BTC · Crypto \$[\d,]+\.\d\d")
         step("home lists Middle East stocks + crypto with live prices")
 
         page.get_by_role("checkbox", name="Crypto").click()
-        wait_for_no_text(page, "Saudi Arabian Oil Company")
+        wait_for_no_text(page, "Saudi Aramco")
         wait_for_text(page, "Bitcoin")
         step("interest filter narrows the list")
 

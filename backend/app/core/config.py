@@ -63,7 +63,7 @@ class Settings(BaseSettings):
 
     # AI copilot (Ollama on this server; see infra/ollama/install.sh)
     ollama_url: str = "http://127.0.0.1:11434"
-    ollama_model: str = "qwen3:4b"
+    ollama_model: str = "qwen3:4b-instruct"
     ollama_num_thread: int = 4
     ollama_num_ctx: int = 8192
     ollama_timeout_seconds: int = 300
