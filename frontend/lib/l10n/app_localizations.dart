@@ -1623,6 +1623,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Alerts & notifications'**
   String get profileAlertsSection;
+
+  /// No description provided for @copilotTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Copilot'**
+  String get copilotTitle;
+
+  /// No description provided for @copilotAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Copilot'**
+  String get copilotAsk;
+
+  /// No description provided for @copilotAskAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask Copilot about {symbol}'**
+  String copilotAskAbout(String symbol);
+
+  /// No description provided for @copilotWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi {name}! I can look up prices, explain terms in plain words, and manage your watchlist and alerts.'**
+  String copilotWelcome(String name);
+
+  /// No description provided for @copilotTryAsking.
+  ///
+  /// In en, this message translates to:
+  /// **'Try asking:'**
+  String get copilotTryAsking;
+
+  /// No description provided for @copilotHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about a stock, coin or market…'**
+  String get copilotHint;
+
+  /// No description provided for @copilotSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get copilotSend;
+
+  /// No description provided for @copilotStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get copilotStop;
+
+  /// No description provided for @copilotStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped.'**
+  String get copilotStopped;
+
+  /// No description provided for @copilotOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected right now. Reconnecting… please try again in a moment.'**
+  String get copilotOffline;
+
+  /// No description provided for @copilotDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Copilot can make mistakes. Educational information only — not financial advice.'**
+  String get copilotDisclaimer;
+
+  /// No description provided for @copilotRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No questions left today} =1{1 question left today} other{{count} questions left today}}'**
+  String copilotRemaining(int count);
+
+  /// No description provided for @copilotNewChat.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat'**
+  String get copilotNewChat;
+
+  /// No description provided for @copilotHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Past chats'**
+  String get copilotHistory;
+
+  /// No description provided for @copilotHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No past chats yet.'**
+  String get copilotHistoryEmpty;
+
+  /// No description provided for @copilotDeleteChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete chat'**
+  String get copilotDeleteChat;
+
+  /// No description provided for @copilotStarterBitcoin.
+  ///
+  /// In en, this message translates to:
+  /// **'How is Bitcoin doing this week?'**
+  String get copilotStarterBitcoin;
+
+  /// No description provided for @copilotStarterPe.
+  ///
+  /// In en, this message translates to:
+  /// **'What is a P/E ratio, in simple words?'**
+  String get copilotStarterPe;
+
+  /// No description provided for @copilotStarterWatchlist.
+  ///
+  /// In en, this message translates to:
+  /// **'How is my watchlist doing today?'**
+  String get copilotStarterWatchlist;
+
+  /// No description provided for @copilotStarterAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Saudi Aramco to my watchlist'**
+  String get copilotStarterAdd;
+
+  /// No description provided for @copilotStarterAssetMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'How has {symbol} done this month?'**
+  String copilotStarterAssetMonth(String symbol);
+
+  /// No description provided for @copilotStarterAssetFigures.
+  ///
+  /// In en, this message translates to:
+  /// **'Explain {symbol}\'s key figures simply'**
+  String copilotStarterAssetFigures(String symbol);
+
+  /// No description provided for @copilotStarterAssetRisks.
+  ///
+  /// In en, this message translates to:
+  /// **'What are the risks of {symbol}?'**
+  String copilotStarterAssetRisks(String symbol);
+
+  /// No description provided for @copilotStarterAssetAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert me if {symbol} falls 5% in a day'**
+  String copilotStarterAssetAlert(String symbol);
+
+  /// No description provided for @actionWatchlistAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {name} to your watchlist'**
+  String actionWatchlistAdded(String name);
+
+  /// No description provided for @actionWatchlistRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {name} from your watchlist'**
+  String actionWatchlistRemoved(String name);
+
+  /// No description provided for @actionAlertCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert on {symbol}: {description}'**
+  String actionAlertCreated(String symbol, String description);
+
+  /// No description provided for @actionUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get actionUndo;
+
+  /// No description provided for @actionUndone.
+  ///
+  /// In en, this message translates to:
+  /// **'Undone'**
+  String get actionUndone;
 }
 
 class _AppLocalizationsDelegate

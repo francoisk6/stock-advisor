@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/errors/api_error.dart';
@@ -10,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../alerts/data/alerts_api.dart';
 import '../../alerts/presentation/alert_tile.dart';
 import '../../alerts/presentation/create_alert_sheet.dart';
+import '../../copilot/application/copilot_controller.dart';
 import '../../live/live_controller.dart';
 import '../../live/live_interest.dart';
 import '../../watchlist/data/watchlist_api.dart';
@@ -66,6 +68,21 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                   padding: const EdgeInsets.all(16),
                   children: [
                     _Header(detail: d),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: FilledButton.tonalIcon(
+                        icon: const Icon(Icons.auto_awesome),
+                        label: Text(l10n.copilotAskAbout(d.asset.symbol)),
+                        onPressed: () {
+                          // A fresh chat with this asset as context.
+                          ref
+                              .read(copilotControllerProvider.notifier)
+                              .newConversation();
+                          context.go('/copilot?asset=${d.asset.id}');
+                        },
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     _chartSection(context, d),
                     const SizedBox(height: 16),

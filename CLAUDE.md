@@ -112,6 +112,18 @@ Implemented (Phase 2) in `backend/app/market_data/`:
   (cooldown) and stale cache is served; a coin's market data from any batch call answers its
   detail page for 60 s; details fall back to the last known price instead of a 503.
 
+### AI copilot (Phase 4)
+- `app/ai/`: `provider.py` (LLMProvider protocol) · `ollama.py` (streaming `/api/chat` + tools)
+  · `tools.py` (registry: lookups + app actions returning UI cards; errors go back to the model)
+  · `prompts.py` (system prompt from the user's profile + rules) · `agent.py` (≤5 tool rounds,
+  one request at a time with a queue position message).
+- Transport: the existing WebSocket (`chat.send` / `chat.cancel` → `chat` events), because
+  Flutter web's HTTP client can't stream responses. `app/services/copilot.py` is
+  transport-independent (checks, daily limit, storage).
+- Stored: user questions and final answers + action cards (`chat_messages`), not tool traffic.
+  Daily limit counts answered questions (`ai_messages_per_day`); failed answers don't count.
+- Tests use `ScriptedLLM` (tests/test_copilot.py) — never the real model in unit tests.
+
 ### Live updates & background jobs (Phase 3)
 - `app/realtime/hub.py`: one WebSocket per open app at `/api/v1/ws` (protocol in the module
   docstring): first message authenticates, then `subscribe` to asset ids; server pushes changed
@@ -196,8 +208,10 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       (above/below one-shot, daily move once/day) delivered in-app + email (confirmed emails
       only), notifications inbox + bell badge, WebSocket for live prices + instant alert
       pop-ups, Free-plan limits enforced. Verified unit + live e2e. Push notifications: Android phase.
-- [ ] **Phase 4 — AI copilot v1:** Ollama provider, tool calling, agent loop, streaming chat,
-      app-action tools, guardrails + disclaimer.
+- [~] **Phase 4 — AI copilot v1:** Ollama provider, tool calling, agent loop, streaming chat,
+      app-action tools, guardrails + disclaimer. *Built and tested with a scripted model;
+      remaining: install Ollama (`infra/ollama/install.sh`), measure speed + tool-calling
+      quality of qwen3:4b, live e2e.*
 - [ ] **Phase 5 — Daily insights:** news ingestion, SearXNG web search, batch digest
       generation, push notifications, "why did it move?".
 - [ ] **Phase 6 — Learning & practice:** glossary, explain-this, paper trading, portfolio.
@@ -274,13 +288,15 @@ stock-advisor-dev/
 - Live prices: wrap screens in `LiveInterest(name, assetIds)` and read prices with
   `liveQuote(ref, asset)`; `LiveController` owns the socket (reconnect + token refresh).
 - Messages: `showSnack(messenger, text)` replaces the current SnackBar (no queueing).
+- Copilot: `CopilotController` (kept alive across screens) sends via
+  `LiveController.sendChat`; answers render with `RichAnswer` (bullets, **bold**, headings).
 
 ## Environment (dev machine)
 - Ubuntu 22.04, Python 3.10, Flutter 3.41 at `/opt/flutter`, MySQL 8.0 (shared with evolution).
 - `python3-venv` is not installed (no passwordless sudo) — create venvs with `virtualenv`
   (`~/.local/bin/virtualenv`), not `python3 -m venv`.
-- Not yet installed: Ollama (plan: native systemd install with resource limits), Docker
-  (approved; for SearXNG and dev tooling).
+- Ollama: install with `sudo bash infra/ollama/install.sh` (pinned v0.35.1, CPU-only, no GPU
+  add-ons, systemd limits, pulls qwen3:4b). Not yet installed: Docker (approved; for SearXNG).
 - Note: Docker modifies iptables — publish container ports on 127.0.0.1 only and verify
   evolution's networking (Apache, WireGuard vhosts) is unaffected after install.
 

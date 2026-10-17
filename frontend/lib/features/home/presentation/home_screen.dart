@@ -43,6 +43,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: Text(l10n.appTitle),
         actions: [
           IconButton(
+            tooltip: l10n.copilotTitle,
+            icon: const Icon(Icons.auto_awesome_outlined),
+            onPressed: () => context.go('/copilot'),
+          ),
+          IconButton(
             tooltip: unread > 0
                 ? '${l10n.notificationsTitle} (${l10n.unreadBadge(unread)})'
                 : l10n.notificationsTitle,
@@ -59,6 +64,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () => context.go('/profile'),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.go('/copilot'),
+        icon: const Icon(Icons.auto_awesome),
+        label: Text(l10n.copilotAsk),
       ),
       body: LiveInterest(
         name: 'home',

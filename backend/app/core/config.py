@@ -61,6 +61,16 @@ class Settings(BaseSettings):
     def smtp_use_ssl(self) -> bool:
         return self.smtp_ssl if self.smtp_ssl is not None else self.smtp_port == 465
 
+    # AI copilot (Ollama on this server; see infra/ollama/install.sh)
+    ollama_url: str = "http://127.0.0.1:11434"
+    ollama_model: str = "qwen3:4b"
+    ollama_num_thread: int = 4
+    ollama_num_ctx: int = 8192
+    ollama_timeout_seconds: int = 300
+    ai_think: bool = False  # Qwen's step-by-step "thinking" is too slow on this CPU
+    ai_max_tool_rounds: int = 5
+    ai_history_messages: int = 10
+
     # Background loops in the API process (single worker): alert checks and live price pushes.
     background_jobs: bool = True
     alert_check_seconds: int = 60

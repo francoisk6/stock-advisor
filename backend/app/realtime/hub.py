@@ -3,9 +3,14 @@
 Protocol (JSON messages):
   client -> {"type": "auth", "token": "<access token>"}        (first message, within 10 s)
   client -> {"type": "subscribe", "asset_ids": [1, 2, ...]}    (replaces the previous set)
+  client -> {"type": "chat.send", "request_id": "r1", "text": "...",
+             "conversation_id": 3 | null, "asset_id": 7 | null}   (copilot question)
+  client -> {"type": "chat.cancel", "request_id": "r1"}
   server -> {"type": "ready"}
   server -> {"type": "quotes", "quotes": {"<asset id>": QuoteOut, ...}}   (only changed ones)
   server -> {"type": "notification", "notification": NotificationOut, "unread_count": n}
+  server -> {"type": "chat", "request_id": "r1", "event": "conversation" | "status" | "delta"
+             | "action" | "done" | "error", ...}   (see app/services/copilot.py)
 Auth failures close the socket with code 4401.
 
 In-process registry: valid while the API runs as a single worker (see CLAUDE.md).
@@ -26,6 +31,7 @@ from app.db.models import Asset, User
 from app.db.session import SessionLocal
 from app.market_data import service as market
 from app.market_data.types import Quote
+from app.services import copilot
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +59,8 @@ class Connection:
     asset_ids: set[int] = field(default_factory=set)
     sent: dict[int, tuple[float, float | None]] = field(default_factory=dict)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    chat_task: asyncio.Task | None = None
+    chat_request_id: str | None = None
 
     async def send(self, message: dict[str, Any]) -> bool:
         async with self.lock:
@@ -84,15 +92,56 @@ class Hub:
         try:
             while True:
                 message = await websocket.receive_json()
-                if message.get("type") == "subscribe":
+                kind = message.get("type")
+                if kind == "subscribe":
                     ids = message.get("asset_ids") or []
                     conn.asset_ids = {int(i) for i in ids[:MAX_SUBSCRIPTIONS] if str(i).isdigit()}
                     conn.sent = {k: v for k, v in conn.sent.items() if k in conn.asset_ids}
                     await self.push_quotes([conn])
+                elif kind == "chat.send":
+                    await self._start_chat(conn, message)
+                elif kind == "chat.cancel" and message.get("request_id") == conn.chat_request_id:
+                    if conn.chat_task is not None:
+                        conn.chat_task.cancel()
         except (WebSocketDisconnect, RuntimeError, ValueError):
             pass
         finally:
             self._connections.pop(conn_id, None)
+            if conn.chat_task is not None:
+                conn.chat_task.cancel()
+
+    async def _start_chat(self, conn: Connection, message: dict[str, Any]) -> None:
+        request_id = str(message.get("request_id") or "")[:64]
+        if conn.chat_task is not None and not conn.chat_task.done():
+            await conn.send(
+                {
+                    "type": "chat",
+                    "request_id": request_id,
+                    "event": "error",
+                    "detail": "Please wait for the current answer to finish.",
+                }
+            )
+            return
+        conn.chat_request_id = request_id
+
+        async def run() -> None:
+            try:
+                async for event in copilot.handle(conn.user_id, message):
+                    await conn.send({"type": "chat", "request_id": request_id, **event})
+            except asyncio.CancelledError:
+                raise
+            except Exception:
+                logger.exception("Copilot request failed")
+                await conn.send(
+                    {
+                        "type": "chat",
+                        "request_id": request_id,
+                        "event": "error",
+                        "detail": "Something went wrong. Please try again.",
+                    }
+                )
+
+        conn.chat_task = asyncio.create_task(run())
 
     async def _authenticate(self, websocket: WebSocket) -> int | None:
         try:

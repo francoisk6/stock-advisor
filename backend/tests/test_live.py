@@ -66,3 +66,21 @@ def test_socket_streams_prices_and_notifications(live_client: TestClient) -> Non
         assert pushed["type"] == "notification"
         assert pushed["notification"]["title"] == "BTC is above $100.00"
         assert pushed["unread_count"] == 1
+
+
+def test_socket_chat_streams_answers(live_client: TestClient, monkeypatch) -> None:
+    from app.ai import agent
+    from tests.test_copilot import ScriptedLLM, say
+
+    monkeypatch.setattr(agent, "provider", ScriptedLLM(say("Hi", " there")))
+    token, _ = _signup(live_client)
+    with live_client.websocket_connect("/api/v1/ws") as ws:
+        ws.send_json({"type": "auth", "token": token})
+        assert ws.receive_json() == {"type": "ready"}
+        ws.send_json({"type": "chat.send", "request_id": "r1", "text": "hello"})
+        events = []
+        while not events or events[-1]["event"] not in ("done", "error"):
+            events.append(ws.receive_json())
+    assert {e["request_id"] for e in events} == {"r1"}
+    assert [e["event"] for e in events] == ["conversation", "status", "delta", "delta", "done"]
+    assert events[-1]["text"] == "Hi there"

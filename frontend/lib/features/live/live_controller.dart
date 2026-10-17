@@ -43,6 +43,8 @@ class LiveController extends Notifier<LiveState> {
   static const _unauthorized = 4401;
 
   final _interests = <String, Set<int>>{};
+  final _chats = <String, StreamController<Map<String, dynamic>>>{};
+  int _chatCounter = 0;
   LiveConnection? _connection;
   StreamSubscription<Map<String, dynamic>>? _subscription;
   Timer? _retryTimer;
@@ -78,6 +80,40 @@ class LiveController extends Notifier<LiveState> {
 
   Set<int> get _subscribed => _interests.values.expand((ids) => ids).toSet();
 
+  /// Sends a copilot question; the stream yields its events (`conversation`, `status`,
+  /// `delta`, `action`, `done`, `error`) and closes after `done` or `error`.
+  /// An `error` with `code: offline` means there is no live connection right now.
+  (String, Stream<Map<String, dynamic>>) sendChat(
+    Map<String, dynamic> request,
+  ) {
+    final id = 'chat-${++_chatCounter}';
+    final controller = StreamController<Map<String, dynamic>>();
+    final connection = _connection;
+    if (!state.connected || connection == null) {
+      controller
+        ..add({'event': 'error', 'code': 'offline'})
+        ..close();
+      return (id, controller.stream);
+    }
+    _chats[id] = controller;
+    connection.send({...request, 'type': 'chat.send', 'request_id': id});
+    return (id, controller.stream);
+  }
+
+  void cancelChat(String id) {
+    _connection?.send({'type': 'chat.cancel', 'request_id': id});
+    _chats.remove(id)?.close();
+  }
+
+  void _failChats() {
+    for (final chat in _chats.values) {
+      chat
+        ..add({'event': 'error', 'code': 'offline'})
+        ..close();
+    }
+    _chats.clear();
+  }
+
   void _start() {
     _wanted = true;
     _attempt = 0;
@@ -86,6 +122,7 @@ class LiveController extends Notifier<LiveState> {
 
   void _stop() {
     _wanted = false;
+    _failChats();
     _retryTimer?.cancel();
     _closeConnection();
     state = const LiveState();
@@ -141,12 +178,22 @@ class LiveController extends Notifier<LiveState> {
             .read(notificationsProvider.notifier)
             .received(notification, message['unread_count'] as int);
         state = state.copyWith(lastNotification: notification);
+      case 'chat':
+        final id = message['request_id'] as String?;
+        final chat = _chats[id];
+        if (chat == null) return;
+        chat.add(message);
+        if (message['event'] == 'done' || message['event'] == 'error') {
+          _chats.remove(id);
+          chat.close();
+        }
     }
   }
 
   Future<void> _onClosed(LiveConnection connection) async {
     if (!identical(_connection, connection) || !_wanted) return;
     state = state.copyWith(connected: false);
+    _failChats(); // answers in progress are lost; they're saved server-side if completed
     if (connection.closeCode == _unauthorized) {
       // Access token expired: any authenticated call refreshes it (or signs the user out).
       try {

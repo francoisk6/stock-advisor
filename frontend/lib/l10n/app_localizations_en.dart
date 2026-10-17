@@ -850,4 +850,120 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileAlertsSection => 'Alerts & notifications';
+
+  @override
+  String get copilotTitle => 'Copilot';
+
+  @override
+  String get copilotAsk => 'Ask Copilot';
+
+  @override
+  String copilotAskAbout(String symbol) {
+    return 'Ask Copilot about $symbol';
+  }
+
+  @override
+  String copilotWelcome(String name) {
+    return 'Hi $name! I can look up prices, explain terms in plain words, and manage your watchlist and alerts.';
+  }
+
+  @override
+  String get copilotTryAsking => 'Try asking:';
+
+  @override
+  String get copilotHint => 'Ask about a stock, coin or market…';
+
+  @override
+  String get copilotSend => 'Send';
+
+  @override
+  String get copilotStop => 'Stop';
+
+  @override
+  String get copilotStopped => 'Stopped.';
+
+  @override
+  String get copilotOffline =>
+      'Not connected right now. Reconnecting… please try again in a moment.';
+
+  @override
+  String get copilotDisclaimer =>
+      'Copilot can make mistakes. Educational information only — not financial advice.';
+
+  @override
+  String copilotRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count questions left today',
+      one: '1 question left today',
+      zero: 'No questions left today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get copilotNewChat => 'New chat';
+
+  @override
+  String get copilotHistory => 'Past chats';
+
+  @override
+  String get copilotHistoryEmpty => 'No past chats yet.';
+
+  @override
+  String get copilotDeleteChat => 'Delete chat';
+
+  @override
+  String get copilotStarterBitcoin => 'How is Bitcoin doing this week?';
+
+  @override
+  String get copilotStarterPe => 'What is a P/E ratio, in simple words?';
+
+  @override
+  String get copilotStarterWatchlist => 'How is my watchlist doing today?';
+
+  @override
+  String get copilotStarterAdd => 'Add Saudi Aramco to my watchlist';
+
+  @override
+  String copilotStarterAssetMonth(String symbol) {
+    return 'How has $symbol done this month?';
+  }
+
+  @override
+  String copilotStarterAssetFigures(String symbol) {
+    return 'Explain $symbol\'s key figures simply';
+  }
+
+  @override
+  String copilotStarterAssetRisks(String symbol) {
+    return 'What are the risks of $symbol?';
+  }
+
+  @override
+  String copilotStarterAssetAlert(String symbol) {
+    return 'Alert me if $symbol falls 5% in a day';
+  }
+
+  @override
+  String actionWatchlistAdded(String name) {
+    return 'Added $name to your watchlist';
+  }
+
+  @override
+  String actionWatchlistRemoved(String name) {
+    return 'Removed $name from your watchlist';
+  }
+
+  @override
+  String actionAlertCreated(String symbol, String description) {
+    return 'Alert on $symbol: $description';
+  }
+
+  @override
+  String get actionUndo => 'Undo';
+
+  @override
+  String get actionUndone => 'Undone';
 }

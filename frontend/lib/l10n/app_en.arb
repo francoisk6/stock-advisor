@@ -372,5 +372,107 @@
   },
   "alertDelete": "Delete alert",
   "alertThresholdInvalid": "Please enter a number greater than zero.",
-  "profileAlertsSection": "Alerts & notifications"
+  "profileAlertsSection": "Alerts & notifications",
+  "copilotTitle": "Copilot",
+  "copilotAsk": "Ask Copilot",
+  "copilotAskAbout": "Ask Copilot about {symbol}",
+  "@copilotAskAbout": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "copilotWelcome": "Hi {name}! I can look up prices, explain terms in plain words, and manage your watchlist and alerts.",
+  "@copilotWelcome": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "copilotTryAsking": "Try asking:",
+  "copilotHint": "Ask about a stock, coin or market…",
+  "copilotSend": "Send",
+  "copilotStop": "Stop",
+  "copilotStopped": "Stopped.",
+  "copilotOffline": "Not connected right now. Reconnecting… please try again in a moment.",
+  "copilotDisclaimer": "Copilot can make mistakes. Educational information only — not financial advice.",
+  "copilotRemaining": "{count, plural, =0{No questions left today} =1{1 question left today} other{{count} questions left today}}",
+  "@copilotRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "copilotNewChat": "New chat",
+  "copilotHistory": "Past chats",
+  "copilotHistoryEmpty": "No past chats yet.",
+  "copilotDeleteChat": "Delete chat",
+  "copilotStarterBitcoin": "How is Bitcoin doing this week?",
+  "copilotStarterPe": "What is a P/E ratio, in simple words?",
+  "copilotStarterWatchlist": "How is my watchlist doing today?",
+  "copilotStarterAdd": "Add Saudi Aramco to my watchlist",
+  "copilotStarterAssetMonth": "How has {symbol} done this month?",
+  "@copilotStarterAssetMonth": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "copilotStarterAssetFigures": "Explain {symbol}'s key figures simply",
+  "@copilotStarterAssetFigures": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "copilotStarterAssetRisks": "What are the risks of {symbol}?",
+  "@copilotStarterAssetRisks": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "copilotStarterAssetAlert": "Alert me if {symbol} falls 5% in a day",
+  "@copilotStarterAssetAlert": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "actionWatchlistAdded": "Added {name} to your watchlist",
+  "@actionWatchlistAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionWatchlistRemoved": "Removed {name} from your watchlist",
+  "@actionWatchlistRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionAlertCreated": "Alert on {symbol}: {description}",
+  "@actionAlertCreated": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "actionUndo": "Undo",
+  "actionUndone": "Undone"
 }
