@@ -461,8 +461,128 @@ async def test_invented_news_is_retracted_and_looked_up(
     assert events[-1]["text"] == "I found no news about Bitcoin from the last 7 days."
 
 
+async def test_refusing_twice_triggers_a_web_search(user: dict, llm, monkeypatch) -> None:
+    from app.news import web_search
+
+    async def fake_search(query: str, limit: int = 5):
+        assert query == "Why did Bitcoin move today?"
+        return [web_search.WebResult("BTC slips", "https://web.example/btc", "Outflows")]
+
+    monkeypatch.setattr(web_search, "search", fake_search)
+    scripted = llm(
+        say("I don't have live data on today's Bitcoin movement."),
+        say("I can't check today's data."),  # asked again, still no lookup
+        say("Bitcoin slipped on outflows ([web.example](w1))."),
+    )
+    events = await ask(user, "Why did Bitcoin move today?")
+
+    last_round = scripted.calls[2]
+    assert last_round[-1].content.startswith("You DID receive results")
+    assert last_round[-2].role == "tool" and "w1" in last_round[-2].content
+    assert "Searching the web for “Why did Bitcoin move today?”…" in [
+        e["text"] for e in events if e["event"] == "status"
+    ]
+    assert (
+        events[-1]["text"]
+        == "Bitcoin slipped on outflows ([web.example](https://web.example/btc))."
+    )
+
+
 async def test_plain_answers_are_not_retried(user: dict, llm) -> None:
     scripted = llm(say("A P/E ratio compares a share price with yearly profit per share."))
     events = await ask(user, "What is a P/E ratio?")
     assert "retract" not in kinds(events)
     assert len(scripted.calls) == 1
+
+
+async def test_uncited_news_answers_get_a_sources_line(user: dict, llm, fakes, monkeypatch) -> None:
+    from app.news import service as news_service
+    from tests.test_news import FakeNews
+
+    news = FakeNews()
+    from datetime import timedelta
+
+    from app.core.time import utcnow
+    from app.news.google_news import NewsItem
+
+    news.items = [
+        NewsItem("Bitcoin ETF outflows", "https://n.example/1", "Reuters", utcnow()),
+        NewsItem(
+            "Bitcoin tests $82K", "https://n.example/2", "CoinDesk", utcnow() - timedelta(hours=1)
+        ),
+    ]
+    monkeypatch.setattr(news_service, "provider", news)
+    news_service.fetched.clear()
+    llm(
+        [TextDelta("Let me check the news."), ToolCalls([ToolCall("get_news", {"asset": "BTC"})])],
+        say("Bitcoin slipped as ETF investors pulled money out."),  # forgot to cite
+    )
+    events = await ask(user, "Why did Bitcoin move today?")
+    kinds_seen = kinds(events)
+    assert kinds_seen.index("retract") < kinds_seen.index("status", 2)  # filler taken back
+    final = events[-1]["text"]
+    assert not final.startswith("Let me check")
+    assert final.endswith(
+        "Sources: [Reuters](https://n.example/1), [CoinDesk](https://n.example/2)"
+    )
+
+
+async def test_answer_that_ignores_fetched_news_is_redone(
+    user: dict, llm, fakes, monkeypatch
+) -> None:
+    from app.core.time import utcnow
+    from app.news import service as news_service
+    from app.news.google_news import NewsItem
+    from tests.test_news import FakeNews
+
+    news = FakeNews()
+    news.items = [NewsItem("Bitcoin ETF outflows", "https://n.example/1", "Reuters", utcnow())]
+    monkeypatch.setattr(news_service, "provider", news)
+    news_service.fetched.clear()
+    scripted = llm(
+        call("get_news", asset="BTC"),
+        say("I don't have today's Bitcoin news, check CoinGecko."),  # ignores the results
+        say("According to [Reuters](n1), ETF investors pulled money out."),
+    )
+    events = await ask(user, "Why did Bitcoin move today?")
+    assert scripted.calls[2][-1].content.startswith("You DID receive results")
+    assert events[-1]["text"] == (
+        "According to [Reuters](https://n.example/1), ETF investors pulled money out."
+    )
+
+
+async def test_honest_no_news_answer_is_not_redone(user: dict, llm, fakes, monkeypatch) -> None:
+    from app.news import service as news_service
+    from tests.test_news import FakeNews
+
+    monkeypatch.setattr(news_service, "provider", FakeNews())  # finds nothing
+    news_service.fetched.clear()
+    scripted = llm(call("get_news", asset="BTC"), say("I can't find recent Bitcoin news."))
+    events = await ask(user, "Why did Bitcoin move today?")
+    assert len(scripted.calls) == 2 and events[-1]["text"] == "I can't find recent Bitcoin news."
+
+
+async def test_invented_links_are_removed_and_uncited_answers_redone(
+    user: dict, llm, fakes, monkeypatch
+) -> None:
+    from app.core.time import utcnow
+    from app.news import service as news_service
+    from app.news.google_news import NewsItem
+    from tests.test_news import FakeNews
+
+    news = FakeNews()
+    news.items = [NewsItem("Bitcoin ETF outflows", "https://n.example/1", "Reuters", utcnow())]
+    monkeypatch.setattr(news_service, "provider", news)
+    news_service.fetched.clear()
+    scripted = llm(
+        call("get_news", asset="BTC"),
+        # Cites a URL it typed itself, none of the fetched headlines -> redone once.
+        say("According to [CoinGecko](https://www.coingecko.com/x), rates rose."),
+        # Still mixes in a made-up link: that link loses its URL; the real one stays.
+        say("According to [Reuters](n1), outflows grew; see [Blog](https://made.up/y)."),
+    )
+    events = await ask(user, "Why did Bitcoin move today?")
+    assert scripted.calls[2][-1].content.startswith("You DID receive results")
+    assert events[-1]["text"] == (
+        "According to [Reuters](https://n.example/1), outflows grew; see Blog."
+    )

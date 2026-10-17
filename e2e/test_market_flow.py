@@ -48,6 +48,9 @@ with sync_playwright() as p:
         expect(page.get_by_role("heading", name="Key figures")).to_be_visible(timeout=30000)
         wait_for_text(page, "over the past month")
         step("search -> asset page with chart and key figures")
+        expect(page.get_by_role("heading", name="Latest news")).to_be_visible(timeout=30000)
+        wait_for_text(page, r"(minutes?|hours?) ago|yesterday|days ago", timeout=30)
+        step("asset page shows recent news with source and time")
 
         page.get_by_role("button", name=re.compile(r"^P\/E ratio")).click()
         wait_for_text(page, "how many years of", timeout=5)

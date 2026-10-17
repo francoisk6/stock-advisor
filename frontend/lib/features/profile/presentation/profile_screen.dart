@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/errors/api_error.dart';
+import '../../../core/widgets/snack.dart';
 import '../../../core/validation/validators.dart';
 import '../../../core/widgets/error_text.dart';
 import '../../../core/widgets/password_field.dart';
@@ -136,6 +137,29 @@ class ProfileScreen extends ConsumerWidget {
                     title: Text(l10n.notificationsTitle),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => context.go('/notifications'),
+                  ),
+                  SwitchListTile(
+                    secondary: const Icon(Icons.wb_sunny_outlined),
+                    title: Text(l10n.briefEmail),
+                    subtitle: user.emailVerified
+                        ? null
+                        : Text(l10n.briefEmailUnverified),
+                    value: user.profile.digestEmail && user.emailVerified,
+                    onChanged: user.emailVerified
+                        ? (on) async {
+                            final messenger = ScaffoldMessenger.of(context);
+                            try {
+                              final updated = await ref
+                                  .read(userApiProvider)
+                                  .setDigestEmail(on);
+                              ref
+                                  .read(authControllerProvider.notifier)
+                                  .setUser(updated);
+                            } catch (e) {
+                              showSnack(messenger, apiErrorMessage(e, l10n));
+                            }
+                          }
+                        : null,
                   ),
                 ],
               ),

@@ -2,8 +2,19 @@ import 'package:dio/dio.dart';
 
 import '../../l10n/app_localizations.dart';
 
+/// A server-side job (brief, explanation) finished with a friendly error message.
+class JobFailed implements Exception {
+  const JobFailed(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 /// Turns any error from an API call into a short message a beginner can act on.
 String apiErrorMessage(Object error, AppLocalizations l10n) {
+  if (error is JobFailed) return error.message;
   if (error is! DioException) return l10n.errorUnexpected;
 
   switch (error.type) {

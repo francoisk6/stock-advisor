@@ -10,11 +10,26 @@ from sqlalchemy import select, union
 from sqlalchemy.dialects.mysql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai import digest as digest_service
+from app.core.config import settings
 from app.core.time import utcnow
-from app.db.models import Alert, Asset, JobRun, PriceBarDaily, WatchlistItem
+from app.db.models import (
+    Alert,
+    Asset,
+    Digest,
+    JobRun,
+    PriceBarDaily,
+    User,
+    UserProfile,
+    WatchlistItem,
+)
 from app.db.session import SessionLocal
 from app.market_data import service as market
 from app.market_data.types import Candle, ProviderError, Range
+from app.realtime.hub import hub
+from app.schemas.notifications import notification_out
+from app.services import notifications as notifications_service
+from app.services.email import digest_email, send_email
 
 logger = logging.getLogger(__name__)
 
@@ -126,3 +141,62 @@ async def store_daily_prices(session: AsyncSession) -> str:
             saved += len(rows)
         await asyncio.sleep(PAUSE_BETWEEN_ASSETS_SECONDS)
     return f"{saved} daily bars saved, {failed} assets unavailable"
+
+
+async def morning_briefs(session: AsyncSession) -> str:
+    """Write today's brief for every active, onboarded user (one at a time, off-peak)."""
+    users = list(
+        (
+            await session.execute(
+                select(User)
+                .join(UserProfile)
+                .where(User.is_active.is_(True), UserProfile.onboarding_completed_at.is_not(None))
+            )
+        ).scalars()
+    )
+    written = 0
+    for user in users:
+        try:
+            if await digest_service.today_for(session, user) is not None:
+                continue
+            digest = await digest_service.create_today(session, user)
+        except Exception:
+            logger.exception("Morning brief failed for user %s", user.id)
+            continue
+        if digest is None:
+            continue
+        written += 1
+        await deliver_brief(session, user, digest)
+    return f"{written} briefs written for {len(users)} users"
+
+
+async def deliver_brief(session: AsyncSession, user: User, digest: Digest) -> None:
+    """In-app notification (live if the app is open) + email when the user asked for it."""
+    notification = notifications_service.build(
+        user.id,
+        "digest",
+        "Your morning brief is ready",
+        "What moved in your markets, the news behind it, and what to watch today.",
+    )
+    session.add(notification)
+    await session.commit()
+    await hub.notify_user(
+        user.id,
+        {
+            "type": "notification",
+            "notification": notification_out(notification).model_dump(mode="json"),
+            "unread_count": await notifications_service.unread_count(session, user.id),
+        },
+    )
+    if user.profile.digest_email and user.email_verified and digest.emailed_at is None:
+        first_name = user.full_name.split()[0] if user.full_name.strip() else ""
+        await send_email(
+            digest_email(
+                user.email,
+                first_name,
+                digest.content,
+                f"{settings.frontend_url.rstrip('/')}/brief",
+            )
+        )
+        digest.emailed_at = utcnow()
+        await session.commit()

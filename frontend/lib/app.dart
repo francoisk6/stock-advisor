@@ -34,7 +34,12 @@ class StockAdviserApp extends ConsumerWidget {
         SnackBar(
           content: Text(next.title),
           duration: const Duration(seconds: 8),
-          action: next.assetId == null
+          action: next.kind == 'digest'
+              ? SnackBarAction(
+                  label: l10n.viewAction,
+                  onPressed: () => router.go('/brief'),
+                )
+              : next.assetId == null
               ? null
               : SnackBarAction(
                   label: l10n.viewAction,

@@ -2,12 +2,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from app.ai import insights
-from app.ai.types import AIUnavailable
+from app.ai import background, insights
 from app.api.deps import CurrentUser, SessionDep
 from app.core.errors import NotFoundError
 from app.core.rate_limit import enforce
-from app.db.models import Asset
+from app.db.models import Asset, AssetInsight
 from app.market_data import service
 from app.market_data.types import AssetType, Quote, Range
 from app.news import service as news_service
@@ -120,19 +119,40 @@ async def asset_news(asset_id: int, user: CurrentUser, session: SessionDep) -> l
     ]
 
 
-@router.post("/{asset_id}/why", response_model=InsightOut)
-async def why_did_it_move(asset_id: int, user: CurrentUser, session: SessionDep) -> InsightOut:
-    """Today's explanation (shared, cached); generating one takes ~20–40 s on this server."""
-    enforce(f"why:user:{user.id}", limit=20, window_seconds=3600)
-    asset = await get_asset(session, asset_id)
-    try:
-        insight = await insights.why_moved(session, asset)
-    except AIUnavailable as exc:
-        raise insights.InsightUnavailable(
-            "The explanation service is busy or offline. Please try again in a few minutes."
-        ) from exc
+def _why_out(insight: AssetInsight) -> InsightOut:
     return InsightOut(
+        status="ready",
         content=insight.content,
         change_percent=None if insight.change_percent is None else float(insight.change_percent),
         created_at=insight.created_at,
     )
+
+
+async def _why_status(session: SessionDep, asset: Asset) -> InsightOut | None:
+    key = f"why:{asset.id}"
+    if background.is_running(key):
+        return InsightOut(status="writing")
+    if (detail := background.error(key)) is not None:
+        return InsightOut(status="failed", detail=detail)
+    insight = await insights.cached(session, asset)
+    return None if insight is None else _why_out(insight)
+
+
+@router.get("/{asset_id}/why", response_model=InsightOut | None)
+async def why_status(asset_id: int, user: CurrentUser, session: SessionDep) -> InsightOut | None:
+    """Poll after POST: writing -> ready (or failed)."""
+    return await _why_status(session, await get_asset(session, asset_id))
+
+
+@router.post("/{asset_id}/why", response_model=InsightOut)
+async def why_did_it_move(asset_id: int, user: CurrentUser, session: SessionDep) -> InsightOut:
+    """Today's shared explanation; if none, starts writing it (~20-60 s) and says "writing"."""
+    enforce(f"why:user:{user.id}", limit=20, window_seconds=3600)
+    asset = await get_asset(session, asset_id)
+    status = await _why_status(session, asset)
+    if status is not None and status.status in ("ready", "writing"):
+        return status
+    await insights.check_move(asset)  # quick friendly refusals before any slow work
+    asset_id_ = asset.id
+    background.start(f"why:{asset_id_}", lambda: insights.write(asset_id_))
+    return InsightOut(status="writing")

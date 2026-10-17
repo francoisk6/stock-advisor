@@ -54,6 +54,7 @@ class UserProfile {
     required this.preferredLanguage,
     required this.preferredCurrency,
     required this.onboardingCompletedAt,
+    this.digestEmail = false,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
@@ -67,6 +68,7 @@ class UserProfile {
     onboardingCompletedAt: json['onboarding_completed_at'] == null
         ? null
         : DateTime.parse('${json['onboarding_completed_at']}Z'),
+    digestEmail: json['digest_email'] as bool? ?? false,
   );
 
   final String? experienceLevel;
@@ -77,6 +79,7 @@ class UserProfile {
   final String preferredLanguage;
   final String preferredCurrency;
   final DateTime? onboardingCompletedAt;
+  final bool digestEmail;
 }
 
 class Plan {

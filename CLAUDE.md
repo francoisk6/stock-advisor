@@ -131,6 +131,38 @@ Implemented (Phase 2) in `backend/app/market_data/`:
   companies, e.g. "Saudi Aramco (Saudi Arabian Oil Company)", "Alphabet (Google)".
 - Prompt rules live in `app/ai/prompts.py`; period questions must use `get_price_history`.
 
+### News, insights & daily jobs (Phase 5)
+- `app/news/`: `google_news.py` (RSS; queries from the familiar name, acronyms use the full name;
+  **headlines must name the asset** for stocks/funds/crypto — search drifts to related companies)
+  · `service.py` (store + dedupe by URL hash and title, refresh ≤ every 30 min per asset)
+  · `web_search.py` (SearXNG JSON). Google News RSS, like yfinance, is a dev source: check
+  terms or switch to a licensed news API before launch.
+- Citations: tools give short refs (`n1`, `w2`); the model writes `[Source](n1)` or bare `[n1]`;
+  `agent.resolve_citations` swaps in real URLs; unknown refs and any URL the model typed itself
+  become plain text (it invented CoinGecko links) — used by chat, insights and the brief.
+  Chat's `with_sources` appends "Sources:" if nothing fetched got cited.
+- Guards in `agent._model_turn` (each fires at most once per turn):
+  - `needs_news_retry`: an answer that claims news/causes, or answers a "why" question,
+    without get_news/web_search in that turn is retracted and redone (the real model invented
+    "according to recent news…"). A per-turn reminder follows the question.
+  - Still no lookup after that ("I don't have live data") → the backend runs `web_search` with
+    the question itself and asks the model to answer from the results.
+  - `ignores_results`: results arrived but the answer says it has none, or (why/news
+    questions) cites none of them → nudged once with `USE_RESULTS`.
+  - Text before a tool call ("Let me check…") is retracted as filler.
+- `app/ai/insights.py` ("why did it move?", ≥2% moves) and `app/ai/digest.py` (morning brief)
+  call the model without tools, from facts we assemble; both share `app/ai/slot.py` with chat.
+  Prompts forbid relaying headlines' buy/sell opinions, causes not stated by a headline, and
+  metaphors (the model overused them).
+- **Slow AI writing never blocks a request** (`app/ai/background.py`): POST starts it and returns
+  `{"status": "writing"}`; the app polls GET (`core/network/poll_job.dart`) until `ready` or
+  `failed`. Found in e2e: on Flutter web Dio's connectTimeout fires when no response arrives
+  within 10 s, and production proxies cut ~60 s requests. Quick refusals stay synchronous.
+- `app/jobs/daily.py`: `run_once_per_day` (recorded in `job_runs`; runs "running" > 1 h are taken
+  over) — daily prices at `DAILY_PRICES_HOUR_UTC` (2), morning briefs at `DIGEST_HOUR_UTC` (3).
+  Measured: brief ≈ 30–90 s per user on this CPU (sequential) — fine for now, revisit at scale.
+- SearXNG: `infra/searxng` (Docker, pinned image, 127.0.0.1:8220, 512 MB / 0.5 CPU).
+
 ### Live updates & background jobs (Phase 3)
 - `app/realtime/hub.py`: one WebSocket per open app at `/api/v1/ws` (protocol in the module
   docstring): first message authenticates, then `subscribe` to asset ids; server pushes changed
@@ -218,8 +250,10 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
 - [x] **Phase 4 — AI copilot v1:** Ollama (qwen3:4b-instruct, CPU) with tool calling, agent
       loop, streamed chat over the WebSocket, app actions with undo cards, past chats, daily
       limit, guardrails + disclaimer. Verified: unit (scripted model) + live e2e (real model).
-- [ ] **Phase 5 — Daily insights:** news ingestion, SearXNG web search, batch digest
-      generation, push notifications, "why did it move?".
+- [x] **Phase 5 — Daily insights:** per-asset news (Google News RSS, relevance-filtered), copilot
+      `get_news` + `web_search` (SearXNG) with cited links, "Why did it move?" (shared per asset
+      per day), nightly stored daily prices (chart fallback), morning brief at 06:00 Beirut
+      (in-app + optional email). Push notifications: Android phase. Verified unit + live e2e.
 - [ ] **Phase 6 — Learning & practice:** glossary, explain-this, paper trading, portfolio.
 - [ ] **Phase 7 — Monetization:** plans, quotas, Stripe + in-app purchases, Pro features.
 - [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
@@ -310,9 +344,12 @@ stock-advisor-dev/
 - Ollama v0.35.1 installed 2026-10-17 via `sudo bash infra/ollama/install.sh` (CPU-only, no GPU
   add-ons, systemd limits: Nice 10, ≤4 cores, MemoryMax 6G; models in /usr/share/ollama,
   writable via ReadWritePaths). Manage models via the local API (`/api/pull`, `/api/delete`),
-  no sudo needed. Not yet installed: Docker (approved; for SearXNG).
-- Note: Docker modifies iptables — publish container ports on 127.0.0.1 only and verify
-  evolution's networking (Apache, WireGuard vhosts) is unaffected after install.
+  no sudo needed.
+- Docker 29 installed 2026-10-17 via `infra/docker/install.sh` (ports default to 127.0.0.1,
+  networks 172.30.0.0/16, capped logs); evo is in the docker group (until re-login, prefix
+  `sg docker -c "…"`). SearXNG runs from `infra/searxng` (`docker compose up -d`).
+- Docker modifies iptables — this server is a WireGuard *client* (ip_forward was 0), so the
+  FORWARD policy change is harmless; after install Apache/MySQL/evolution ports were verified.
 
 ## Google Sign-In setup
 
@@ -392,6 +429,8 @@ nice -n 19 flutter build web        # low priority: shared server
 - 2026-10-15 — Phase 3: alerts in-app + email now; phone push with Firebase in the Android
   phase. Background jobs run inside the API process (single worker) for now.
 - 2026-10-17 — Domain: universal-stock-advisor.trade (production web + `api.` subdomain).
+- 2026-10-17 — Phase 5: news from Google News RSS (dev source), web search via self-hosted
+  SearXNG, brief at 06:00 Beirut (03:00 UTC), brief email opt-in (default off).
 - 2026-10-17 — Phase 4: copilot on qwen3:4b-instruct (non-thinking) for speed on CPU; chat
   streamed over the existing WebSocket; app actions run immediately with undo cards; web and
   news search deferred to Phase 5.

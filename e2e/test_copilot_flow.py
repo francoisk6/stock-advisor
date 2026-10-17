@@ -58,7 +58,47 @@ with sync_playwright() as p:
         answer = detail["messages"][-1]["content"]
         print("     answer:", " ".join(answer.split())[:500])
         assert re.search(r"\]\(https?://", answer), "expected at least one cited source link"
+        assert not re.search(r"don'?t have|can'?t provide|unable to", answer, re.I), (
+            "answer claims to have no data although news was fetched"
+        )
+        # Typed-in URLs are stripped by the backend; what remains are fetched sources.
+        links = re.findall(r"\]\((https?://[^)]+)\)", answer)
+        assert not any("coingecko.com" in link for link in links), links
         step("news question answered with cited source links")
+
+        button(page, "Back").click()
+        expect(page.get_by_role("heading", name="Your 2-minute morning brief")).to_be_visible(
+            timeout=15000
+        )
+        button(page, "Get today's brief now").click()
+        expect(button(page, "Read")).to_be_visible(timeout=300000)
+        button(page, "Read").click()
+        wait_for_text(page, "Your markets", timeout=30)
+        wait_for_text(page, "Saudi Aramco", timeout=10)  # from the watchlist
+        wait_for_text(page, "Written by AI", timeout=10)
+        brief = api("/digest/today", token=tokens["access_token"], method="GET")
+        print("     brief:", " ".join(brief["content"].split())[:300])
+        assert "## Your markets" in brief["content"]
+        step("morning brief written on demand from the watchlist")
+
+        movers = [
+            a for kind in ("crypto", "stock", "commodity")
+            for a in api(f"/assets/popular?type={kind}", token=tokens["access_token"],
+                         method="GET")
+            if a["quote"] and a["quote"]["change_percent"] is not None
+            and abs(a["quote"]["change_percent"]) >= 2
+        ]
+        if not movers:
+            step("no asset moved 2%+ today: 'why did it move?' not shown (nothing to check)")
+        else:
+            mover = movers[0]
+            page.goto(f"{BASE}/assets/{mover['id']}", wait_until="networkidle")
+            enable_semantics(page)
+            wait_for_text(page, rf"Why is {re.escape(mover['symbol'])} (up|down)", timeout=60)
+            button(page, "Explain").click()
+            wait_for_text(page, "AI summary of recent headlines", timeout=300)
+            step(f"'why did it move?' explained {mover['symbol']} "
+                 f"({mover['quote']['change_percent']:+.1f}%)")
         page.screenshot(path=f"{ARTIFACTS}/e2e-copilot.png", full_page=True)
     except Exception:
         page.screenshot(path=f"{ARTIFACTS}/e2e-copilot-failure.png", full_page=True)

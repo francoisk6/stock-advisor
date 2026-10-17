@@ -61,6 +61,14 @@ class UserApi {
     return User.fromJson(response.data!);
   }
 
+  Future<User> setDigestEmail(bool enabled) async {
+    final response = await _dio.put<Map<String, dynamic>>(
+      '/users/me/preferences',
+      data: {'digest_email': enabled},
+    );
+    return User.fromJson(response.data!);
+  }
+
   /// Returns fresh tokens: the server signs out every other session.
   Future<AuthSession> changePassword({
     String? currentPassword,

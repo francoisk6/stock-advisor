@@ -6,6 +6,7 @@ import '../../features/auth/application/auth_controller.dart';
 import '../../features/auth/domain/auth_state.dart';
 import '../../features/alerts/presentation/alerts_screen.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
+import '../../features/brief/presentation/brief_screen.dart';
 import '../../features/copilot/presentation/copilot_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
@@ -74,6 +75,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'profile',
             builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: 'brief',
+            builder: (context, state) => const BriefScreen(),
           ),
           GoRoute(
             path: 'copilot',

@@ -66,7 +66,17 @@ TURN_REMINDER = (
 
 # Sent when an answer talks about news without having looked any up.
 NEWS_RETRY = (
-    "Your answer mentions news or reasons, but you did not call get_news or web_search in "
-    "this turn, so it may be invented. Call get_news (for an asset) or web_search now, then "
-    "answer using only what they return, with [Source](ref) links."
+    "This question needs news, but you did not call get_news or web_search in this turn, so "
+    "your answer may be invented (and you DO have live news through these tools). Call "
+    "get_news (for an asset) or web_search now, then answer using only what they return, "
+    "with [Source](ref) links."
+)
+
+# Sent when the model was given news/web results but answered as if it had none.
+USE_RESULTS = (
+    "You DID receive results above (the get_news / web_search tool messages). Answer the "
+    "question using those results (and any figures from your other lookups), citing each "
+    "headline you use with its reference, e.g. [Reuters](n1) — never type a web address "
+    "yourself, and don't add reasons the results don't state. If none of them explains it, "
+    "say the recent headlines don't give a clear reason."
 )

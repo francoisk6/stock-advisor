@@ -10,7 +10,7 @@ from app.core.time import utcnow
 from app.db.models import Asset, NewsArticle, NewsArticleAsset
 from app.market_data.cache import TTLCache
 from app.market_data.types import ProviderError
-from app.news.google_news import GoogleNews, NewsItem, news_query
+from app.news.google_news import GoogleNews, NewsItem, is_relevant, news_query
 
 provider = GoogleNews()
 fetched = TTLCache(stale_for=0)  # remembers when each asset's news was last refreshed
@@ -25,6 +25,7 @@ def url_hash(url: str) -> str:
 
 async def store(session: AsyncSession, asset: Asset, items: list[NewsItem]) -> int:
     """Insert new articles and link them to the asset; returns how many links were added."""
+    items = [i for i in items if is_relevant(asset, i.title)]
     items = sorted(items, key=lambda i: i.published_at, reverse=True)[:KEEP_PER_FETCH]
     if not items:
         return 0
@@ -101,7 +102,8 @@ async def latest(session: AsyncSession, asset: Asset, limit: int = 10) -> list[N
     )
     unique: dict[str, NewsArticle] = {}
     for article in result.scalars():
-        unique.setdefault(_title_key(article.title), article)
+        if is_relevant(asset, article.title):  # also hides links stored before the filter
+            unique.setdefault(_title_key(article.title), article)
     return list(unique.values())[:limit]
 
 

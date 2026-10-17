@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/network/poll_job.dart';
 import '../domain/market.dart';
 
 class MarketApi {
@@ -43,13 +44,15 @@ class MarketApi {
     ];
   }
 
-  /// Today's "why did it move?" explanation. Generating one can take up to a minute.
+  /// Today's "why did it move?" explanation (writing one takes up to a minute).
   Future<String> whyMoved(int id) async {
-    final response = await _dio.post<Map<String, dynamic>>(
-      '/assets/$id/why',
-      options: Options(receiveTimeout: const Duration(seconds: 150)),
+    final started = await _dio.post<Map<String, dynamic>>('/assets/$id/why');
+    final done = await pollJob(
+      () async =>
+          (await _dio.get<Map<String, dynamic>?>('/assets/$id/why')).data,
+      first: started.data!,
     );
-    return response.data!['content'] as String;
+    return done['content'] as String;
   }
 
   Future<PriceHistory> history(int id, String range) async {

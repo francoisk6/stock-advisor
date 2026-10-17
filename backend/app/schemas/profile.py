@@ -51,6 +51,11 @@ class ProfileOut(BaseModel):
     preferred_language: str
     preferred_currency: str
     onboarding_completed_at: datetime | None
+    digest_email: bool
+
+
+class PreferencesIn(BaseModel):
+    digest_email: bool
 
 
 class ProfileUpdateIn(BaseModel):

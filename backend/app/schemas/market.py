@@ -76,6 +76,8 @@ class NewsOut(BaseModel):
 
 
 class InsightOut(BaseModel):
-    content: str
-    change_percent: float | None
-    created_at: datetime
+    status: str  # ready | writing | failed
+    content: str | None = None
+    change_percent: float | None = None
+    created_at: datetime | None = None
+    detail: str | None = None

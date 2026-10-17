@@ -5,6 +5,7 @@ import 'package:stock_adviser/app.dart';
 import 'package:stock_adviser/features/auth/application/auth_controller.dart';
 import 'package:stock_adviser/features/auth/domain/auth_state.dart';
 import 'package:stock_adviser/features/auth/domain/user.dart';
+import 'package:stock_adviser/features/brief/data/brief_api.dart';
 import 'package:stock_adviser/features/health/data/health_repository.dart';
 import 'package:stock_adviser/features/market/data/market_api.dart';
 import 'package:stock_adviser/features/market/domain/market.dart';
@@ -69,6 +70,25 @@ class FakeWatchlistController extends WatchlistController {
   );
 }
 
+class FakeBriefController extends BriefController {
+  FakeBriefController(this.brief);
+
+  final Brief? brief;
+
+  @override
+  Future<Brief?> build() async => brief;
+
+  @override
+  Future<void> create() async => state = AsyncData(
+    Brief(
+      content:
+          '## Your markets\n- Bitcoin is up 10%.\n## In the news\n'
+          '- According to [Reuters](https://example.com/r), ETF demand rose.',
+      createdAt: DateTime.utc(2026, 10, 17, 3),
+    ),
+  );
+}
+
 class FakeNotificationsController extends NotificationsController {
   FakeNotificationsController(this.inbox);
 
@@ -95,6 +115,7 @@ Future<void> pumpApp(
   List<Asset> popular = const [],
   List<Asset> watchlist = const [],
   NotificationInbox inbox = const NotificationInbox(unreadCount: 0, items: []),
+  Brief? brief,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -103,6 +124,7 @@ Future<void> pumpApp(
         watchlistProvider.overrideWith(
           () => FakeWatchlistController(watchlist),
         ),
+        briefProvider.overrideWith(() => FakeBriefController(brief)),
         notificationsProvider.overrideWith(
           () => FakeNotificationsController(inbox),
         ),

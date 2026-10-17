@@ -14,6 +14,7 @@ from app.core.errors import AppError
 from app.core.money import format_money, format_percent
 from app.core.time import utcnow
 from app.db.models import Asset, AssetInsight
+from app.db.session import SessionLocal
 from app.market_data import service as market
 from app.news import service as news_service
 
@@ -39,20 +40,24 @@ class InsightUnavailable(AppError):
     status_code = 503
 
 
-async def why_moved(session: AsyncSession, asset: Asset) -> AssetInsight:
-    today = utcnow().date()
+async def cached(session: AsyncSession, asset: Asset) -> AssetInsight | None:
+    """Today's explanation if it's still fresh."""
     existing = (
         await session.execute(
             select(AssetInsight).where(
                 AssetInsight.asset_id == asset.id,
                 AssetInsight.kind == "why_move",
-                AssetInsight.day == today,
+                AssetInsight.day == utcnow().date(),
             )
         )
     ).scalar_one_or_none()
     if existing is not None and utcnow() - existing.created_at < REFRESH_AFTER:
         return existing
+    return None
 
+
+async def check_move(asset: Asset) -> None:
+    """Fast checks before writing: raises a friendly error on normal days / missing prices."""
     quote = (await market.quotes_for([asset])).get(asset.id)
     if quote is None or quote.change_percent is None:
         raise InsightUnavailable("Today's price isn't available yet, so we can't explain it.")
@@ -62,36 +67,55 @@ async def why_moved(session: AsyncSession, asset: Asset) -> AssetInsight:
             "that's a normal day, so there's nothing special to explain."
         )
 
-    headlines = await news_service.news_for(session, asset, limit=8)
-    if not headlines:
-        content = NO_NEWS
-    else:
-        sources = {f"n{i}": (h.url, h.source) for i, h in enumerate(headlines, 1)}
-        lines = "\n".join(
-            f"[n{i}] {h.published_at:%Y-%m-%d %H:%M} UTC — {h.source}: {h.title}"
-            for i, h in enumerate(headlines, 1)
-        )
-        facts = (
-            f"Asset: {asset.name} ({asset.symbol}, {asset.asset_type}).\n"
-            f"Today: {format_percent(quote.change_percent)} to "
-            f"{format_money(quote.price, quote.currency or asset.currency)} "
-            f"(data from {market.SOURCE_NAMES.get(asset.provider, asset.provider)}).\n"
-            f"Headlines (newest first):\n{lines}"
-        )
-        text = ""
-        async with slot.slot:
-            async for event in agent.provider.stream_chat(
-                [ChatMessage("system", SYSTEM), ChatMessage("user", facts)], []
-            ):
-                if isinstance(event, TextDelta):
-                    text += event.text
-        content = resolve_citations(text.strip(), sources) or NO_NEWS
 
-    if existing is None:
-        existing = AssetInsight(asset_id=asset.id, kind="why_move", day=today, content=content)
-        session.add(existing)
-    existing.content = content
-    existing.change_percent = Decimal(str(round(quote.change_percent, 4)))
-    existing.created_at = utcnow()
-    await session.commit()
-    return existing
+async def write(asset_id: int) -> None:
+    """Write (or refresh) today's explanation. Slow: runs in the background, own session."""
+    async with SessionLocal() as session:
+        asset = await session.get(Asset, asset_id)
+        if asset is None:
+            return
+        quote = (await market.quotes_for([asset])).get(asset.id)
+        if quote is None or quote.change_percent is None:
+            return
+        headlines = await news_service.news_for(session, asset, limit=8)
+        if not headlines:
+            content = NO_NEWS
+        else:
+            sources = {f"n{i}": (h.url, h.source) for i, h in enumerate(headlines, 1)}
+            lines = "\n".join(
+                f"[n{i}] {h.published_at:%Y-%m-%d %H:%M} UTC — {h.source}: {h.title}"
+                for i, h in enumerate(headlines, 1)
+            )
+            facts = (
+                f"Asset: {asset.name} ({asset.symbol}, {asset.asset_type}).\n"
+                f"Today: {format_percent(quote.change_percent)} to "
+                f"{format_money(quote.price, quote.currency or asset.currency)} "
+                f"(data from {market.SOURCE_NAMES.get(asset.provider, asset.provider)}).\n"
+                f"Headlines (newest first):\n{lines}"
+            )
+            text = ""
+            async with slot.slot:
+                async for event in agent.provider.stream_chat(
+                    [ChatMessage("system", SYSTEM), ChatMessage("user", facts)], []
+                ):
+                    if isinstance(event, TextDelta):
+                        text += event.text
+            content = resolve_citations(text.strip(), sources) or NO_NEWS
+
+        today = utcnow().date()
+        existing = (
+            await session.execute(
+                select(AssetInsight).where(
+                    AssetInsight.asset_id == asset.id,
+                    AssetInsight.kind == "why_move",
+                    AssetInsight.day == today,
+                )
+            )
+        ).scalar_one_or_none()
+        if existing is None:
+            existing = AssetInsight(asset_id=asset.id, kind="why_move", day=today, content=content)
+            session.add(existing)
+        existing.content = content
+        existing.change_percent = Decimal(str(round(quote.change_percent, 4)))
+        existing.created_at = utcnow()
+        await session.commit()

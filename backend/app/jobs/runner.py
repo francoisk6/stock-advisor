@@ -51,6 +51,8 @@ async def run_daily_jobs() -> None:
     now = utcnow()
     if now.hour >= settings.daily_prices_hour_utc:
         await daily.run_once_per_day("daily_prices", now.date(), daily.store_daily_prices)
+    if now.hour >= settings.digest_hour_utc:
+        await daily.run_once_per_day("morning_briefs", now.date(), daily.morning_briefs)
 
 
 async def _loop(name: str, seconds: int, job: Callable[[], Awaitable[object]]) -> None:

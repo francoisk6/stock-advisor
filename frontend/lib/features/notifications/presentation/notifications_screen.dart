@@ -81,7 +81,9 @@ class NotificationsScreen extends ConsumerWidget {
                           isThreeLine: true,
                           onTap: () {
                             controller.markRead(n.id);
-                            if (n.assetId != null) {
+                            if (n.kind == 'digest') {
+                              context.go('/brief');
+                            } else if (n.assetId != null) {
                               context.go('/assets/${n.assetId}');
                             }
                           },

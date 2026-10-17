@@ -6,7 +6,7 @@ from app.api.v1.auth import auth_response
 from app.core.errors import AppError
 from app.core.rate_limit import enforce
 from app.schemas.auth import AuthOut, ChangePasswordIn
-from app.schemas.profile import ProfileUpdateIn
+from app.schemas.profile import PreferencesIn, ProfileUpdateIn
 from app.schemas.user import UserOut, UserUpdateIn
 from app.services import auth as auth_service
 from app.services import users as users_service
@@ -34,6 +34,15 @@ async def update_my_profile(
     data: ProfileUpdateIn, user: CurrentUser, session: SessionDep
 ) -> UserOut:
     await users_service.update_profile(session, user, data)
+    return users_service.to_user_out(user)
+
+
+@router.put("/me/preferences", response_model=UserOut)
+async def update_my_preferences(
+    data: PreferencesIn, user: CurrentUser, session: SessionDep
+) -> UserOut:
+    user.profile.digest_email = data.digest_email
+    await session.commit()
     return users_service.to_user_out(user)
 
 

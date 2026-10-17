@@ -152,3 +152,32 @@ def alert_email(to: str, name: str, title: str, body: str, url: str) -> Outgoing
             + _button(url, "See the chart"),
         ),
     )
+
+
+def digest_email(to: str, name: str, body_markdown: str, url: str) -> OutgoingEmail:
+    """Plain-text-first email of the morning brief (markdown links shown as 'text (url)')."""
+    import re
+
+    greeting = f"Good morning {name}," if name else "Good morning,"
+    text_body = re.sub(r"\[([^\]]+)\]\((https?://[^)]+)\)", r"\1 (\2)", body_markdown)
+    html_body = html.escape(body_markdown)
+    html_body = re.sub(r"\[([^\]]+)\]\((https?://[^)]+)\)", r'<a href="\2">\1</a>', html_body)
+    html_body = re.sub(r"^## (.+)$", r"<h3>\1</h3>", html_body, flags=re.M)
+    html_body = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", html_body)
+    html_body = re.sub(r"^[-*] (.+)$", r"• \1<br>", html_body, flags=re.M)
+    return OutgoingEmail(
+        to=to,
+        subject="Your 2-minute morning brief",
+        text=(
+            f"{greeting}\n\n{text_body}\n\nOpen the app: {url}\n\n"
+            "Educational information only — not financial advice. You can turn these "
+            "emails off in Profile."
+        ),
+        html=_layout(
+            "Your 2-minute morning brief",
+            f"<p>{html.escape(greeting)}</p><div>{html_body}</div>"
+            + _button(url, "Open the app")
+            + "<p style='font-size:12px;color:#666'>You can turn these emails off in "
+            "Profile.</p>",
+        ),
+    )

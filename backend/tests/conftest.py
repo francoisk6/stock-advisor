@@ -19,6 +19,7 @@ from httpx import ASGITransport, AsyncClient  # noqa: E402
 from sqlalchemy import text  # noqa: E402
 
 from alembic import command  # noqa: E402
+from app.ai import background  # noqa: E402
 from app.core.config import settings  # noqa: E402
 from app.core.rate_limit import limiter  # noqa: E402
 from app.db.session import SessionLocal, engine  # noqa: E402
@@ -30,6 +31,7 @@ assert settings.db_name == "stock_advisor_test", "tests must never touch the dev
 
 # Tables reset between tests (children first); plans keep their migration seed data.
 _RESET_TABLES = [
+    "digests",
     "job_runs",
     "price_bars_daily",
     "asset_insights",
@@ -79,6 +81,7 @@ async def clean_state() -> AsyncIterator[None]:
         await conn.execute(text("DELETE FROM assets WHERE popularity IS NULL"))
     memory_outbox.clear()
     limiter.reset()
+    background.clear()
     yield
 
 

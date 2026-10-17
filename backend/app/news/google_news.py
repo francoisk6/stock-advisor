@@ -54,6 +54,54 @@ def short_name(asset: Asset) -> str:
     return name or asset.symbol
 
 
+# Words too common to tell companies apart ("Saudi Aramco" vs "Saudi Aramco Base Oil").
+_GENERIC = {
+    "saudi",
+    "arabian",
+    "national",
+    "international",
+    "bank",
+    "banking",
+    "group",
+    "company",
+    "corporation",
+    "holding",
+    "holdings",
+    "energy",
+    "properties",
+    "telecom",
+    "industries",
+    "basic",
+    "financial",
+    "technologies",
+    "technology",
+    "manufacturing",
+    "semiconductor",
+    "commercial",
+    "investment",
+    "global",
+    "the",
+    "and",
+}
+
+
+def relevance_keywords(asset: Asset) -> set[str]:
+    """Lower-case words a headline must contain to really be about this asset."""
+    name = short_name(asset).lower()
+    words = {w for w in re.findall(r"[a-z0-9&]+", name) if len(w) >= 4 and w not in _GENERIC}
+    keywords = {name, *words, asset.symbol.split(".")[0].lstrip("^").lower()}
+    return {k for k in keywords if len(k) >= 3}
+
+
+def is_relevant(asset: Asset, title: str) -> bool:
+    """Stocks/funds/crypto: the headline must name the asset (search results drift to related
+    companies). Currencies, commodities and indices are topics, so any result counts."""
+    if asset.asset_type not in ("stock", "etf", "fund", "crypto"):
+        return True
+    text = title.lower()
+    return any(re.search(rf"\b{re.escape(k)}\b", text) for k in relevance_keywords(asset))
+
+
 def news_query(asset: Asset) -> str:
     name = short_name(asset)
     query = {

@@ -58,6 +58,18 @@ cd ../frontend && flutter pub get                # new Flutter packages, if any
 curl -s localhost:8200/api/v1/health/db          # API + database
 systemctl status ollama --no-pager               # AI model service
 curl -s 127.0.0.1:11434/api/tags                 # installed AI models
+docker ps --format '{{.Names}} {{.Status}}'       # SearXNG (web search)
+```
+
+**Daily jobs** (run inside the API process; times in UTC, set in `backend/.env`):
+`DAILY_PRICES_HOUR_UTC=2` stores daily prices, `DIGEST_HOUR_UTC=3` writes everyone's morning
+brief (06:00 Beirut). Each runs once per day; check what ran:
+```bash
+cd ~/stock-advisor/stock-advisor-dev/backend && .venv/bin/python -c "
+import pymysql; from app.core.config import settings as s
+c=pymysql.connect(host=s.db_host,user=s.db_user,password=s.db_password,database=s.db_name)
+cur=c.cursor(); cur.execute('select * from job_runs order by day desc, name limit 10')
+[print(r) for r in cur.fetchall()]"
 ```
 
 ---
@@ -167,7 +179,7 @@ cd .. && sudo bash infra/ollama/install.sh              # AI model service (CPU-
 
 ---
 
-## 6. Phase 5 setup — Docker + SearXNG (web search for the copilot)
+## 6. Docker + SearXNG (web search for the copilot) — done 2026-10-17
 
 **Step 1 — install Docker** (asks for your sudo password):
 ```bash
@@ -201,4 +213,6 @@ Stop: `docker compose down` · Logs: `docker compose logs -f` · Limits: 512 MB 
 | Copilot: "unavailable right now" | `systemctl status ollama --no-pager`; restart with `sudo systemctl restart ollama`. |
 | First copilot answer is slow (~15 s extra) | Normal: the model loads after 5 idle minutes. |
 | Prices missing / "temporarily unavailable" | Free data sources are rate-limiting; cached prices return within ~1 minute. |
+| Copilot says web search is unavailable | `cd infra/searxng && docker compose ps` — start with `docker compose up -d`. |
+| No morning brief today | Check `job_runs` (section 1). A brief needs an onboarded user; "Get today's brief now" on Home writes one on demand. |
 | Port 8200/8210 "already in use" | An old server is still running: `ss -tlnp \| grep -E ':(8200\|8210) '` then stop that process. |

@@ -7,6 +7,7 @@ import '../../../core/widgets/error_text.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../auth/presentation/widgets/verify_email_banner.dart';
+import '../../brief/presentation/brief_card.dart';
 import '../../live/live_interest.dart';
 import '../../market/data/market_api.dart';
 import '../../notifications/data/notifications_api.dart';
@@ -108,6 +109,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 l10n.homeSubtitle,
                                 style: theme.textTheme.bodyLarge,
                               ),
+                              const SizedBox(height: 16),
+                              const BriefCard(),
                               const SizedBox(height: 16),
                               SearchBar(
                                 hintText: l10n.searchHint,

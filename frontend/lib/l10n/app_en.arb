@@ -537,5 +537,21 @@
   },
   "whyExplain": "Explain",
   "whyLoading": "Reading today's news… this can take up to a minute.",
-  "whyNote": "AI summary of recent headlines — it can be incomplete or wrong. Not financial advice."
+  "whyNote": "AI summary of recent headlines — it can be incomplete or wrong. Not financial advice.",
+  "briefTitle": "Your 2-minute morning brief",
+  "briefNone": "Your brief is written early every morning: what moved in your markets, the news behind it, and what to watch.",
+  "briefGet": "Get today's brief now",
+  "briefWriting": "Writing your brief… this takes about a minute.",
+  "briefRead": "Read",
+  "briefWritten": "Written {time}",
+  "@briefWritten": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "briefNote": "Written by AI from market data and headlines — it can be incomplete or wrong. Educational information only — not financial advice.",
+  "briefEmail": "Email me my morning brief",
+  "briefEmailUnverified": "Confirm your email address to get the brief by email."
 }

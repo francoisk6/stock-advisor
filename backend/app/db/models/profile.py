@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, DateTime, ForeignKey, String
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -28,5 +28,9 @@ class UserProfile(TimestampMixin, Base):
     preferred_language: Mapped[str] = mapped_column(String(10), nullable=False, default="en")
     preferred_currency: Mapped[str] = mapped_column(String(3), nullable=False, default="USD")
     onboarding_completed_at: Mapped[datetime | None] = mapped_column(DateTime)
+    # Also email the morning brief (it's always in the app).
+    digest_email: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=false()
+    )
 
     user: Mapped[User] = relationship(back_populates="profile")

@@ -1035,4 +1035,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get whyNote =>
       'AI summary of recent headlines — it can be incomplete or wrong. Not financial advice.';
+
+  @override
+  String get briefTitle => 'Your 2-minute morning brief';
+
+  @override
+  String get briefNone =>
+      'Your brief is written early every morning: what moved in your markets, the news behind it, and what to watch.';
+
+  @override
+  String get briefGet => 'Get today\'s brief now';
+
+  @override
+  String get briefWriting => 'Writing your brief… this takes about a minute.';
+
+  @override
+  String get briefRead => 'Read';
+
+  @override
+  String briefWritten(String time) {
+    return 'Written $time';
+  }
+
+  @override
+  String get briefNote =>
+      'Written by AI from market data and headlines — it can be incomplete or wrong. Educational information only — not financial advice.';
+
+  @override
+  String get briefEmail => 'Email me my morning brief';
+
+  @override
+  String get briefEmailUnverified =>
+      'Confirm your email address to get the brief by email.';
 }

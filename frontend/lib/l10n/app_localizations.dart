@@ -1869,6 +1869,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI summary of recent headlines — it can be incomplete or wrong. Not financial advice.'**
   String get whyNote;
+
+  /// No description provided for @briefTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 2-minute morning brief'**
+  String get briefTitle;
+
+  /// No description provided for @briefNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your brief is written early every morning: what moved in your markets, the news behind it, and what to watch.'**
+  String get briefNone;
+
+  /// No description provided for @briefGet.
+  ///
+  /// In en, this message translates to:
+  /// **'Get today\'s brief now'**
+  String get briefGet;
+
+  /// No description provided for @briefWriting.
+  ///
+  /// In en, this message translates to:
+  /// **'Writing your brief… this takes about a minute.'**
+  String get briefWriting;
+
+  /// No description provided for @briefRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get briefRead;
+
+  /// No description provided for @briefWritten.
+  ///
+  /// In en, this message translates to:
+  /// **'Written {time}'**
+  String briefWritten(String time);
+
+  /// No description provided for @briefNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Written by AI from market data and headlines — it can be incomplete or wrong. Educational information only — not financial advice.'**
+  String get briefNote;
+
+  /// No description provided for @briefEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email me my morning brief'**
+  String get briefEmail;
+
+  /// No description provided for @briefEmailUnverified.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your email address to get the brief by email.'**
+  String get briefEmailUnverified;
 }
 
 class _AppLocalizationsDelegate

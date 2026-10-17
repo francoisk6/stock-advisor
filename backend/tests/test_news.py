@@ -28,6 +28,18 @@ def test_short_names_and_queries() -> None:
     assert news_query(asset("Gold", "commodity")) == '"Gold" price when:7d'
 
 
+def test_headlines_must_name_the_asset() -> None:
+    from app.news.google_news import is_relevant
+
+    aramco = asset("Saudi Aramco (Saudi Arabian Oil Company)", "stock", "2222.SR")
+    assert is_relevant(aramco, "Aramco profit rises")
+    assert not is_relevant(aramco, "Luberef stock fell 5.26 percent")
+    assert not is_relevant(aramco, "Saudi bank results beat estimates")  # generic word only
+    btc = asset("Bitcoin", "crypto", "BTC")
+    assert is_relevant(btc, "BTC tests $82,000") and is_relevant(btc, "Bitcoin ETFs see outflows")
+    assert is_relevant(asset("Gold", "commodity", "GOLD"), "Fed signals weigh on metals")
+
+
 def test_parse_feed() -> None:
     xml = """<rss><channel>
       <item><title>Aramco profit rises - Reuters</title><link>https://n/1</link>
@@ -72,15 +84,17 @@ async def test_news_endpoint_stores_dedupes_and_caches(
     asset_id = aramco.json()[0]["id"]
     now = utcnow()
     fake_news.items = [
-        NewsItem("Old story", "https://n/old", "Archive", now - timedelta(days=30)),
+        NewsItem("Old Aramco story", "https://n/old", "Archive", now - timedelta(days=30)),
         NewsItem("Aramco profit rises", "https://n/1", "Reuters", now - timedelta(hours=2)),
         NewsItem("Aramco profit rises", "https://n/1", "Reuters", now - timedelta(hours=2)),
-        NewsItem("Oil climbs", "https://n/2", "WSJ", now - timedelta(hours=1)),
-        NewsItem("Oil  climbs", "https://n/2b", "WSJ", now - timedelta(hours=1)),  # syndicated
+        NewsItem("Aramco oil output climbs", "https://n/2", "WSJ", now - timedelta(hours=1)),
+        NewsItem("Aramco oil  output climbs", "https://n/2b", "WSJ", now - timedelta(hours=1)),
+        NewsItem("Luberef shares drop", "https://n/3", "Argaam", now),  # not about Aramco
     ]
 
     first = (await client.get(f"/assets/{asset_id}/news", headers=bearer(user))).json()
-    assert [n["title"] for n in first] == ["Oil climbs", "Aramco profit rises"]  # newest first
+    titles = [n["title"] for n in first]
+    assert titles == ["Aramco oil output climbs", "Aramco profit rises"]  # newest first
     assert first[0]["source"] == "WSJ" and first[0]["url"] == "https://n/2"
     assert fake_news.queries == ['"Saudi Aramco" stock when:7d']
 
@@ -90,4 +104,4 @@ async def test_news_endpoint_stores_dedupes_and_caches(
     news_service.fetched.clear()
     fake_news.fail = True  # source down: stored headlines still shown
     again = (await client.get(f"/assets/{asset_id}/news", headers=bearer(user))).json()
-    assert [n["title"] for n in again] == ["Oil climbs", "Aramco profit rises"]
+    assert [n["title"] for n in again] == ["Aramco oil output climbs", "Aramco profit rises"]
