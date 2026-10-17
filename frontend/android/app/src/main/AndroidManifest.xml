@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Release builds need this explicitly (Flutter adds it only to debug builds). -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="Stock Adviser"
+        android:usesCleartextTraffic="${usesCleartextTraffic}"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

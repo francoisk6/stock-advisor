@@ -1,4 +1,4 @@
-# CLAUDE.md — Stock Adviser (future brand: Universal Stock Advisor, "USA")
+# CLAUDE.md — Stock Adviser (brand: Universal Stock Advisor, "USA" — universal-stock-advisor.trade)
 
 Guidance for Claude Code when working in this repository.
 
@@ -222,8 +222,8 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       generation, push notifications, "why did it move?".
 - [ ] **Phase 6 — Learning & practice:** glossary, explain-this, paper trading, portfolio.
 - [ ] **Phase 7 — Monetization:** plans, quotas, Stripe + in-app purchases, Pro features.
-- [ ] **Phase 8 — Launch:** production deploy, domain (universal-stock-advisor), monitoring,
-      store releases.
+- [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
+      (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.
 
 ## Repository layout
 
@@ -235,8 +235,8 @@ stock-advisor-dev/
 │                       · market_data/ (providers/, cache, catalog.json, seed, service)
 ├── frontend/           Flutter app — web + android (lib/core, lib/features, lib/l10n, test/)
 ├── e2e/                Playwright browser flows (run.sh starts backend + web build, cleans up)
-├── infra/              mysql/ setup script; later docker-compose (SearXNG), Ollama service
-└── docs/               ADRs / decision log, API notes
+├── infra/              mysql/ · ollama/ · docker/ install scripts · searxng/ (compose + settings)
+└── docs/               RUNBOOK.md (run/build/release/setup commands), decision notes
 ```
 
 ## Conventions
@@ -277,7 +277,13 @@ stock-advisor-dev/
   (e.g. `fl_chart` / `syncfusion_flutter_charts` — decide in Phase 2).
 - All user-facing strings via localization files (`lib/l10n/app_en.arb`); no hard-coded text.
 - API base URL via `--dart-define=API_BASE_URL=...` (default `http://localhost:8200/api/v1`).
-- Package id / org: `com.universalstockadvisor` (Dart package `stock_adviser`).
+- Package id / org: `com.universalstockadvisor` (Dart package `stock_adviser`); Android
+  applicationId `com.universalstockadvisor.stock_adviser` (cannot change after first Play upload).
+- Android: release signing from `android/key.properties` (gitignored) → upload keystore in
+  `~/keys/stock-adviser/` (outside the repo; must be backed up). Cleartext http is allowed in
+  debug/profile, and in release only with `-P allowCleartext=true` (LAN test builds, never Play).
+  Gradle heap capped at 3 GB, daemon exits after 10 idle min (shared server).
+  Build commands: `docs/RUNBOOK.md`.
 - `flutter analyze` must be clean; run `dart format lib test`.
 - Auth flow: `AuthController` (Riverpod Notifier) is the single source of truth; go_router
   redirects from it (`authRedirect` in `core/router/app_router.dart`, unit-tested). `dioProvider`
@@ -385,6 +391,7 @@ nice -n 19 flutter build web        # low priority: shared server
   Market endpoints require sign-in (protects free API quotas).
 - 2026-10-15 — Phase 3: alerts in-app + email now; phone push with Firebase in the Android
   phase. Background jobs run inside the API process (single worker) for now.
+- 2026-10-17 — Domain: universal-stock-advisor.trade (production web + `api.` subdomain).
 - 2026-10-17 — Phase 4: copilot on qwen3:4b-instruct (non-thinking) for speed on CPU; chat
   streamed over the existing WebSocket; app actions run immediately with undo cards; web and
   news search deferred to Phase 5.

@@ -29,3 +29,6 @@ frontend/ios/Pods/
 
 # Local runtime data (dev email outbox, etc.)
 backend/var/
+
+# Kotlin compiler caches (Android builds)
+frontend/android/.kotlin/

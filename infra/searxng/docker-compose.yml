@@ -1,0 +1,23 @@
+# Self-hosted SearXNG: free web search for the copilot (no API key), local only.
+# Start:  cd infra/searxng && SEARXNG_SECRET=$(openssl rand -hex 32) docker compose up -d
+name: stock-adviser-search
+
+services:
+  searxng:
+    image: searxng/searxng:2026.10.2-19ffbcd30   # pinned; bump deliberately
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8220:8080"   # never on the LAN
+    environment:
+      - SEARXNG_BASE_URL=http://127.0.0.1:8220/
+      - SEARXNG_SECRET=${SEARXNG_SECRET:?set SEARXNG_SECRET}
+    volumes:
+      - ./settings.yml:/etc/searxng/settings.yml:ro
+    # Shared server: keep it small.
+    mem_limit: 512m
+    cpus: 0.5
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETGID, SETUID]
+    logging:
+      driver: json-file
+      options: { max-size: "5m", max-file: "2" }
