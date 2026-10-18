@@ -10,6 +10,7 @@ from app.api.v1 import (
     learn,
     live,
     notifications,
+    practice,
     users,
     watchlist,
 )
@@ -25,4 +26,5 @@ api_router.include_router(notifications.router)
 api_router.include_router(chat.router)
 api_router.include_router(digest.router)
 api_router.include_router(learn.router)
+api_router.include_router(practice.router)
 api_router.include_router(live.router)

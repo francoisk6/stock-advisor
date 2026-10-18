@@ -25,12 +25,16 @@ from app.core.rate_limit import limiter  # noqa: E402
 from app.db.session import SessionLocal, engine  # noqa: E402
 from app.main import app  # noqa: E402
 from app.market_data.seed import seed_catalog  # noqa: E402
+from app.services import practice  # noqa: E402
 from app.services.email import memory_outbox  # noqa: E402
 
 assert settings.db_name == "stock_advisor_test", "tests must never touch the dev database"
 
 # Tables reset between tests (children first); plans keep their migration seed data.
 _RESET_TABLES = [
+    "practice_orders",
+    "practice_positions",
+    "practice_accounts",
     "digests",
     "job_runs",
     "price_bars_daily",
@@ -82,6 +86,7 @@ async def clean_state() -> AsyncIterator[None]:
     memory_outbox.clear()
     limiter.reset()
     background.clear()
+    practice.closed_until.clear()
     yield
 
 

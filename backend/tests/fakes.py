@@ -13,6 +13,9 @@ class FakeProvider:
         self.fail = False
         self.search_results: list[FoundAsset] = []
         self.missing: set[str] = set()
+        self.prices: dict[str, float] = {}  # per-symbol price (default 110)
+        self.market_open: bool | None = None  # what details() reports
+        self.as_of = datetime(2026, 10, 13)  # time of every price
 
     def _check(self) -> None:
         if self.fail:
@@ -22,7 +25,12 @@ class FakeProvider:
         self.calls.append(("quotes", tuple(symbols)))
         self._check()
         return {
-            s: Quote(price=110.0, previous_close=100.0, currency="", as_of=datetime(2026, 10, 13))
+            s: Quote(
+                price=self.prices.get(s, 110.0),
+                previous_close=100.0,
+                currency="",
+                as_of=self.as_of,
+            )
             for s in symbols
             if s not in self.missing
         }
@@ -32,7 +40,11 @@ class FakeProvider:
         self._check()
         return Details(
             quote=Quote(
-                price=110.0, previous_close=100.0, currency="SAR", as_of=datetime(2026, 10, 13)
+                price=self.prices.get(symbol, 110.0),
+                previous_close=100.0,
+                currency="",  # filled from our catalog, as with real batch quotes
+                as_of=self.as_of,
+                market_open=self.market_open,
             ),
             stats=[Stat("market_cap", 2.5e12, "compact"), Stat("sector", "Energy", "text")],
             description="An oil company.",

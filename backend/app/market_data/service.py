@@ -2,6 +2,7 @@
 
 import asyncio
 from datetime import datetime, time, timedelta
+from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -101,6 +102,37 @@ async def quotes_for(
 
     await asyncio.gather(*(fetch(name, missing) for name, missing in by_provider.items()))
     return result
+
+
+# Prices quoted in minor units: pence, South African cents, Israeli agorot.
+MINOR_UNITS = {"GBp": ("GBP", 100), "GBX": ("GBP", 100), "ZAc": ("ZAR", 100), "ILA": ("ILS", 100)}
+FX_TTL = 600
+
+
+async def usd_per_unit(currency: str) -> Decimal | None:
+    """US dollars for one unit of `currency` (e.g. SAR -> 0.2666), from Yahoo's FX pairs.
+
+    None when no rate is available (not even a stale one).
+    """
+    major, divisor = MINOR_UNITS.get(currency, (currency.upper(), 1))
+    if major == "USD":
+        return Decimal(1) / divisor
+    symbol = f"{major}USD=X"
+    key = f"fx:{symbol}"
+
+    async def fetch() -> float:
+        quote = (await providers["yahoo"].quotes([symbol])).get(symbol)
+        if quote is None or quote.price <= 0:
+            raise ProviderError(f"No exchange rate for {major}")
+        return quote.price
+
+    try:
+        rate = await cache.get_or_fetch(key, FX_TTL, fetch)
+    except ProviderError:
+        rate = cache.peek(key, STALE_SECONDS)
+        if rate is None:
+            return None
+    return Decimal(str(rate)) / divisor
 
 
 async def details_for(session: AsyncSession, asset: Asset) -> Details:

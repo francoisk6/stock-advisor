@@ -1,4 +1,5 @@
-"""Background loops inside the API process (single worker): alert checks and live prices."""
+"""Background loops inside the API process (single worker): alert checks, live prices,
+practice order fills and the daily jobs."""
 
 import asyncio
 import logging
@@ -12,6 +13,7 @@ from app.realtime.hub import hub
 from app.schemas.notifications import notification_out
 from app.services import alerts as alerts_service
 from app.services import notifications as notifications_service
+from app.services import practice as practice_service
 from app.services.email import send_email
 
 logger = logging.getLogger(__name__)
@@ -39,6 +41,25 @@ async def run_alert_check() -> int:
     if fired:
         logger.info("Alerts fired: %d", len(fired))
     return len(fired)
+
+
+async def run_practice_fills() -> int:
+    """Fill practice orders that were waiting for their market to open; tell the user live."""
+    async with SessionLocal() as session:
+        done = await practice_service.fill_pending(session)
+        for d in done:
+            user_id = d.notification.user_id
+            await hub.notify_user(
+                user_id,
+                {
+                    "type": "notification",
+                    "notification": notification_out(d.notification).model_dump(mode="json"),
+                    "unread_count": await notifications_service.unread_count(session, user_id),
+                },
+            )
+    if done:
+        logger.info("Practice orders processed: %d", len(done))
+    return len(done)
 
 
 async def run_live_prices() -> None:
@@ -72,6 +93,9 @@ def start() -> list[asyncio.Task]:
     return [
         asyncio.create_task(_loop("alerts", settings.alert_check_seconds, run_alert_check)),
         asyncio.create_task(_loop("live-prices", settings.live_price_seconds, run_live_prices)),
+        asyncio.create_task(
+            _loop("practice-fills", settings.alert_check_seconds, run_practice_fills)
+        ),
         asyncio.create_task(_loop("daily", DAILY_CHECK_SECONDS, run_daily_jobs)),
     ]
 

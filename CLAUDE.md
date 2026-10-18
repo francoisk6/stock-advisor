@@ -176,6 +176,15 @@ Implemented (Phase 2) in `backend/app/market_data/`:
   + "Ask the Copilot"); key figures map to entries via `statTerm`; `askCopilot(context, q)` opens
   a fresh chat with the question. Chips that navigate are buttons (Flutter web announces chips
   as checkboxes).
+- Practice account (`app/services/practice.py`, `/practice` API): one per user, opened lazily
+  with $10,000. Market orders by units or dollar amount; no fees/shorting/leverage; indices are
+  refused (buy an ETF). Price check = latest price × `market.usd_per_unit(currency)` (Yahoo
+  `XXXUSD=X`, minor units GBp/ZAc/ILA ÷ 100). Market state comes from details (`marketState`;
+  batch quotes don't have it); crypto is always open; "open" with a price > 2 h old counts as
+  closed. Closed → order pending with cash reserved; `run_practice_fills` (alert-loop interval)
+  fills at the first price after the open (closed markets re-asked every 5 min) and notifies
+  (kind `practice`). Undo = only the latest filled order of an asset. Positions keep cost in
+  USD and local currency; realized gains from sells' `cost_usd_removed`.
 
 ### Live updates & background jobs (Phase 3)
 - `app/realtime/hub.py`: one WebSocket per open app at `/api/v1/ws` (protocol in the module
@@ -269,7 +278,7 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       per day), nightly stored daily prices (chart fallback), morning brief at 06:00 Beirut
       (in-app + optional email). Push notifications: Android phase. Verified unit + live e2e.
 - [ ] **Phase 6 — Learning & practice:** steps: 1 glossary + explain-this ✓ · 2 practice account
-      backend · 3 practice app UI · 4 portfolio tracker · 5 bottom navigation · 6 lessons + quizzes.
+      backend ✓ · 3 practice app UI · 4 portfolio tracker · 5 bottom navigation · 6 lessons + quizzes.
 - [ ] **Phase 7 — Monetization:** plans, quotas, Stripe + in-app purchases, Pro features.
 - [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
       (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.
