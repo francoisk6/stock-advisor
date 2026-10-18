@@ -69,6 +69,24 @@ List<(String, String)> interestFilters(
   _ => null,
 };
 
+/// Glossary entry that explains a key figure in more depth.
+String? statTerm(String key) => switch (key) {
+  'market_cap' || 'market_cap_rank' => 'market-cap',
+  'pe_ratio' => 'pe-ratio',
+  'dividend_yield' => 'dividend-yield',
+  'expense_ratio' => 'expense-ratio',
+  'day_range' => 'day-range',
+  'week52_range' => '52-week-range',
+  'avg_volume' || 'volume_24h' => 'volume',
+  'beta' => 'beta',
+  'sector' || 'industry' => 'sector',
+  'circulating_supply' => 'circulating-supply',
+  'max_supply' => 'max-supply',
+  'all_time_high' => 'all-time-high',
+  'from_all_time_high' => 'drawdown',
+  _ => null,
+};
+
 /// "2222.SR · Stock · Tadawul" (the exchange is skipped when it only repeats the type).
 String assetSubtitle(AppLocalizations l, Asset asset) {
   final type = assetTypeLabel(l, asset.assetType);

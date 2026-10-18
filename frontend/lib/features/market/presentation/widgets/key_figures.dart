@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/format/numbers.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../learn/presentation/explain_sheet.dart';
 import '../../domain/market.dart';
 import '../labels.dart';
 
@@ -69,9 +70,10 @@ List<KeyFigure> buildKeyFigures(AppLocalizations l, AssetDetail detail) {
 }
 
 class KeyFiguresCard extends StatelessWidget {
-  const KeyFiguresCard({super.key, required this.figures});
+  const KeyFiguresCard({super.key, required this.figures, required this.asset});
 
   final List<KeyFigure> figures;
+  final Asset asset;
 
   @override
   Widget build(BuildContext context) {
@@ -116,30 +118,18 @@ class KeyFiguresCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                onTap: () => showModalBottomSheet<void>(
-                  context: context,
-                  showDragHandle: true,
-                  builder: (context) => SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(f.label, style: theme.textTheme.titleLarge),
-                          const SizedBox(height: 4),
-                          Text(f.value, style: theme.textTheme.titleMedium),
-                          const SizedBox(height: 16),
-                          Text(f.help, style: theme.textTheme.bodyLarge),
-                          const SizedBox(height: 24),
-                          FilledButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(l10n.gotIt),
-                          ),
-                        ],
-                      ),
-                    ),
+                onTap: () => showExplainSheet(
+                  context,
+                  title: f.label,
+                  value: f.value,
+                  help: f.help,
+                  termId: statTerm(f.key),
+                  question: l10n.explainFigureQuestion(
+                    asset.symbol,
+                    f.label,
+                    f.value,
                   ),
+                  assetId: asset.id,
                 ),
               ),
           ],

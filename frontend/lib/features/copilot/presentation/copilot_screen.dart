@@ -399,8 +399,24 @@ class _ActionCard extends StatelessWidget {
           ),
         ),
       ),
+      'glossary_term' => (
+        Icons.menu_book_outlined,
+        l10n.actionGlossaryTerm(name),
+      ),
       _ => (Icons.check, card['type'].toString()),
     };
+    if (card['type'] == 'glossary_term') {
+      return Card(
+        margin: const EdgeInsets.only(top: 8),
+        child: ListTile(
+          dense: true,
+          leading: Icon(icon),
+          title: Text(text),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.go('/learn/${card['term_id']}'),
+        ),
+      );
+    }
     final undone = card['undone'] == true;
     return Card(
       margin: const EdgeInsets.only(top: 8),

@@ -1923,6 +1923,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm your email address to get the brief by email.'**
   String get briefEmailUnverified;
+
+  /// No description provided for @learnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn'**
+  String get learnTitle;
+
+  /// No description provided for @glossaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Glossary'**
+  String get glossaryTitle;
+
+  /// No description provided for @glossarySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search terms, e.g. P/E or ETF'**
+  String get glossarySearchHint;
+
+  /// No description provided for @glossaryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get glossaryAll;
+
+  /// No description provided for @glossaryBasics.
+  ///
+  /// In en, this message translates to:
+  /// **'Basics'**
+  String get glossaryBasics;
+
+  /// No description provided for @glossaryValuation.
+  ///
+  /// In en, this message translates to:
+  /// **'Company value'**
+  String get glossaryValuation;
+
+  /// No description provided for @glossaryFunds.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds'**
+  String get glossaryFunds;
+
+  /// No description provided for @glossaryCrypto.
+  ///
+  /// In en, this message translates to:
+  /// **'Crypto'**
+  String get glossaryCrypto;
+
+  /// No description provided for @glossaryRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Risk'**
+  String get glossaryRisk;
+
+  /// No description provided for @glossaryPortfolio.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio'**
+  String get glossaryPortfolio;
+
+  /// No description provided for @glossaryTrading.
+  ///
+  /// In en, this message translates to:
+  /// **'Trading'**
+  String get glossaryTrading;
+
+  /// No description provided for @glossaryCharts.
+  ///
+  /// In en, this message translates to:
+  /// **'Charts'**
+  String get glossaryCharts;
+
+  /// No description provided for @glossaryEconomy.
+  ///
+  /// In en, this message translates to:
+  /// **'Economy'**
+  String get glossaryEconomy;
+
+  /// No description provided for @glossaryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No terms match “{query}”.'**
+  String glossaryEmpty(String query);
+
+  /// No description provided for @glossaryAskUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'What does “{query}” mean in investing?'**
+  String glossaryAskUnknown(String query);
+
+  /// No description provided for @termNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'We don\'t have that term in the glossary yet.'**
+  String get termNotFound;
+
+  /// No description provided for @termExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Example'**
+  String get termExample;
+
+  /// No description provided for @termRelated.
+  ///
+  /// In en, this message translates to:
+  /// **'Related terms'**
+  String get termRelated;
+
+  /// No description provided for @termAskCopilot.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the Copilot'**
+  String get termAskCopilot;
+
+  /// No description provided for @termQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Can you explain {term} with a simple example?'**
+  String termQuestion(String term);
+
+  /// No description provided for @explainLearnMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn more'**
+  String get explainLearnMore;
+
+  /// No description provided for @explainFigureQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What does {symbol}\'s {figure} of {value} tell me?'**
+  String explainFigureQuestion(String symbol, String figure, String value);
+
+  /// No description provided for @changeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Change today'**
+  String get changeToday;
+
+  /// No description provided for @changeToday24h.
+  ///
+  /// In en, this message translates to:
+  /// **'Change in 24 hours'**
+  String get changeToday24h;
+
+  /// No description provided for @changeTodayHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How much the price has moved since the previous trading day\'s closing price. Moves of 1–2% in a day are common for large companies; bigger moves are often linked to news.'**
+  String get changeTodayHelp;
+
+  /// No description provided for @changeToday24hHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How much the price has moved over the last 24 hours (crypto trades non-stop, so there is no daily close). Moves of several percent in a day are common for crypto.'**
+  String get changeToday24hHelp;
+
+  /// No description provided for @explainChangeQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Why did {symbol} move {change} today?'**
+  String explainChangeQuestion(String symbol, String change);
+
+  /// No description provided for @actionGlossaryTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Glossary: {name}'**
+  String actionGlossaryTerm(String name);
 }
 
 class _AppLocalizationsDelegate

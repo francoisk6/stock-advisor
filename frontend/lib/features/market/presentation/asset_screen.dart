@@ -16,6 +16,7 @@ import '../../live/live_controller.dart';
 import '../../live/live_interest.dart';
 import '../../watchlist/data/watchlist_api.dart';
 import '../data/market_api.dart';
+import '../../learn/presentation/explain_sheet.dart';
 import '../domain/market.dart';
 import 'labels.dart';
 import 'widgets/asset_avatar.dart';
@@ -91,7 +92,10 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     const SizedBox(height: 16),
                     _AlertsCard(asset: d.asset),
                     const SizedBox(height: 16),
-                    KeyFiguresCard(figures: buildKeyFigures(l10n, d)),
+                    KeyFiguresCard(
+                      figures: buildKeyFigures(l10n, d),
+                      asset: d.asset,
+                    ),
                     const SizedBox(height: 16),
                     NewsCard(assetId: d.asset.id),
                     if (d.description != null) ...[
@@ -297,10 +301,7 @@ class _Header extends ConsumerWidget {
             spacing: 12,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              PriceChange(
-                percent: quote.changePercent,
-                style: theme.textTheme.titleMedium,
-              ),
+              _ExplainedChange(asset: asset, percent: quote.changePercent),
               if (quote.marketOpen != null)
                 Chip(
                   visualDensity: VisualDensity.compact,
@@ -465,6 +466,67 @@ class _AlertsCard extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Today's change; tapping it explains what the number means.
+class _ExplainedChange extends StatelessWidget {
+  const _ExplainedChange({required this.asset, required this.percent});
+
+  final Asset asset;
+  final double? percent;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final crypto = asset.assetType == 'crypto';
+    final title = crypto ? l10n.changeToday24h : l10n.changeToday;
+    // Its own button for screen readers: "Change today +1.50%".
+    return Semantics(
+      container: true,
+      button: true,
+      label: title,
+      child: Tooltip(
+        message: title,
+        excludeFromSemantics: true,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () => showExplainSheet(
+            context,
+            title: title,
+            value: percent == null ? null : formatPercent(percent!),
+            help: crypto ? l10n.changeToday24hHelp : l10n.changeTodayHelp,
+            termId: 'volatility',
+            question: percent == null
+                ? null
+                : l10n.explainChangeQuestion(
+                    asset.symbol,
+                    formatPercent(percent!),
+                  ),
+            assetId: asset.id,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PriceChange(
+                  percent: percent,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: theme.colorScheme.primary,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

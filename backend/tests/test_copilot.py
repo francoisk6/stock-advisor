@@ -23,7 +23,7 @@ from app.db.session import SessionLocal
 from app.market_data import service as market
 from app.market_data.types import Range
 from app.services import copilot
-from tests.conftest import bearer, onboard, register
+from tests.conftest import bearer, register
 from tests.fakes import FakeProvider
 
 
@@ -67,23 +67,6 @@ def fakes(monkeypatch: pytest.MonkeyPatch) -> dict[str, FakeProvider]:
     market.cache.clear()
     yield providers
     market.cache.clear()
-
-
-@pytest.fixture
-def llm(monkeypatch: pytest.MonkeyPatch):
-    def install(*rounds: list[ProviderEvent], fail: bool = False) -> ScriptedLLM:
-        scripted = ScriptedLLM(*rounds, fail=fail)
-        monkeypatch.setattr(agent, "provider", scripted)
-        return scripted
-
-    return install
-
-
-@pytest.fixture
-async def user(client: AsyncClient) -> dict:
-    tokens = await register(client)
-    await onboard(client, tokens, assets=["stocks", "crypto"], regions=["middle_east"])
-    return tokens
 
 
 async def ask(user: dict, text: str, **extra) -> list[dict]:

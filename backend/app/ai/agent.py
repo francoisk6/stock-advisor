@@ -17,6 +17,7 @@ from app.ai.provider import LLMProvider
 from app.ai.types import AIUnavailable, ChatMessage, TextDelta, ToolCall, ToolCalls
 from app.core.config import settings
 from app.db.models import Asset, ChatConversation, User
+from app.learn import glossary
 from app.services import chat as chat_service
 
 logger = logging.getLogger(__name__)
@@ -70,7 +71,18 @@ _NEWS_CLAIM = re.compile(
     r"according to|report(s|ed)|news|headline|analysts? (say|said)|due to|because of|driven by",
     re.IGNORECASE,
 )
-_WHY_QUESTION = re.compile(r"\bwhy\b|\bnews\b|what happened|what's happening", re.IGNORECASE)
+# Questions that need today's news: price moves and current events, not every "why"
+# ("what is an ETF and why do beginners like them?" is a definition).
+_NEWS_QUESTION = re.compile(
+    r"\bnews\b|\bheadlines?\b|what happened|what's happening|what is happening"
+    r"|\bwhy\b[^?]*\b(move[sd]?|moving|up|down|falls?|falling|fell|drops?|dropped|dropping"
+    r"|rises?|rising|rose|jump(s|ed)?|surge[sd]?|crash(es|ed)?|today|this week|price)\b",
+    re.IGNORECASE,
+)
+# "What is …", "what does … mean", "explain …": answered from the glossary when it has the term.
+_DEFINITION_QUESTION = re.compile(
+    r"^\s*(what(?:'s| is| are| does| do)|define|explain|meaning of)\b", re.IGNORECASE
+)
 NEWS_TOOLS = {"get_news", "web_search"}
 
 
@@ -96,13 +108,23 @@ def ignores_results(question: str, answer: str, tools_used: set[str], sources: d
         return False
     if _NO_DATA_CLAIM.search(answer):
         return True
-    return bool(_WHY_QUESTION.search(question)) and not cites_results(answer, sources)
+    return bool(_NEWS_QUESTION.search(question)) and not cites_results(answer, sources)
+
+
+def glossary_term_asked(question: str) -> str | None:
+    """The glossary term a definition question asks about ("What does P/E mean?")."""
+    if not _DEFINITION_QUESTION.search(question):
+        return None
+    term = glossary.find(question)
+    return term.term if term else None
 
 
 def needs_news_retry(question: str, answer: str, tools_used: set[str]) -> bool:
     if tools_used & NEWS_TOOLS:
         return False
-    return bool(_NEWS_CLAIM.search(answer) or _WHY_QUESTION.search(question))
+    if "explain_term" in tools_used and not _NEWS_QUESTION.search(question):
+        return False  # a definition from the glossary, not news
+    return bool(_NEWS_CLAIM.search(answer) or _NEWS_QUESTION.search(question))
 
 
 _HTTP_LINK = re.compile(r"\[([^\]\n]+)\]\((https?://[^)\s]+)\)")
@@ -163,6 +185,12 @@ async def _model_turn(
     retried = False
     searched = False
     nudged = False
+    if term := glossary_term_asked(question):
+        # The small model often explains terms from memory: give it the vetted text first.
+        lookup = [ToolCall("explain_term", {"term": term})]
+        messages.append(ChatMessage("assistant", "", tool_calls=lookup))
+        async for event in _run_calls(lookup, ctx, actions, messages, tools_used):
+            yield event
     for _ in range(settings.ai_max_tool_rounds):
         round_text = ""
         calls = []
@@ -189,7 +217,12 @@ async def _model_turn(
                 messages.append(ChatMessage("system", NEWS_RETRY))
                 answer = ""
                 continue
-            if retried and not searched and not (tools_used & NEWS_TOOLS):
+            if (
+                retried
+                and not searched
+                and not (tools_used & NEWS_TOOLS)
+                and _NEWS_QUESTION.search(question)
+            ):
                 # Asked twice and still no lookup ("I don't have live data"): search for it.
                 searched = True
                 yield Retract()
@@ -235,7 +268,7 @@ async def _run_calls(
             logger.exception("Tool %s failed", call.name)
             result = toolbox.ToolResult({"error": "This lookup failed. Try again later."})
         logger.info("Tool %s done; %d citable sources so far", call.name, len(ctx.sources))
-        if result.action is not None:
+        if result.action is not None and result.action not in actions:
             actions.append(result.action)
             yield Action(result.action)
         messages.append(

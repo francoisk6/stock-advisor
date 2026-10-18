@@ -1,0 +1,598 @@
+[
+  {
+    "id": "stock",
+    "term": "Stock",
+    "aliases": ["stocks", "equity", "equities"],
+    "category": "basics",
+    "short": "A small piece of ownership in a company.",
+    "body": "When you own a company's stock, you own a tiny part of that business. If the company grows and earns more, its stock usually becomes worth more; if it struggles, the stock can lose value. Stocks are bought and sold on exchanges.",
+    "example": "Owning 1 Apple share makes you one of Apple's many part-owners.",
+    "related": ["share", "exchange", "dividend", "market-cap"]
+  },
+  {
+    "id": "share",
+    "term": "Share",
+    "aliases": ["shares"],
+    "category": "basics",
+    "short": "One unit of a company's stock.",
+    "body": "A company's ownership is split into many equal shares. The share price is what one unit costs right now. Some apps and brokers also let you buy a fraction of a share.",
+    "example": "If a share costs $200 and you invest $50, you own a quarter of a share.",
+    "related": ["stock", "market-cap", "fractional-share"]
+  },
+  {
+    "id": "fractional-share",
+    "term": "Fractional share",
+    "aliases": ["fractional shares", "fraction of a share"],
+    "category": "trading",
+    "short": "A part of one share, so you can invest a small amount in an expensive stock.",
+    "body": "Instead of buying whole shares, you buy an amount of money's worth, for example $25 of a $500 share (0.05 shares). Gains and losses work the same way, just in proportion to what you own.",
+    "related": ["share", "position"]
+  },
+  {
+    "id": "exchange",
+    "term": "Stock exchange",
+    "aliases": ["exchange", "stock market", "bourse"],
+    "category": "basics",
+    "short": "A marketplace where shares and other investments are bought and sold.",
+    "body": "Exchanges such as the New York Stock Exchange, Nasdaq, London Stock Exchange or Saudi Tadawul match buyers with sellers. Each exchange has its own trading hours and holidays; outside those hours prices of its stocks don't change. Crypto trades on many online exchanges, 24 hours a day.",
+    "related": ["ticker", "trading-hours", "stock"]
+  },
+  {
+    "id": "ticker",
+    "term": "Ticker symbol",
+    "aliases": ["ticker", "symbol"],
+    "category": "basics",
+    "short": "The short code used to identify an investment, like AAPL for Apple.",
+    "body": "Tickers are short codes that make investments easy to look up. Some include the exchange: 2222.SR is Saudi Aramco on Tadawul. Crypto uses codes too, like BTC for Bitcoin.",
+    "related": ["exchange", "stock"]
+  },
+  {
+    "id": "trading-hours",
+    "term": "Trading hours",
+    "aliases": ["market hours", "market open", "market closed", "opening hours"],
+    "category": "trading",
+    "short": "The times when an exchange is open for buying and selling.",
+    "body": "Stocks trade only while their exchange is open, on working days, in the exchange's own time zone. Orders placed while the market is closed wait until it opens. Crypto markets never close.",
+    "example": "The New York Stock Exchange is open 9:30 to 16:00 New York time, Monday to Friday.",
+    "related": ["exchange", "market-order"]
+  },
+  {
+    "id": "market-cap",
+    "term": "Market capitalization",
+    "aliases": ["market cap", "market value", "market cap rank", "rank"],
+    "category": "basics",
+    "short": "The total value of all of a company's shares (or all coins of a crypto).",
+    "body": "Market cap = share price × number of shares. It tells you how big a company is in the eyes of the market. Large companies (often above $10 billion) tend to move less than small ones. For crypto, the same idea uses the number of coins in circulation, and coins are often ranked by it.",
+    "example": "A $50 share with 1 billion shares gives a market cap of $50 billion.",
+    "related": ["share", "circulating-supply", "volatility"]
+  },
+  {
+    "id": "dividend",
+    "term": "Dividend",
+    "aliases": ["dividends", "payout"],
+    "category": "basics",
+    "short": "Cash a company pays to its shareholders out of its profits.",
+    "body": "Some companies share part of their profits with shareholders, often every quarter or year. Dividends are not guaranteed: a company can cut or stop them. Many fast-growing companies pay none and reinvest instead.",
+    "related": ["dividend-yield", "stock", "eps"]
+  },
+  {
+    "id": "dividend-yield",
+    "term": "Dividend yield",
+    "aliases": ["yield", "dividend rate"],
+    "category": "valuation",
+    "short": "Yearly dividends as a percentage of the share price.",
+    "body": "Dividend yield = yearly dividend per share ÷ share price. A 3% yield means about $3 a year for every $100 invested, if the dividend stays the same. A very high yield can be a warning sign: it sometimes appears because the share price fell sharply.",
+    "example": "A $100 share paying $4 a year has a 4% dividend yield.",
+    "related": ["dividend", "pe-ratio"]
+  },
+  {
+    "id": "pe-ratio",
+    "term": "P/E ratio",
+    "aliases": ["pe", "p/e", "price to earnings", "price-to-earnings", "pe ratio", "price earnings ratio"],
+    "category": "valuation",
+    "short": "How many dollars investors pay for each dollar of a company's yearly profit.",
+    "body": "P/E = share price ÷ earnings per share over the last year. A P/E of 20 means investors pay $20 for every $1 of yearly profit. A high P/E often means people expect fast growth; a low one can mean slow growth or worries. Compare it with similar companies, not across very different industries.",
+    "example": "A $60 share with $3 of yearly earnings per share has a P/E of 20.",
+    "related": ["eps", "earnings", "valuation"]
+  },
+  {
+    "id": "eps",
+    "term": "Earnings per share (EPS)",
+    "aliases": ["eps", "earnings per share"],
+    "category": "valuation",
+    "short": "A company's profit divided by its number of shares.",
+    "body": "EPS shows how much profit belongs to each share. If it grows year after year, the business is earning more. It's the 'E' in the P/E ratio.",
+    "example": "$1 billion of profit and 500 million shares gives an EPS of $2.",
+    "related": ["pe-ratio", "earnings"]
+  },
+  {
+    "id": "earnings",
+    "term": "Earnings report",
+    "aliases": ["earnings", "results", "quarterly results", "profit", "net income", "earnings season"],
+    "category": "valuation",
+    "short": "A company's regular report of its sales and profit, usually every quarter.",
+    "body": "Listed companies publish results regularly. Prices often move a lot on those days, because investors compare the numbers with what they expected. Beating expectations can lift a stock; missing them can push it down, even if the company is still profitable.",
+    "related": ["revenue", "eps", "pe-ratio"]
+  },
+  {
+    "id": "revenue",
+    "term": "Revenue",
+    "aliases": ["sales", "turnover", "top line"],
+    "category": "valuation",
+    "short": "All the money a company takes in from selling its products or services, before costs.",
+    "body": "Revenue is the starting point; profit (earnings) is what's left after costs and taxes. A company can have big revenue and still lose money if its costs are higher.",
+    "related": ["earnings", "eps"]
+  },
+  {
+    "id": "valuation",
+    "term": "Valuation",
+    "aliases": ["overvalued", "undervalued", "expensive stock", "cheap stock"],
+    "category": "valuation",
+    "short": "An estimate of what an investment is worth compared with its price.",
+    "body": "People use measures like the P/E ratio, growth and profits to judge whether a price looks high or low. These are opinions, not facts: two careful investors can value the same company very differently.",
+    "related": ["pe-ratio", "market-cap"]
+  },
+  {
+    "id": "etf",
+    "term": "ETF (exchange-traded fund)",
+    "aliases": ["etf", "etfs", "exchange traded fund", "index fund"],
+    "category": "funds",
+    "short": "A basket of many investments you can buy as one, traded like a stock.",
+    "body": "An ETF holds many stocks, bonds or other assets at once, so one purchase spreads your money widely. Many ETFs simply follow an index such as the S&P 500. They charge a small yearly fee, the expense ratio.",
+    "example": "One share of an S&P 500 ETF gives you a small slice of 500 large US companies.",
+    "related": ["index", "expense-ratio", "diversification", "mutual-fund"]
+  },
+  {
+    "id": "mutual-fund",
+    "term": "Mutual fund",
+    "aliases": ["mutual funds", "fund", "funds"],
+    "category": "funds",
+    "short": "A pooled investment run by a manager, bought directly from the fund company.",
+    "body": "Like an ETF, a mutual fund holds many investments. It is usually priced once a day instead of trading all day on an exchange, and some charge higher fees, especially actively managed ones.",
+    "related": ["etf", "expense-ratio"]
+  },
+  {
+    "id": "expense-ratio",
+    "term": "Expense ratio",
+    "aliases": ["fund fee", "management fee", "ter"],
+    "category": "funds",
+    "short": "The yearly fee a fund takes, as a percentage of what you invested.",
+    "body": "A 0.10% expense ratio costs about $1 a year for every $1,000 invested; it's taken out of the fund's value automatically. Small differences add up over many years, so lower is generally better for similar funds.",
+    "example": "$10,000 in a fund with a 0.5% expense ratio costs about $50 a year.",
+    "related": ["etf", "mutual-fund"]
+  },
+  {
+    "id": "index",
+    "term": "Index",
+    "aliases": ["indices", "indexes", "market index", "s&p 500", "dow jones", "nasdaq composite"],
+    "category": "basics",
+    "short": "A score that tracks a group of investments, used to see how a market is doing.",
+    "body": "The S&P 500 follows 500 large US companies; Saudi Arabia's TASI follows stocks on Tadawul. You can't buy an index itself, but you can buy funds (ETFs) that copy it.",
+    "related": ["etf", "diversification", "bull-market"]
+  },
+  {
+    "id": "sector",
+    "term": "Sector and industry",
+    "aliases": ["sector", "industry", "sectors"],
+    "category": "basics",
+    "short": "The area of the economy a company works in, such as technology or energy.",
+    "body": "A sector is a broad group (technology, healthcare, energy); an industry is narrower (semiconductors, oil refining). Companies in the same sector often move together, because the same news affects them.",
+    "related": ["diversification", "allocation"]
+  },
+  {
+    "id": "ipo",
+    "term": "IPO (initial public offering)",
+    "aliases": ["ipo", "going public", "listing"],
+    "category": "basics",
+    "short": "When a company sells its shares to the public for the first time.",
+    "body": "After an IPO anyone can buy the company's shares on an exchange. Prices of newly listed companies are often very jumpy in the first months, because there is little trading history.",
+    "related": ["stock", "exchange", "volatility"]
+  },
+  {
+    "id": "bull-market",
+    "term": "Bull market",
+    "aliases": ["bull", "bullish"],
+    "category": "basics",
+    "short": "A long period when prices are generally rising.",
+    "body": "'Bullish' means expecting prices to rise. A common rule of thumb calls it a bull market when prices rise 20% or more from a recent low. Nobody knows in advance how long one will last.",
+    "related": ["bear-market", "index"]
+  },
+  {
+    "id": "bear-market",
+    "term": "Bear market",
+    "aliases": ["bear", "bearish"],
+    "category": "basics",
+    "short": "A long period when prices are generally falling.",
+    "body": "'Bearish' means expecting prices to fall. A common rule of thumb calls it a bear market when prices drop 20% or more from a recent high. Bear markets have happened many times and have always been part of investing.",
+    "related": ["bull-market", "drawdown", "recession"]
+  },
+  {
+    "id": "cryptocurrency",
+    "term": "Cryptocurrency",
+    "aliases": ["crypto", "coin", "coins", "token", "tokens", "altcoin", "altcoins"],
+    "category": "crypto",
+    "short": "Digital money that runs on a shared online record (a blockchain) instead of a bank.",
+    "body": "Bitcoin and Ethereum are the best-known cryptocurrencies. Their prices are set only by what buyers will pay, which makes them much more volatile than most stocks: moves of 5–10% in a day are common. Crypto markets are open 24/7.",
+    "related": ["blockchain", "stablecoin", "volatility", "wallet"]
+  },
+  {
+    "id": "blockchain",
+    "term": "Blockchain",
+    "aliases": ["distributed ledger"],
+    "category": "crypto",
+    "short": "A shared public record of transactions that many computers keep in sync.",
+    "body": "Each new batch of transactions (a block) is linked to the previous one, which makes old records very hard to change. Cryptocurrencies use blockchains to track who owns what without a central bank.",
+    "related": ["cryptocurrency", "wallet"]
+  },
+  {
+    "id": "stablecoin",
+    "term": "Stablecoin",
+    "aliases": ["stablecoins", "usdt", "usdc", "tether"],
+    "category": "crypto",
+    "short": "A cryptocurrency designed to keep a steady price, usually $1.",
+    "body": "Stablecoins like USDT and USDC aim to stay at $1, backed by cash or similar reserves. They are used to move money between crypto exchanges. 'Stable' is a goal, not a guarantee: some stablecoins have lost their $1 value in the past.",
+    "related": ["cryptocurrency"]
+  },
+  {
+    "id": "wallet",
+    "term": "Crypto wallet",
+    "aliases": ["wallet", "private key", "seed phrase"],
+    "category": "crypto",
+    "short": "An app or device that holds the keys to your cryptocurrency.",
+    "body": "Whoever has the wallet's private key or recovery phrase controls the coins. Never share it with anyone: legitimate apps and support staff will never ask for it.",
+    "related": ["cryptocurrency", "blockchain"]
+  },
+  {
+    "id": "circulating-supply",
+    "term": "Circulating supply",
+    "aliases": ["circulating", "coins in circulation", "supply"],
+    "category": "crypto",
+    "short": "How many coins of a cryptocurrency exist and can be traded right now.",
+    "body": "Price × circulating supply gives a coin's market cap. If many new coins are released later, each existing coin can become worth less, unless demand grows too.",
+    "related": ["max-supply", "market-cap"]
+  },
+  {
+    "id": "max-supply",
+    "term": "Maximum supply",
+    "aliases": ["max supply", "total supply", "supply cap"],
+    "category": "crypto",
+    "short": "The most coins that can ever exist for a cryptocurrency, if it has a limit.",
+    "body": "Bitcoin is capped at 21 million coins. Some coins have no maximum, so new ones keep being created. A fixed cap doesn't guarantee the price goes up; it only limits how many coins can exist.",
+    "related": ["circulating-supply", "cryptocurrency"]
+  },
+  {
+    "id": "volatility",
+    "term": "Volatility",
+    "aliases": ["volatile", "swings", "price swings"],
+    "category": "risk",
+    "short": "How much and how quickly a price tends to move up and down.",
+    "body": "A volatile investment can rise or fall a lot in a short time. Higher volatility means more uncertainty: bigger possible gains, but also bigger possible losses. Crypto and small companies are usually more volatile than large companies or bonds.",
+    "related": ["beta", "drawdown", "risk-tolerance"]
+  },
+  {
+    "id": "beta",
+    "term": "Beta",
+    "aliases": ["stock beta"],
+    "category": "risk",
+    "short": "How much a stock tends to move compared with the whole market.",
+    "body": "A beta of 1 means the stock has tended to move about as much as the market. Above 1 means bigger swings (1.5 ≈ 50% more); below 1 means calmer. It is based on past prices, so it can change.",
+    "example": "If the market falls 10%, a stock with beta 1.5 has historically tended to fall about 15%.",
+    "related": ["volatility", "index"]
+  },
+  {
+    "id": "drawdown",
+    "term": "Drawdown",
+    "aliases": ["drop from peak", "decline from high", "from all-time high"],
+    "category": "risk",
+    "short": "How far a price has fallen from its previous highest point.",
+    "body": "A drawdown of 30% means the price is 30% below its peak. To get back to the peak it then needs to rise about 43%, because the gain is calculated from a smaller number.",
+    "related": ["all-time-high", "volatility", "bear-market"]
+  },
+  {
+    "id": "all-time-high",
+    "term": "All-time high",
+    "aliases": ["ath", "record high", "all time high"],
+    "category": "charts",
+    "short": "The highest price an investment has ever reached.",
+    "body": "Being far below the all-time high doesn't mean a price will return there, and being at a high doesn't mean it must fall. It's simply a reference point showing where the price stands compared with its best moment.",
+    "related": ["drawdown", "52-week-range"]
+  },
+  {
+    "id": "risk-tolerance",
+    "term": "Risk tolerance",
+    "aliases": ["risk profile", "risk comfort", "risk appetite"],
+    "category": "risk",
+    "short": "How much ups and downs in your investments you can handle, financially and emotionally.",
+    "body": "It depends on your goals, how soon you need the money, and how you'd feel seeing your investments drop 20%. Money you need soon is usually kept in calmer investments. Your onboarding answers set the risk comfort the copilot uses.",
+    "related": ["volatility", "diversification", "time-horizon"]
+  },
+  {
+    "id": "time-horizon",
+    "term": "Time horizon",
+    "aliases": ["horizon", "investment horizon", "long term", "short term"],
+    "category": "risk",
+    "short": "How long you plan to keep your money invested before you need it.",
+    "body": "A longer time horizon gives investments more time to recover from drops. Money needed within a few years is more exposed to a bad moment in the market.",
+    "related": ["risk-tolerance", "compound-interest"]
+  },
+  {
+    "id": "diversification",
+    "term": "Diversification",
+    "aliases": ["diversify", "diversified", "don't put all your eggs in one basket"],
+    "category": "risk",
+    "short": "Spreading money across different investments so one bad result hurts less.",
+    "body": "If all your money is in one company and it struggles, you lose a lot. Spread across many companies, sectors, regions and asset types, one problem matters less. Diversification lowers risk but does not remove it: whole markets can fall together.",
+    "related": ["allocation", "etf", "sector", "correlation"]
+  },
+  {
+    "id": "correlation",
+    "term": "Correlation",
+    "aliases": ["correlated", "move together"],
+    "category": "risk",
+    "short": "How much two investments tend to move in the same direction.",
+    "body": "Highly correlated investments rise and fall together, so owning both spreads risk less than it seems. Investments with low correlation can balance each other out.",
+    "related": ["diversification"]
+  },
+  {
+    "id": "allocation",
+    "term": "Asset allocation",
+    "aliases": ["allocation", "portfolio mix", "asset mix"],
+    "category": "portfolio",
+    "short": "How your money is split between types of investments, like stocks, bonds, crypto and cash.",
+    "body": "Your allocation has a big effect on how bumpy your results will be. A portfolio with 80% crypto will swing far more than one with 80% broad stock funds and bonds.",
+    "related": ["diversification", "rebalancing", "portfolio"]
+  },
+  {
+    "id": "rebalancing",
+    "term": "Rebalancing",
+    "aliases": ["rebalance"],
+    "category": "portfolio",
+    "short": "Adjusting your investments back to the mix you planned.",
+    "body": "When one investment grows a lot it becomes a bigger share of your portfolio, and your risk changes. Rebalancing means selling a bit of what grew and adding to what shrank, to return to your plan.",
+    "related": ["allocation", "portfolio"]
+  },
+  {
+    "id": "portfolio",
+    "term": "Portfolio",
+    "aliases": ["holdings", "my investments"],
+    "category": "portfolio",
+    "short": "All the investments you own, taken together.",
+    "body": "Looking at the whole portfolio instead of single investments shows your real risk: how much is in one asset, one sector or one currency, and how the total value changes.",
+    "related": ["allocation", "position", "diversification"]
+  },
+  {
+    "id": "position",
+    "term": "Position",
+    "aliases": ["positions", "holding"],
+    "category": "portfolio",
+    "short": "How much of one investment you own.",
+    "body": "Owning 10 Apple shares is a position in Apple. Its value goes up and down with the price; the gain or loss is the difference from what you paid (your cost basis).",
+    "related": ["cost-basis", "unrealized-gain", "portfolio"]
+  },
+  {
+    "id": "cost-basis",
+    "term": "Cost basis",
+    "aliases": ["average cost", "average buy price", "purchase price", "average price"],
+    "category": "portfolio",
+    "short": "What you paid for an investment on average, used to work out your gain or loss.",
+    "body": "If you buy 1 share at $100 and another at $120, your average cost is $110 per share. Your gain or loss is the current price compared with that average.",
+    "related": ["unrealized-gain", "realized-gain", "position"]
+  },
+  {
+    "id": "unrealized-gain",
+    "term": "Unrealized gain or loss",
+    "aliases": ["paper gain", "paper loss", "unrealised gain", "open p&l", "unrealized loss"],
+    "category": "portfolio",
+    "short": "The gain or loss on something you still own; it only becomes final when you sell.",
+    "body": "If you bought at $100 and the price is now $120, you have a $20 unrealized gain per share. It can grow, shrink or turn into a loss while you hold.",
+    "related": ["realized-gain", "cost-basis"]
+  },
+  {
+    "id": "realized-gain",
+    "term": "Realized gain or loss",
+    "aliases": ["realised gain", "realized loss", "closed p&l", "profit taken"],
+    "category": "portfolio",
+    "short": "The gain or loss you locked in by selling.",
+    "body": "Once you sell, the difference between the sale price and your cost basis is final. In many countries realized gains can be taxed; rules differ by country.",
+    "related": ["unrealized-gain", "cost-basis"]
+  },
+  {
+    "id": "return",
+    "term": "Return",
+    "aliases": ["returns", "performance", "gain", "loss", "p&l", "profit and loss"],
+    "category": "portfolio",
+    "short": "How much an investment gained or lost, usually shown as a percentage.",
+    "body": "A 10% return on $1,000 is $100. Past returns show what happened, not what will happen next. Returns over different time periods can look very different for the same investment.",
+    "related": ["unrealized-gain", "compound-interest"]
+  },
+  {
+    "id": "compound-interest",
+    "term": "Compounding",
+    "aliases": ["compound interest", "compound growth", "compounding"],
+    "category": "basics",
+    "short": "Earning returns on your earlier returns, so growth builds on itself over time.",
+    "body": "If $1,000 grows 7% a year, after one year it's $1,070, and the next year's 7% is calculated on $1,070. Over decades this snowball effect can be large. Losses compound too, and returns are never guaranteed.",
+    "related": ["return", "time-horizon"]
+  },
+  {
+    "id": "paper-trading",
+    "term": "Paper trading",
+    "aliases": ["practice trading", "practice account", "virtual trading", "demo account", "paper money"],
+    "category": "trading",
+    "short": "Practicing buying and selling with pretend money and real prices.",
+    "body": "Paper trading lets you learn how orders, gains and losses work without risking anything. Real investing feels different, because real losses are harder to sit through than practice ones.",
+    "related": ["market-order", "position", "return"]
+  },
+  {
+    "id": "market-order",
+    "term": "Market order",
+    "aliases": ["buy order", "sell order", "order", "orders"],
+    "category": "trading",
+    "short": "An order to buy or sell right away at the best price currently available.",
+    "body": "A market order fills quickly while the market is open, but the final price can be a little different from the one you saw, especially in fast-moving or thinly traded markets. When the market is closed it waits for the opening price, which can differ more.",
+    "related": ["limit-order", "bid-ask-spread", "trading-hours"]
+  },
+  {
+    "id": "limit-order",
+    "term": "Limit order",
+    "aliases": ["limit price", "stop order", "stop loss", "stop-loss"],
+    "category": "trading",
+    "short": "An order to buy or sell only at a price you choose, or better.",
+    "body": "A buy limit at $95 only fills at $95 or lower; a sell limit at $110 only at $110 or higher. You control the price, but the order may never fill. A stop-loss is a related order that sells once the price falls to a level you set.",
+    "related": ["market-order"]
+  },
+  {
+    "id": "bid-ask-spread",
+    "term": "Bid–ask spread",
+    "aliases": ["spread", "bid", "ask", "bid ask"],
+    "category": "trading",
+    "short": "The small gap between the highest price buyers offer and the lowest price sellers accept.",
+    "body": "Buying happens at the ask and selling at the bid, so the spread is a hidden cost each time you trade. Popular investments usually have tiny spreads; rarely traded ones can have wide spreads.",
+    "related": ["market-order", "liquidity"]
+  },
+  {
+    "id": "liquidity",
+    "term": "Liquidity",
+    "aliases": ["liquid", "illiquid"],
+    "category": "trading",
+    "short": "How easily something can be bought or sold quickly without moving its price.",
+    "body": "Large company stocks are very liquid: there are always buyers and sellers. Small stocks or coins can be illiquid, so a single big order may push the price noticeably.",
+    "related": ["volume", "bid-ask-spread"]
+  },
+  {
+    "id": "volume",
+    "term": "Volume",
+    "aliases": ["trading volume", "avg volume", "average volume", "24h volume"],
+    "category": "charts",
+    "short": "How much of an investment was traded in a period, such as a day.",
+    "body": "High volume means many people are buying and selling; a big price move on high volume usually reflects strong interest. Low volume moves can be less meaningful. For crypto it's often shown as the money traded over 24 hours.",
+    "related": ["liquidity", "candlestick"]
+  },
+  {
+    "id": "short-selling",
+    "term": "Short selling",
+    "aliases": ["short", "shorting", "going short"],
+    "category": "trading",
+    "short": "Betting that a price will fall by selling borrowed shares and buying them back later.",
+    "body": "If the price falls, the short seller profits; if it rises, they lose, and in theory the loss has no limit. It is risky and not something beginners usually do. The practice account in this app does not allow it.",
+    "related": ["leverage", "bear-market"]
+  },
+  {
+    "id": "leverage",
+    "term": "Leverage",
+    "aliases": ["margin", "borrowing to invest", "leveraged"],
+    "category": "risk",
+    "short": "Investing with borrowed money, which makes both gains and losses bigger.",
+    "body": "With 2× leverage, a 10% drop becomes a 20% loss on your own money, and you can lose more than you put in. Leveraged products are high-risk and often unsuitable for beginners.",
+    "related": ["short-selling", "volatility"]
+  },
+  {
+    "id": "candlestick",
+    "term": "Candlestick chart",
+    "aliases": ["candles", "candle", "candlesticks", "ohlc"],
+    "category": "charts",
+    "short": "A chart where each bar shows the open, high, low and close price for a period.",
+    "body": "The thick body runs from the opening to the closing price; the thin lines (wicks) show the highest and lowest prices. In this app a green candle closed higher than it opened and a red one closed lower.",
+    "related": ["day-range", "volume", "moving-average"]
+  },
+  {
+    "id": "day-range",
+    "term": "Day's range",
+    "aliases": ["day range", "daily range", "24h range", "intraday range"],
+    "category": "charts",
+    "short": "The lowest and highest price so far today (or in the last 24 hours for crypto).",
+    "body": "A wide range means the price moved around a lot today; a narrow range means a calm day. It shows today's swings, not the longer trend.",
+    "related": ["52-week-range", "volatility", "candlestick"]
+  },
+  {
+    "id": "52-week-range",
+    "term": "52-week range",
+    "aliases": ["52 week range", "52-week high", "52-week low", "year range"],
+    "category": "charts",
+    "short": "The lowest and highest price over the last year.",
+    "body": "It shows where today's price sits compared with the past year: near the top, near the bottom, or in between. It says nothing on its own about where the price goes next.",
+    "related": ["day-range", "all-time-high"]
+  },
+  {
+    "id": "moving-average",
+    "term": "Moving average",
+    "aliases": ["ma", "sma", "ema", "50-day average", "200-day average"],
+    "category": "charts",
+    "short": "The average price over a recent number of days, used to smooth out a chart.",
+    "body": "A 50-day moving average is the average closing price of the last 50 days, updated every day. People use it to see the general direction (trend) without the daily noise. It looks backwards only.",
+    "related": ["candlestick", "trend"]
+  },
+  {
+    "id": "trend",
+    "term": "Trend",
+    "aliases": ["uptrend", "downtrend", "momentum"],
+    "category": "charts",
+    "short": "The general direction a price has been moving over a period.",
+    "body": "An uptrend is a series of higher highs and higher lows; a downtrend the opposite. Trends describe the past and can change at any time.",
+    "related": ["moving-average", "bull-market"]
+  },
+  {
+    "id": "bond",
+    "term": "Bond",
+    "aliases": ["bonds", "treasury", "treasuries", "fixed income", "bond yield"],
+    "category": "economy",
+    "short": "A loan you give to a government or company, which pays you interest.",
+    "body": "Bonds usually swing less than stocks and pay regular interest. When interest rates rise, existing bonds' prices tend to fall, and the other way round. A bond's yield is the yearly return it pays at today's price.",
+    "related": ["interest-rate", "allocation"]
+  },
+  {
+    "id": "interest-rate",
+    "term": "Interest rates",
+    "aliases": ["interest rate", "rates", "rate hike", "rate cut", "fed rate"],
+    "category": "economy",
+    "short": "The cost of borrowing money, set mainly by central banks.",
+    "body": "Higher rates make loans more expensive and safe savings more attractive, which can weigh on stock and crypto prices. Lower rates tend to do the opposite. Markets often move when central banks change rates or hint that they will.",
+    "related": ["central-bank", "inflation", "bond"]
+  },
+  {
+    "id": "central-bank",
+    "term": "Central bank",
+    "aliases": ["fed", "federal reserve", "ecb", "sama", "monetary policy"],
+    "category": "economy",
+    "short": "The institution that manages a country's money and sets its main interest rate.",
+    "body": "Examples are the US Federal Reserve, the European Central Bank and the Saudi Central Bank (SAMA). Their decisions on rates are closely watched by markets.",
+    "related": ["interest-rate", "inflation"]
+  },
+  {
+    "id": "inflation",
+    "term": "Inflation",
+    "aliases": ["cpi", "rising prices", "consumer prices"],
+    "category": "economy",
+    "short": "The general rise of prices over time, which reduces what money can buy.",
+    "body": "With 3% inflation, something that cost $100 last year costs about $103 now. Cash left uninvested slowly loses buying power. High inflation often leads central banks to raise interest rates.",
+    "related": ["interest-rate", "central-bank"]
+  },
+  {
+    "id": "recession",
+    "term": "Recession",
+    "aliases": ["economic downturn", "gdp", "economic growth"],
+    "category": "economy",
+    "short": "A period when the economy shrinks, often with job losses and weaker company profits.",
+    "body": "Economic activity (GDP) falls, usually for several months. Stock markets often fall around recessions, but they tend to move ahead of the economy, sometimes recovering before the recession ends.",
+    "related": ["bear-market", "earnings"]
+  },
+  {
+    "id": "exchange-rate",
+    "term": "Exchange rate",
+    "aliases": ["forex", "fx", "currency", "currency pair", "eur/usd"],
+    "category": "economy",
+    "short": "The price of one currency in another, like 1 euro = 1.08 US dollars.",
+    "body": "Exchange rates matter when you own investments priced in another currency: even if the investment doesn't move, its value in your own currency changes when the exchange rate moves.",
+    "example": "A Saudi stock priced in SAR is worth more in dollars if the riyal strengthens against the dollar.",
+    "related": ["commodity", "allocation"]
+  },
+  {
+    "id": "commodity",
+    "term": "Commodity",
+    "aliases": ["commodities", "gold", "oil", "silver", "raw materials"],
+    "category": "economy",
+    "short": "A basic raw material traded worldwide, such as gold, oil or wheat.",
+    "body": "Commodity prices move with supply and demand, weather, politics and the economy. Gold is often bought in uncertain times; oil prices affect energy companies and inflation.",
+    "related": ["inflation", "exchange-rate", "sector"]
+  }
+]

@@ -553,5 +553,84 @@
   },
   "briefNote": "Written by AI from market data and headlines — it can be incomplete or wrong. Educational information only — not financial advice.",
   "briefEmail": "Email me my morning brief",
-  "briefEmailUnverified": "Confirm your email address to get the brief by email."
+  "briefEmailUnverified": "Confirm your email address to get the brief by email.",
+  "learnTitle": "Learn",
+  "glossaryTitle": "Glossary",
+  "glossarySearchHint": "Search terms, e.g. P/E or ETF",
+  "glossaryAll": "All",
+  "glossaryBasics": "Basics",
+  "glossaryValuation": "Company value",
+  "glossaryFunds": "Funds",
+  "glossaryCrypto": "Crypto",
+  "glossaryRisk": "Risk",
+  "glossaryPortfolio": "Portfolio",
+  "glossaryTrading": "Trading",
+  "glossaryCharts": "Charts",
+  "glossaryEconomy": "Economy",
+  "glossaryEmpty": "No terms match “{query}”.",
+  "@glossaryEmpty": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "glossaryAskUnknown": "What does “{query}” mean in investing?",
+  "@glossaryAskUnknown": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "termNotFound": "We don't have that term in the glossary yet.",
+  "termExample": "Example",
+  "termRelated": "Related terms",
+  "termAskCopilot": "Ask the Copilot",
+  "termQuestion": "Can you explain {term} with a simple example?",
+  "@termQuestion": {
+    "placeholders": {
+      "term": {
+        "type": "String"
+      }
+    }
+  },
+  "explainLearnMore": "Learn more",
+  "explainFigureQuestion": "What does {symbol}'s {figure} of {value} tell me?",
+  "@explainFigureQuestion": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      },
+      "figure": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "changeToday": "Change today",
+  "changeToday24h": "Change in 24 hours",
+  "changeTodayHelp": "How much the price has moved since the previous trading day's closing price. Moves of 1–2% in a day are common for large companies; bigger moves are often linked to news.",
+  "changeToday24hHelp": "How much the price has moved over the last 24 hours (crypto trades non-stop, so there is no daily close). Moves of several percent in a day are common for crypto.",
+  "explainChangeQuestion": "Why did {symbol} move {change} today?",
+  "@explainChangeQuestion": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      },
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "actionGlossaryTerm": "Glossary: {name}",
+  "@actionGlossaryTerm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

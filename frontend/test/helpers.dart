@@ -7,6 +7,8 @@ import 'package:stock_adviser/features/auth/domain/auth_state.dart';
 import 'package:stock_adviser/features/auth/domain/user.dart';
 import 'package:stock_adviser/features/brief/data/brief_api.dart';
 import 'package:stock_adviser/features/health/data/health_repository.dart';
+import 'package:stock_adviser/features/learn/data/learn_api.dart';
+import 'package:stock_adviser/features/learn/domain/glossary_term.dart';
 import 'package:stock_adviser/features/market/data/market_api.dart';
 import 'package:stock_adviser/features/market/domain/market.dart';
 import 'package:stock_adviser/features/notifications/data/notifications_api.dart';
@@ -133,6 +135,7 @@ Future<void> pumpApp(
           (ref) async => const HealthStatus(status: 'ok', environment: 'test'),
         ),
         // The home screen's market list, without network.
+        glossaryProvider.overrideWith((ref) async => testGlossary),
         popularAssetsProvider.overrideWith(
           (ref, type) async => [
             for (final a in popular)
@@ -146,6 +149,39 @@ Future<void> pumpApp(
   );
   await tester.pumpAndSettle();
 }
+
+GlossaryTerm _term(
+  String id,
+  String term,
+  String category, {
+  List<String> aliases = const [],
+  String? example,
+  List<String> related = const [],
+}) => GlossaryTerm(
+  id: id,
+  term: term,
+  aliases: aliases,
+  category: category,
+  short: 'Short: $term.',
+  body: 'Body of $term.',
+  example: example,
+  related: related,
+);
+
+final testGlossary = [
+  _term('etf', 'ETF (exchange-traded fund)', 'funds', aliases: ['index fund']),
+  _term('eps', 'Earnings per share (EPS)', 'valuation', related: ['pe-ratio']),
+  _term(
+    'pe-ratio',
+    'P/E ratio',
+    'valuation',
+    aliases: ['price to earnings'],
+    example: 'A \$60 share with \$3 EPS has a P/E of 20.',
+    related: ['eps', 'missing-id'],
+  ),
+  _term('stablecoin', 'Stablecoin', 'crypto'),
+  _term('volatility', 'Volatility', 'risk'),
+];
 
 Asset testAsset({
   int id = 1,

@@ -13,6 +13,8 @@ import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/auth/presentation/verify_email_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/learn/presentation/glossary_screen.dart';
+import '../../features/learn/presentation/term_screen.dart';
 import '../../features/market/presentation/asset_screen.dart';
 import '../../features/market/presentation/search_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
@@ -97,6 +99,17 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'search',
             builder: (context, state) => const SearchScreen(),
+          ),
+          GoRoute(
+            path: 'learn',
+            builder: (context, state) => const GlossaryScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (context, state) =>
+                    TermScreen(termId: state.pathParameters['id']!),
+              ),
+            ],
           ),
           GoRoute(
             path: 'assets/:id',

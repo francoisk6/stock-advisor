@@ -7,6 +7,7 @@ from app.api.v1 import (
     chat,
     digest,
     health,
+    learn,
     live,
     notifications,
     users,
@@ -23,4 +24,5 @@ api_router.include_router(alerts.router)
 api_router.include_router(notifications.router)
 api_router.include_router(chat.router)
 api_router.include_router(digest.router)
+api_router.include_router(learn.router)
 api_router.include_router(live.router)

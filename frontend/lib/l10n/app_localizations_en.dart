@@ -1067,4 +1067,102 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get briefEmailUnverified =>
       'Confirm your email address to get the brief by email.';
+
+  @override
+  String get learnTitle => 'Learn';
+
+  @override
+  String get glossaryTitle => 'Glossary';
+
+  @override
+  String get glossarySearchHint => 'Search terms, e.g. P/E or ETF';
+
+  @override
+  String get glossaryAll => 'All';
+
+  @override
+  String get glossaryBasics => 'Basics';
+
+  @override
+  String get glossaryValuation => 'Company value';
+
+  @override
+  String get glossaryFunds => 'Funds';
+
+  @override
+  String get glossaryCrypto => 'Crypto';
+
+  @override
+  String get glossaryRisk => 'Risk';
+
+  @override
+  String get glossaryPortfolio => 'Portfolio';
+
+  @override
+  String get glossaryTrading => 'Trading';
+
+  @override
+  String get glossaryCharts => 'Charts';
+
+  @override
+  String get glossaryEconomy => 'Economy';
+
+  @override
+  String glossaryEmpty(String query) {
+    return 'No terms match “$query”.';
+  }
+
+  @override
+  String glossaryAskUnknown(String query) {
+    return 'What does “$query” mean in investing?';
+  }
+
+  @override
+  String get termNotFound => 'We don\'t have that term in the glossary yet.';
+
+  @override
+  String get termExample => 'Example';
+
+  @override
+  String get termRelated => 'Related terms';
+
+  @override
+  String get termAskCopilot => 'Ask the Copilot';
+
+  @override
+  String termQuestion(String term) {
+    return 'Can you explain $term with a simple example?';
+  }
+
+  @override
+  String get explainLearnMore => 'Learn more';
+
+  @override
+  String explainFigureQuestion(String symbol, String figure, String value) {
+    return 'What does $symbol\'s $figure of $value tell me?';
+  }
+
+  @override
+  String get changeToday => 'Change today';
+
+  @override
+  String get changeToday24h => 'Change in 24 hours';
+
+  @override
+  String get changeTodayHelp =>
+      'How much the price has moved since the previous trading day\'s closing price. Moves of 1–2% in a day are common for large companies; bigger moves are often linked to news.';
+
+  @override
+  String get changeToday24hHelp =>
+      'How much the price has moved over the last 24 hours (crypto trades non-stop, so there is no daily close). Moves of several percent in a day are common for crypto.';
+
+  @override
+  String explainChangeQuestion(String symbol, String change) {
+    return 'Why did $symbol move $change today?';
+  }
+
+  @override
+  String actionGlossaryTerm(String name) {
+    return 'Glossary: $name';
+  }
 }

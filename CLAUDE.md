@@ -163,6 +163,20 @@ Implemented (Phase 2) in `backend/app/market_data/`:
   Measured: brief ≈ 30–90 s per user on this CPU (sequential) — fine for now, revisit at scale.
 - SearXNG: `infra/searxng` (Docker, pinned image, 127.0.0.1:8220, 512 MB / 0.5 CPU).
 
+### Learning & practice (Phase 6)
+- Glossary (`app/learn/glossary.py`): vetted entries in `glossary_<lang>.json` (data, ~65 terms:
+  id, term, aliases, category, short, body, example, related). One source for the Learn screens,
+  "Explain this" sheets and the copilot's `explain_term` tool. `lang` is limited to shipped files.
+  `GET /learn/glossary[/{id}]`.
+- Definition questions ("what is / what does … mean / explain …") that match a glossary term get
+  `explain_term` run by the backend before the model answers (the 4B model otherwise explains
+  from memory) → vetted text + a "Glossary: …" card. News guards only fire for price-move /
+  news questions (`agent._NEWS_QUESTION`), not every "why".
+- App: `features/learn/` (glossary search + topics, term page, `showExplainSheet` → "Learn more"
+  + "Ask the Copilot"); key figures map to entries via `statTerm`; `askCopilot(context, q)` opens
+  a fresh chat with the question. Chips that navigate are buttons (Flutter web announces chips
+  as checkboxes).
+
 ### Live updates & background jobs (Phase 3)
 - `app/realtime/hub.py`: one WebSocket per open app at `/api/v1/ws` (protocol in the module
   docstring): first message authenticates, then `subscribe` to asset ids; server pushes changed
@@ -254,7 +268,8 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       `get_news` + `web_search` (SearXNG) with cited links, "Why did it move?" (shared per asset
       per day), nightly stored daily prices (chart fallback), morning brief at 06:00 Beirut
       (in-app + optional email). Push notifications: Android phase. Verified unit + live e2e.
-- [ ] **Phase 6 — Learning & practice:** glossary, explain-this, paper trading, portfolio.
+- [ ] **Phase 6 — Learning & practice:** steps: 1 glossary + explain-this ✓ · 2 practice account
+      backend · 3 practice app UI · 4 portfolio tracker · 5 bottom navigation · 6 lessons + quizzes.
 - [ ] **Phase 7 — Monetization:** plans, quotas, Stripe + in-app purchases, Pro features.
 - [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
       (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.
@@ -431,6 +446,10 @@ nice -n 19 flutter build web        # low priority: shared server
 - 2026-10-17 — Domain: universal-stock-advisor.trade (production web + `api.` subdomain).
 - 2026-10-17 — Phase 5: news from Google News RSS (dev source), web search via self-hosted
   SearXNG, brief at 06:00 Beirut (03:00 UTC), brief email opt-in (default off).
+- 2026-10-18 — Phase 6: practice account = $10,000 virtual USD (non-USD assets converted at the
+  live FX rate); orders on closed markets wait for the open; no fees/shorting/leverage; the
+  copilot may place practice trades (undo card), never real ones. Learning hub (lessons +
+  quizzes) added as step 6. Glossary content served by the backend (shared with the copilot).
 - 2026-10-17 — Phase 4: copilot on qwen3:4b-instruct (non-thinking) for speed on CPU; chat
   streamed over the existing WebSocket; app actions run immediately with undo cards; web and
   news search deferred to Phase 5.

@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.types import ToolCall, ToolSpec
 from app.core.errors import AppError
 from app.db.models import Asset, User
+from app.learn import glossary
 from app.market_data import service as market
 from app.market_data.types import ProviderError, Quote, Range
 from app.news import service as news_service
@@ -320,6 +321,29 @@ async def web_search(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     )
 
 
+async def explain_term(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
+    term = glossary.find(str(args.get("term", "")))
+    if term is None:
+        return ToolResult(
+            {
+                "found": False,
+                "note": "Not in the app's glossary. Explain it briefly in plain words, or use "
+                "web_search if you are not sure what it means.",
+            }
+        )
+    return ToolResult(
+        {
+            "found": True,
+            "term": term.term,
+            "short": term.short,
+            "explanation": term.body,
+            "example": term.example,
+        },
+        # A link to the full glossary entry (nothing to undo).
+        action={"type": "glossary_term", "term_id": term.id, "name": term.term},
+    )
+
+
 async def list_alerts(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     alerts = await alerts_service.list_for_user(ctx.session, ctx.user)
     return ToolResult(
@@ -414,6 +438,18 @@ TOOLS: dict[str, Tool] = {
             ),
             web_search,
             lambda a: f"Searching the web for “{a.get('query', '')}”…",
+        ),
+        Tool(
+            _spec(
+                "explain_term",
+                "The app's vetted plain-language explanation of an investing term "
+                "(P/E ratio, ETF, volatility, market cap, dividend, …). Use it for "
+                "'what is / what does … mean' questions.",
+                {"term": {"type": "string", "description": "The term, e.g. 'P/E ratio'"}},
+                ["term"],
+            ),
+            explain_term,
+            lambda a: f"Looking up “{a.get('term', '')}” in the glossary…",
         ),
         Tool(
             _spec("get_watchlist", "The user's watchlist with latest prices.", {}, []),

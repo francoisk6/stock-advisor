@@ -131,3 +131,25 @@ def token_from_last_email(to: str) -> str:
     match = re.search(r"token=([^\s&\"]+)", email.text)
     assert match, email.text
     return unquote(match.group(1))
+
+
+@pytest.fixture
+def llm(monkeypatch: pytest.MonkeyPatch):
+    """Replace the model with a ScriptedLLM: `scripted = llm(say("Hi"), call("get_quote", …))`."""
+    from app.ai import agent
+    from tests.test_copilot import ScriptedLLM
+
+    def install(*rounds, fail: bool = False) -> ScriptedLLM:
+        scripted = ScriptedLLM(*rounds, fail=fail)
+        monkeypatch.setattr(agent, "provider", scripted)
+        return scripted
+
+    return install
+
+
+@pytest.fixture
+async def user(client: AsyncClient) -> dict:
+    """A registered, onboarded user (stocks + crypto, Middle East); returns its tokens."""
+    tokens = await register(client)
+    await onboard(client, tokens, assets=["stocks", "crypto"], regions=["middle_east"])
+    return tokens
