@@ -69,6 +69,9 @@ class ProfileScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.workspace_premium_outlined),
                     title: Text(l10n.profilePlan(user.plan.name)),
+                    subtitle: Text(l10n.profilePlanHint),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.go('/plans'),
                   ),
                   ListTile(
                     leading: const Icon(Icons.key_outlined),

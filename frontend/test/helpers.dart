@@ -14,6 +14,8 @@ import 'package:stock_adviser/features/market/data/market_api.dart';
 import 'package:stock_adviser/features/market/domain/market.dart';
 import 'package:stock_adviser/features/notifications/data/notifications_api.dart';
 import 'package:stock_adviser/features/notifications/domain/app_notification.dart';
+import 'package:stock_adviser/features/plans/data/plans_api.dart';
+import 'package:stock_adviser/features/plans/domain/plans.dart';
 import 'package:stock_adviser/features/portfolio/data/portfolio_api.dart';
 import 'package:stock_adviser/features/portfolio/domain/portfolio.dart';
 import 'package:stock_adviser/features/practice/data/practice_api.dart';
@@ -126,13 +128,15 @@ Future<void> pumpApp(
   FakePracticeApi? practice,
   FakePortfolioApi? portfolio,
   FakeLearnApi? learn,
+  FakePlansApi? plans,
+  WatchlistController Function()? watchlistController,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
       retry: (_, _) => null, // no background retries (pending timers) in tests
       overrides: [
         watchlistProvider.overrideWith(
-          () => FakeWatchlistController(watchlist),
+          watchlistController ?? () => FakeWatchlistController(watchlist),
         ),
         briefProvider.overrideWith(() => FakeBriefController(brief)),
         notificationsProvider.overrideWith(
@@ -145,6 +149,7 @@ Future<void> pumpApp(
         // The home screen's market list, without network.
         glossaryProvider.overrideWith((ref) async => testGlossary),
         learnApiProvider.overrideWithValue(learn ?? FakeLearnApi()),
+        plansApiProvider.overrideWithValue(plans ?? FakePlansApi()),
         practiceApiProvider.overrideWithValue(practice ?? FakePracticeApi()),
         portfolioApiProvider.overrideWithValue(portfolio ?? FakePortfolioApi()),
         popularAssetsProvider.overrideWith(
@@ -609,5 +614,49 @@ class FakeLearnApi implements LearnApi {
           },
       ],
     });
+  }
+}
+
+/// Plans stand-in: Free (3 watchlist, 5 questions) and Pro (unlimited, not for sale yet).
+class FakePlansApi implements PlansApi {
+  bool interested = false;
+  int interestCalls = 0;
+
+  @override
+  Future<List<PlanInfo>> plans() async => [
+    PlanInfo.fromJson({
+      'code': 'free',
+      'name': 'Free',
+      'price_monthly_usd': 0,
+      'price_yearly_usd': 0,
+      'for_sale': true,
+      'limits': {'ai_messages_per_day': 5, 'watchlist_assets': 3},
+    }),
+    PlanInfo.fromJson({
+      'code': 'pro',
+      'name': 'Pro',
+      'price_monthly_usd': 4.99,
+      'price_yearly_usd': 39.99,
+      'for_sale': false,
+      'limits': {'ai_messages_per_day': null, 'watchlist_assets': null},
+    }),
+  ];
+
+  @override
+  Future<PlanUsage> usage() async => PlanUsage.fromJson({
+    'plan': 'free',
+    'plan_name': 'Free',
+    'items': [
+      {'key': 'ai_messages_per_day', 'used': 2, 'limit': 5},
+      {'key': 'watchlist_assets', 'used': 3, 'limit': 3},
+    ],
+    'pro_interest_at': interested ? '2026-10-21T10:00:00' : null,
+  });
+
+  @override
+  Future<PlanUsage> proInterest() async {
+    interestCalls++;
+    interested = true;
+    return usage();
   }
 }

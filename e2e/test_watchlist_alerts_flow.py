@@ -48,7 +48,7 @@ with sync_playwright() as p:
         step("empty watchlist explains how to add assets")
 
         page.get_by_role("button", name=re.compile(r"^Bitcoin BTC")).first.click()
-        wait_for_text(page, r"Bitcoin BTC · Crypto \$[\d,]+\.\d\d")
+        wait_for_text(page, r"BTC · Crypto \$[\d,]+\.\d\d")  # name is its own heading
         button(page, "Add to watchlist").click()
         wait_for_text(page, "Added to your watchlist")
         # Regex: while the mouse hovers, the tooltip's text is added to the button's name.

@@ -27,6 +27,7 @@ import 'widgets/news_card.dart';
 import 'widgets/why_card.dart';
 import 'widgets/price_change.dart';
 import 'widgets/price_chart.dart';
+import '../../plans/presentation/plan_limit.dart';
 
 class AssetScreen extends ConsumerStatefulWidget {
   const AssetScreen({super.key, required this.assetId});
@@ -388,7 +389,11 @@ class _WatchlistStarState extends ConsumerState<_WatchlistStar> {
         watched ? l10n.watchlistRemoved : l10n.watchlistAdded,
       );
     } catch (e) {
-      showSnack(messenger, apiErrorMessage(e, l10n));
+      if (isPlanLimit(e) && mounted) {
+        await showPlanLimit(context, apiErrorMessage(e, l10n));
+      } else {
+        showSnack(messenger, apiErrorMessage(e, l10n));
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }

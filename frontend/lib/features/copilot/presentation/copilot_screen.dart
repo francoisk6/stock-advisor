@@ -13,6 +13,7 @@ import '../../market/data/market_api.dart';
 import '../application/copilot_controller.dart';
 import '../data/chat_api.dart';
 import 'rich_answer.dart';
+import '../../plans/presentation/plan_limit.dart';
 
 /// Chat with the copilot. Opened with `?asset=<id>` from an asset page to give it context.
 class CopilotScreen extends ConsumerStatefulWidget {
@@ -358,9 +359,16 @@ class _Bubble extends StatelessWidget {
               if (error != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    error == 'offline' ? l10n.copilotOffline : error,
-                    style: TextStyle(color: colors.error),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        error == 'offline' ? l10n.copilotOffline : error,
+                        style: TextStyle(color: colors.error),
+                      ),
+                      if (message.errorCode == 'plan_limit')
+                        const SeePlansButton(),
+                    ],
                   ),
                 )
               else if (!user && !message.streaming && message.text.isEmpty)

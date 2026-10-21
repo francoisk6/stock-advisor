@@ -2907,6 +2907,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lesson: {name}'**
   String actionLesson(String name);
+
+  /// No description provided for @plansTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plans'**
+  String get plansTitle;
+
+  /// No description provided for @plansCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan: {plan}'**
+  String plansCurrent(String plan);
+
+  /// No description provided for @plansUsageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What you\'ve used'**
+  String get plansUsageTitle;
+
+  /// No description provided for @usageAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Copilot questions today'**
+  String get usageAi;
+
+  /// No description provided for @usageWatchlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Watchlist assets'**
+  String get usageWatchlist;
+
+  /// No description provided for @usageAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Active alerts'**
+  String get usageAlerts;
+
+  /// No description provided for @usageHoldings.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio holdings'**
+  String get usageHoldings;
+
+  /// No description provided for @usageOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{used} of {limit}'**
+  String usageOf(int used, int limit);
+
+  /// No description provided for @usageNoLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'{used} · no limit'**
+  String usageNoLimit(int used);
+
+  /// No description provided for @plansCompare.
+  ///
+  /// In en, this message translates to:
+  /// **'Free and Pro'**
+  String get plansCompare;
+
+  /// No description provided for @limitPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} a day'**
+  String limitPerDay(int count);
+
+  /// No description provided for @limitUpTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {count}'**
+  String limitUpTo(int count);
+
+  /// No description provided for @limitUnlimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited'**
+  String get limitUnlimited;
+
+  /// No description provided for @plansFreePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get plansFreePrice;
+
+  /// No description provided for @plansPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'{monthly} a month, or {yearly} a year'**
+  String plansPrice(String monthly, String yearly);
+
+  /// No description provided for @plansSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Paying yearly saves {percent}.'**
+  String plansSave(String percent);
+
+  /// No description provided for @plansProSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Pro is coming soon. It can\'t be bought yet.'**
+  String get plansProSoon;
+
+  /// No description provided for @plansNotify.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me when Pro is ready'**
+  String get plansNotify;
+
+  /// No description provided for @plansNotified.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks! We\'ll let you know when Pro is ready.'**
+  String get plansNotified;
+
+  /// No description provided for @seePlans.
+  ///
+  /// In en, this message translates to:
+  /// **'See plans'**
+  String get seePlans;
+
+  /// No description provided for @planLimitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached a limit of your plan'**
+  String get planLimitTitle;
+
+  /// No description provided for @profilePlanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'See what\'s included and what you\'ve used'**
+  String get profilePlanHint;
 }
 
 class _AppLocalizationsDelegate

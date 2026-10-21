@@ -17,6 +17,7 @@ import '../../market/presentation/labels.dart';
 import '../../market/presentation/widgets/asset_avatar.dart';
 import '../data/portfolio_api.dart';
 import '../domain/portfolio.dart';
+import '../../plans/presentation/plan_limit.dart';
 
 String _plain(double value) => formatQuantity(value).replaceAll(',', '');
 
@@ -58,6 +59,7 @@ class _HoldingSheetState extends ConsumerState<HoldingSheet> {
   late DateTime? _boughtOn = widget.holding?.boughtOn;
   bool _busy = false;
   String? _error;
+  bool _limit = false; // the error is a plan limit: offer the Plans screen
 
   @override
   void dispose() {
@@ -113,6 +115,7 @@ class _HoldingSheetState extends ConsumerState<HoldingSheet> {
       setState(() {
         _busy = false;
         _error = apiErrorMessage(e, l10n);
+        _limit = isPlanLimit(e);
       });
     }
   }
@@ -234,6 +237,8 @@ class _HoldingSheetState extends ConsumerState<HoldingSheet> {
                 ),
               ),
               ErrorText(_error),
+              if (_limit)
+                SeePlansButton(beforeOpening: () => Navigator.pop(context)),
               BusyButton(busy: _busy, onPressed: _save, label: l10n.save),
               if (widget.holding != null) ...[
                 const SizedBox(height: 8),

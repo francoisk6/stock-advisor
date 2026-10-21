@@ -16,6 +16,7 @@ class CopilotMessage {
     this.status,
     this.streaming = false,
     this.error,
+    this.errorCode,
   });
 
   final bool fromUser;
@@ -32,6 +33,9 @@ class CopilotMessage {
   /// Error detail from the server, or the code `offline`.
   final String? error;
 
+  /// Machine-readable kind of [error], e.g. `plan_limit` (the chat offers the Plans screen).
+  final String? errorCode;
+
   CopilotMessage copyWith({
     String? text,
     List<Map<String, dynamic>>? actions,
@@ -39,6 +43,7 @@ class CopilotMessage {
     bool clearStatus = false,
     bool? streaming,
     String? error,
+    String? errorCode,
   }) => CopilotMessage(
     fromUser: fromUser,
     text: text ?? this.text,
@@ -46,6 +51,7 @@ class CopilotMessage {
     status: clearStatus ? null : status ?? this.status,
     streaming: streaming ?? this.streaming,
     error: error ?? this.error,
+    errorCode: errorCode ?? this.errorCode,
   );
 }
 
@@ -150,6 +156,7 @@ class CopilotController extends Notifier<CopilotState> {
             streaming: false,
             clearStatus: true,
             error: (event['detail'] ?? event['code'] ?? 'error') as String,
+            errorCode: event['code'] as String?,
           ),
         );
     }

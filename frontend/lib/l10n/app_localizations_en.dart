@@ -1712,4 +1712,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String actionLesson(String name) {
     return 'Lesson: $name';
   }
+
+  @override
+  String get plansTitle => 'Plans';
+
+  @override
+  String plansCurrent(String plan) {
+    return 'Your plan: $plan';
+  }
+
+  @override
+  String get plansUsageTitle => 'What you\'ve used';
+
+  @override
+  String get usageAi => 'Copilot questions today';
+
+  @override
+  String get usageWatchlist => 'Watchlist assets';
+
+  @override
+  String get usageAlerts => 'Active alerts';
+
+  @override
+  String get usageHoldings => 'Portfolio holdings';
+
+  @override
+  String usageOf(int used, int limit) {
+    return '$used of $limit';
+  }
+
+  @override
+  String usageNoLimit(int used) {
+    return '$used · no limit';
+  }
+
+  @override
+  String get plansCompare => 'Free and Pro';
+
+  @override
+  String limitPerDay(int count) {
+    return '$count a day';
+  }
+
+  @override
+  String limitUpTo(int count) {
+    return 'Up to $count';
+  }
+
+  @override
+  String get limitUnlimited => 'Unlimited';
+
+  @override
+  String get plansFreePrice => 'Free';
+
+  @override
+  String plansPrice(String monthly, String yearly) {
+    return '$monthly a month, or $yearly a year';
+  }
+
+  @override
+  String plansSave(String percent) {
+    return 'Paying yearly saves $percent.';
+  }
+
+  @override
+  String get plansProSoon => 'Pro is coming soon. It can\'t be bought yet.';
+
+  @override
+  String get plansNotify => 'Tell me when Pro is ready';
+
+  @override
+  String get plansNotified => 'Thanks! We\'ll let you know when Pro is ready.';
+
+  @override
+  String get seePlans => 'See plans';
+
+  @override
+  String get planLimitTitle => 'You\'ve reached a limit of your plan';
+
+  @override
+  String get profilePlanHint => 'See what\'s included and what you\'ve used';
 }

@@ -26,6 +26,7 @@ import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import 'app_shell.dart';
+import '../../features/plans/presentation/plans_screen.dart';
 
 /// Only for signed-out users; signed-in users are sent home.
 const _guestOnly = {'/login', '/register', '/forgot-password'};
@@ -121,6 +122,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'search',
                     builder: (context, state) => const SearchScreen(),
+                  ),
+                  GoRoute(
+                    path: 'plans',
+                    builder: (context, state) => const PlansScreen(),
                   ),
                   _assetRoute(),
                 ],

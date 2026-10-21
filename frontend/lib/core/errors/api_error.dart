@@ -42,6 +42,12 @@ String apiErrorMessage(Object error, AppLocalizations l10n) {
 
 const _frameworkDetails = {null, 'Not Found', 'Method Not Allowed'};
 
+/// The error is a plan limit (the app offers the Plans screen).
+bool isPlanLimit(Object error) =>
+    error is DioException &&
+    error.response?.data is Map &&
+    (error.response!.data as Map)['code'] == 'plan_limit';
+
 String? _detail(Object? data) {
   if (data is Map && data['detail'] is String) return data['detail'] as String;
   return null;

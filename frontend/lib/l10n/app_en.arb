@@ -1240,5 +1240,82 @@
         "type": "String"
       }
     }
-  }
+  },
+  "plansTitle": "Plans",
+  "plansCurrent": "Your plan: {plan}",
+  "@plansCurrent": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "plansUsageTitle": "What you've used",
+  "usageAi": "Copilot questions today",
+  "usageWatchlist": "Watchlist assets",
+  "usageAlerts": "Active alerts",
+  "usageHoldings": "Portfolio holdings",
+  "usageOf": "{used} of {limit}",
+  "@usageOf": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "usageNoLimit": "{used} · no limit",
+  "@usageNoLimit": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      }
+    }
+  },
+  "plansCompare": "Free and Pro",
+  "limitPerDay": "{count} a day",
+  "@limitPerDay": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "limitUpTo": "Up to {count}",
+  "@limitUpTo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "limitUnlimited": "Unlimited",
+  "plansFreePrice": "Free",
+  "plansPrice": "{monthly} a month, or {yearly} a year",
+  "@plansPrice": {
+    "placeholders": {
+      "monthly": {
+        "type": "String"
+      },
+      "yearly": {
+        "type": "String"
+      }
+    }
+  },
+  "plansSave": "Paying yearly saves {percent}.",
+  "@plansSave": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "plansProSoon": "Pro is coming soon. It can't be bought yet.",
+  "plansNotify": "Tell me when Pro is ready",
+  "plansNotified": "Thanks! We'll let you know when Pro is ready.",
+  "seePlans": "See plans",
+  "planLimitTitle": "You've reached a limit of your plan",
+  "profilePlanHint": "See what's included and what you've used"
 }

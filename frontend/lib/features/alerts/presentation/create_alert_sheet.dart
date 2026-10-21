@@ -12,6 +12,7 @@ import '../../market/domain/market.dart';
 import '../data/alerts_api.dart';
 import '../domain/alert.dart';
 import 'alert_text.dart';
+import '../../plans/presentation/plan_limit.dart';
 
 /// Bottom sheet to create an alert, prefilled with sensible values around today's price.
 class CreateAlertSheet extends ConsumerStatefulWidget {
@@ -40,6 +41,7 @@ class _CreateAlertSheetState extends ConsumerState<CreateAlertSheet> {
   bool _email = true;
   bool _busy = false;
   String? _error;
+  bool _limit = false; // the error is a plan limit: offer the Plans screen
 
   bool get _forex => widget.asset.assetType == 'forex';
 
@@ -93,9 +95,10 @@ class _CreateAlertSheetState extends ConsumerState<CreateAlertSheet> {
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (mounted) {
-        setState(
-          () => _error = apiErrorMessage(e, AppLocalizations.of(context)),
-        );
+        setState(() {
+          _error = apiErrorMessage(e, AppLocalizations.of(context));
+          _limit = isPlanLimit(e);
+        });
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -197,6 +200,8 @@ class _CreateAlertSheetState extends ConsumerState<CreateAlertSheet> {
             ),
             const SizedBox(height: 8),
             ErrorText(_error),
+            if (_limit)
+              SeePlansButton(beforeOpening: () => Navigator.pop(context)),
             BusyButton(label: l10n.alertCreate, busy: _busy, onPressed: _save),
           ],
         ),

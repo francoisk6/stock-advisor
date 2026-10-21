@@ -316,7 +316,7 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       (allocation + plain risk overview, values in your currency), tab navigation, 8 lessons with
       quizzes and progress. Verified unit + live e2e (one flow at a time).
 - [ ] **Phase 7 — Monetization (payments later):** steps: 1 plan limits + prices ✓ · 2 plan &
-      usage API ✓ · 3 plans screen, upgrade prompts, interest sign-up · 4 grant Pro to testers.
+      usage API ✓ · 3 plans screen, upgrade prompts, interest sign-up ✓ · 4 grant Pro to testers.
       Stripe + in-app purchases move to launch.
 - [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
       (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.
@@ -360,6 +360,10 @@ stock-advisor-dev/
   copilot questions today, watchlist, active alerts, holdings), `POST /plans/pro/interest`
   ("tell me when Pro is ready" → `user_profiles.pro_interest_at`). The active plan is the
   latest active `user_plans` row (newer row wins a same-second tie).
+- App: `features/plans/` — Plans screen (`/plans`, from Profile: usage bars, Free vs Pro,
+  prices, "Tell me when Pro is ready"); limit errors (`isPlanLimit(e)`, from the API's
+  `code: plan_limit`) show `showPlanLimit` (watchlist star) or `SeePlansButton` (alert and
+  holding sheets, copilot daily limit via `CopilotMessage.errorCode`).
 - Tests that change plan limits use the `free_limits(**changes)` fixture (restores the exact
   previous limits): plans aren't cleared between tests, and hard-coded "restores" once left the
   test DB on old limits.
