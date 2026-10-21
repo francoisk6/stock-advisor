@@ -79,10 +79,25 @@ cur=c.cursor(); cur.execute('select * from job_runs order by day desc, name limi
 ```bash
 cd ~/stock-advisor/stock-advisor-dev/backend && .venv/bin/pytest -q && .venv/bin/ruff check .
 cd ~/stock-advisor/stock-advisor-dev/frontend && flutter analyze && flutter test
-cd ~/stock-advisor/stock-advisor-dev && bash e2e/run.sh     # browser tests, ~10 min
+cd ~/stock-advisor/stock-advisor-dev && E2E_TESTS=test_market_flow.py bash e2e/run.sh  # one flow
 ```
 The browser tests use their own ports (8290/8291) and a temporary email outbox, so they can run
-while your dev servers are up. `E2E_TESTS=test_market_flow.py bash e2e/run.sh` runs one flow.
+while your dev servers are up. On this shared server run **one flow at a time** (the full suite
+once overloaded it and slowed evolution). `run.sh` refuses to start at load ≥ 4 or under 6 GB
+free memory (`E2E_FORCE=1` overrides) and only stops processes it started itself.
+
+---
+
+## 2b. Plans and testers (until payments go live)
+
+```bash
+cd ~/stock-advisor/stock-advisor-dev/backend
+.venv/bin/python -m app.admin grant-pro someone@example.com --days 30   # or --forever
+.venv/bin/python -m app.admin revoke-pro someone@example.com
+.venv/bin/python -m app.admin pro-interest     # who tapped "Tell me when Pro is ready"
+```
+Free: 3 watchlist assets, 5 copilot questions a day. Pro: unlimited (shown at $4.99/month or
+$39.99/year, not for sale yet). Limits live in the `plans` table (change them with a migration).
 
 ---
 

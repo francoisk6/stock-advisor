@@ -1,7 +1,7 @@
 from httpx import AsyncClient
 from sqlalchemy import select
 
-from app.db.models import Plan, UserPlan
+from app.db.models import Plan, User, UserPlan
 from app.db.session import SessionLocal
 from tests.conftest import bearer
 from tests.test_copilot import ask, say
@@ -72,3 +72,29 @@ async def test_pro_users_have_no_limits(client: AsyncClient, user: dict) -> None
     assert usage["plan"] == "pro"
     limits = {i["key"]: i["limit"] for i in usage["items"]}
     assert limits["ai_messages_per_day"] is None and limits["watchlist_assets"] is None
+
+
+async def test_testers_get_pro_and_lose_it(client: AsyncClient, user: dict) -> None:
+    from app.services import plans
+
+    async with SessionLocal() as session:
+        me = await session.get(User, user["user"]["id"])
+        grant = await plans.grant_pro(session, me, days=30)
+        assert grant.provider == "internal" and grant.provider_ref == "tester"
+    usage = (await client.get("/plans/usage", headers=bearer(user))).json()
+    assert usage["plan"] == "pro"
+
+    async with SessionLocal() as session:
+        me = await session.get(User, user["user"]["id"])
+        assert await plans.revoke_pro(session, me) == 1
+    usage = (await client.get("/plans/usage", headers=bearer(user))).json()
+    assert usage["plan"] == "free"
+
+
+async def test_pro_interest_list(client: AsyncClient, user: dict) -> None:
+    from app.services import plans
+
+    await client.post("/plans/pro/interest", headers=bearer(user))
+    async with SessionLocal() as session:
+        rows = await plans.pro_interest(session)
+    assert [(email, name) for email, name, _ in rows] == [("ana@example.com", "Ana")]

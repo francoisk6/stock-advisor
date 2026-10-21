@@ -1,11 +1,12 @@
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import AppError
 from app.core.time import utcnow
-from app.db.models import Alert, Holding, Plan, User
+from app.db.models import Alert, Holding, Plan, User, UserPlan, UserProfile
 from app.services.users import active_plan
 
 
@@ -67,3 +68,61 @@ async def register_pro_interest(session: AsyncSession, user: User) -> None:
     if user.profile.pro_interest_at is None:
         user.profile.pro_interest_at = utcnow()
         await session.commit()
+
+
+# --- testers (no payments yet) -------------------------------------------------------------
+
+TESTER_REF = "tester"
+
+
+async def grant_pro(session: AsyncSession, user: User, days: int | None) -> UserPlan:
+    """Give a tester Pro for `days` (None: until revoked). Recorded as an internal grant, so
+    real subscriptions (Stripe / stores) can sit next to it later."""
+    pro = (await session.execute(select(Plan).where(Plan.code == "pro"))).scalar_one()
+    now = utcnow()
+    grant = UserPlan(
+        user_id=user.id,
+        plan_id=pro.id,
+        status="active",
+        started_at=now,
+        ends_at=None if days is None else now + timedelta(days=days),
+        provider="internal",
+        provider_ref=TESTER_REF,
+    )
+    session.add(grant)
+    await session.commit()
+    return grant
+
+
+async def revoke_pro(session: AsyncSession, user: User) -> int:
+    """End a tester's internal Pro grants now; returns how many were active."""
+    now = utcnow()
+    rows = await session.execute(
+        select(UserPlan)
+        .join(Plan)
+        .where(
+            UserPlan.user_id == user.id,
+            Plan.code == "pro",
+            UserPlan.provider == "internal",
+            UserPlan.status == "active",
+        )
+    )
+    ended = 0
+    for grant in rows.scalars():
+        if grant.ends_at is None or grant.ends_at > now:
+            ended += 1
+        grant.status = "ended"
+        grant.ends_at = min(grant.ends_at or now, now)
+    await session.commit()
+    return ended
+
+
+async def pro_interest(session: AsyncSession) -> list[tuple[str, str, datetime]]:
+    """(email, name, when) of everyone who asked to hear when Pro is ready."""
+    rows = await session.execute(
+        select(User.email, User.full_name, UserProfile.pro_interest_at)
+        .join(UserProfile, UserProfile.user_id == User.id)
+        .where(UserProfile.pro_interest_at.is_not(None), User.is_active.is_(True))
+        .order_by(UserProfile.pro_interest_at)
+    )
+    return [tuple(r) for r in rows.all()]

@@ -316,7 +316,8 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       (allocation + plain risk overview, values in your currency), tab navigation, 8 lessons with
       quizzes and progress. Verified unit + live e2e (one flow at a time).
 - [ ] **Phase 7 — Monetization (payments later):** steps: 1 plan limits + prices ✓ · 2 plan &
-      usage API ✓ · 3 plans screen, upgrade prompts, interest sign-up ✓ · 4 grant Pro to testers.
+      usage API ✓ · 3 plans screen, upgrade prompts, interest sign-up ✓ · 4 grant Pro to testers ✓
+      (`python -m app.admin grant-pro|revoke-pro|pro-interest`, see RUNBOOK).
       Stripe + in-app purchases move to launch.
 - [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
       (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.
