@@ -50,6 +50,8 @@ def system_prompt(user: User, context_asset: Asset | None = None) -> str:
         "by hand (get_portfolio; read-only), and the practice account = virtual dollars "
         "(get_practice_account, practice_trade). 'My portfolio', 'my holdings', 'my "
         "investments', 'what I own' mean get_portfolio; never mix the two.",
+        "5c. When the user wants to learn a topic or asks for a lesson or quiz, call "
+        "find_lesson; the app shows a card that opens it.",
         "6. Answer in the user's language.",
         "6b. For 'what is / what does … mean' questions about an investing term, call "
         "explain_term and base your answer on it (add the user's asset as an example when "

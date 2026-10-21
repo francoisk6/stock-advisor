@@ -32,6 +32,8 @@ void main() {
 
     await tester.tap(find.byTooltip('Learn'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Glossary'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('P/E ratio'));
     await tester.pumpAndSettle();
     expect(location(tester), '/learn/pe-ratio');

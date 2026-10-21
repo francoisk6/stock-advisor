@@ -9,6 +9,7 @@ import 'package:stock_adviser/features/brief/data/brief_api.dart';
 import 'package:stock_adviser/features/health/data/health_repository.dart';
 import 'package:stock_adviser/features/learn/data/learn_api.dart';
 import 'package:stock_adviser/features/learn/domain/glossary_term.dart';
+import 'package:stock_adviser/features/learn/domain/lesson.dart';
 import 'package:stock_adviser/features/market/data/market_api.dart';
 import 'package:stock_adviser/features/market/domain/market.dart';
 import 'package:stock_adviser/features/notifications/data/notifications_api.dart';
@@ -124,6 +125,7 @@ Future<void> pumpApp(
   Brief? brief,
   FakePracticeApi? practice,
   FakePortfolioApi? portfolio,
+  FakeLearnApi? learn,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -142,6 +144,7 @@ Future<void> pumpApp(
         ),
         // The home screen's market list, without network.
         glossaryProvider.overrideWith((ref) async => testGlossary),
+        learnApiProvider.overrideWithValue(learn ?? FakeLearnApi()),
         practiceApiProvider.overrideWithValue(practice ?? FakePracticeApi()),
         portfolioApiProvider.overrideWithValue(portfolio ?? FakePortfolioApi()),
         popularAssetsProvider.overrideWith(
@@ -528,5 +531,83 @@ class FakePortfolioApi implements PortfolioApi {
   Future<Portfolio> setCurrency(String currency) async {
     currencies.add(currency);
     return state = testPortfolio(currency: currency);
+  }
+}
+
+Map<String, dynamic> testLessonJson({
+  String id = 'risk-basics',
+  String title = 'Risk basics',
+  bool suggested = true,
+  bool done = false,
+}) => {
+  'id': id,
+  'title': title,
+  'minutes': 4,
+  'level': 'beginner',
+  'summary': 'Summary of $title.',
+  'suggested': suggested,
+  'done': done,
+  'best_score': done ? 2 : null,
+  'total': 2,
+  'sections': [
+    {'heading': 'Ups and downs', 'body': 'Prices **swing**.'},
+  ],
+  'terms': ['volatility', 'etf'],
+  'quiz': [
+    {
+      'question': 'A fall of 50% needs a rise of…',
+      'options': ['50%', '100%'],
+    },
+    {
+      'question': 'Diversification…',
+      'options': ['removes all risk', 'lowers risk'],
+    },
+  ],
+};
+
+/// Lessons stand-in (the glossary itself comes from [testGlossary]).
+class FakeLearnApi implements LearnApi {
+  final submitted = <List<int>>[];
+
+  @override
+  Future<List<GlossaryTerm>> glossary() async => testGlossary;
+
+  @override
+  Future<List<LessonSummary>> lessons() async => [
+    LessonSummary.fromJson(testLessonJson()),
+    LessonSummary.fromJson(
+      testLessonJson(
+        id: 'charts',
+        title: 'Reading charts',
+        suggested: false,
+        done: true,
+      ),
+    ),
+  ];
+
+  @override
+  Future<Lesson> lesson(String id) async =>
+      Lesson.fromJson(testLessonJson(id: id));
+
+  @override
+  Future<QuizResult> submitQuiz(String id, List<int> answers) async {
+    submitted.add(answers);
+    final right = [1, 1];
+    return QuizResult.fromJson({
+      'score': [
+        for (final (i, a) in answers.indexed)
+          if (a == right[i]) 1,
+      ].length,
+      'total': 2,
+      'best_score': 2,
+      'results': [
+        for (final (i, a) in answers.indexed)
+          {
+            'correct': a == right[i],
+            'answer': right[i],
+            'explanation': 'Because $i.',
+          },
+      ],
+    });
   }
 }

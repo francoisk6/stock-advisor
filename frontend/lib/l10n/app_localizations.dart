@@ -2781,6 +2781,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Learn'**
   String get navLearn;
+
+  /// No description provided for @learnIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Short lessons with a quick quiz, and a glossary of every term in plain words.'**
+  String get learnIntro;
+
+  /// No description provided for @lessonsForYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Lessons for you'**
+  String get lessonsForYou;
+
+  /// No description provided for @lessonsMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More lessons'**
+  String get lessonsMore;
+
+  /// No description provided for @lessonsAllDone.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve finished every lesson that fits your interests. Well done!'**
+  String get lessonsAllDone;
+
+  /// No description provided for @lessonMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String lessonMinutes(int minutes);
+
+  /// No description provided for @lessonDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done · {score}/{total} on the quiz'**
+  String lessonDone(int score, int total);
+
+  /// No description provided for @levelIntermediate.
+  ///
+  /// In en, this message translates to:
+  /// **'Intermediate'**
+  String get levelIntermediate;
+
+  /// No description provided for @glossaryOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Glossary'**
+  String get glossaryOpen;
+
+  /// No description provided for @glossaryOpenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up any investing term in plain words'**
+  String get glossaryOpenHint;
+
+  /// No description provided for @lessonKeyTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Words in this lesson'**
+  String get lessonKeyTerms;
+
+  /// No description provided for @quizTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick quiz'**
+  String get quizTitle;
+
+  /// No description provided for @quizIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Three questions to check what stuck. Every answer is explained afterwards.'**
+  String get quizIntro;
+
+  /// No description provided for @quizCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check my answers'**
+  String get quizCheck;
+
+  /// No description provided for @quizAnswerAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer all {count} questions first.'**
+  String quizAnswerAll(int count);
+
+  /// No description provided for @quizScore.
+  ///
+  /// In en, this message translates to:
+  /// **'You got {score} out of {total}.'**
+  String quizScore(int score, int total);
+
+  /// No description provided for @quizBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Your best so far: {best}/{total}'**
+  String quizBest(int best, int total);
+
+  /// No description provided for @quizRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Right'**
+  String get quizRight;
+
+  /// No description provided for @quizWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Not quite. The answer: {answer}'**
+  String quizWrong(String answer);
+
+  /// No description provided for @quizRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get quizRetry;
+
+  /// No description provided for @lessonNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Educational information only, not financial advice.'**
+  String get lessonNote;
+
+  /// No description provided for @actionLesson.
+  ///
+  /// In en, this message translates to:
+  /// **'Lesson: {name}'**
+  String actionLesson(String name);
 }
 
 class _AppLocalizationsDelegate

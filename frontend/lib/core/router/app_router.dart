@@ -14,6 +14,8 @@ import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/auth/presentation/verify_email_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/learn/presentation/glossary_screen.dart';
+import '../../features/learn/presentation/learn_screen.dart';
+import '../../features/learn/presentation/lesson_screen.dart';
 import '../../features/learn/presentation/term_screen.dart';
 import '../../features/market/presentation/asset_screen.dart';
 import '../../features/market/presentation/search_screen.dart';
@@ -147,9 +149,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/learn',
-                builder: (context, state) => const GlossaryScreen(),
+                builder: (context, state) => const LearnScreen(),
                 routes: [
-                  _assetRoute(), // before ':id', which would match "assets"
+                  // Before ':id' (a glossary term), which would match these too.
+                  _assetRoute(),
+                  GoRoute(
+                    path: 'glossary',
+                    builder: (context, state) => const GlossaryScreen(),
+                  ),
+                  GoRoute(
+                    path: 'lessons/:lessonId',
+                    builder: (context, state) => LessonScreen(
+                      lessonId: state.pathParameters['lessonId']!,
+                    ),
+                  ),
                   GoRoute(
                     path: ':id',
                     builder: (context, state) =>

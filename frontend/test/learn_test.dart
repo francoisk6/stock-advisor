@@ -19,6 +19,8 @@ void main() {
     await pumpApp(tester, AuthState.authenticated(testUser()));
     await tester.tap(find.byTooltip('Learn'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Glossary'));
+    await tester.pumpAndSettle();
     expect(find.text('P/E ratio'), findsOneWidget);
     expect(find.text('Stablecoin'), findsOneWidget);
 
@@ -60,7 +62,7 @@ void main() {
         chatApiProvider.overrideWithValue(FakeChatApi()),
       ],
     );
-    go(tester, '/learn');
+    go(tester, '/learn/glossary');
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'short squeeze');
     await tester.pumpAndSettle();

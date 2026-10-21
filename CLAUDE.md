@@ -207,6 +207,13 @@ Implemented (Phase 2) in `backend/app/market_data/`:
   `few_holdings` < 5, `one_region`, else `spread`) worded by the app (`riskText`) and for the
   model (`tools.RISK_TEXT`). Free limit `portfolio_holdings` = 50 (set by migration). The
   copilot reads it (`get_portfolio`, read-only); the morning brief covers holdings first.
+- Lessons (`app/learn/lessons.py`, `lessons_<lang>.json`; `lesson_progress` table): 8 written
+  lessons, each sections + glossary terms + 3-question quiz (answers revealed only after
+  `POST /learn/lessons/{id}/quiz`; best score kept). Suggested = not done, fits interests
+  (topics or "all") and level (beginners don't get "intermediate"). Learn tab = lessons hub
+  + glossary (`/learn/glossary`, terms stay at `/learn/:id`, lessons at `/learn/lessons/:id`).
+  Copilot `find_lesson` (card "Lesson: …"); "learn / lesson / teach me / quiz" questions get
+  it run by the backend first (the model explained from memory instead).
 - More model guards (real-model findings): figures with no lookup in the turn are retracted
   once, then replaced by an honest "couldn't look that up" (worked examples / "If…" questions
   excepted); "due to/because of" only counts as an invented cause when nothing was looked
@@ -304,8 +311,10 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       `get_news` + `web_search` (SearXNG) with cited links, "Why did it move?" (shared per asset
       per day), nightly stored daily prices (chart fallback), morning brief at 06:00 Beirut
       (in-app + optional email). Push notifications: Android phase. Verified unit + live e2e.
-- [ ] **Phase 6 — Learning & practice:** steps: 1 glossary + explain-this ✓ · 2 practice account
-      backend ✓ · 3 practice app UI ✓ · 4 portfolio tracker ✓ · 5 bottom navigation ✓ · 6 lessons + quizzes.
+- [x] **Phase 6 — Learning & practice:** glossary (65 terms) + "Explain this" everywhere, practice
+      account ($10,000 virtual, closed markets wait, copilot trades with undo), portfolio tracker
+      (allocation + plain risk overview, values in your currency), tab navigation, 8 lessons with
+      quizzes and progress. Verified unit + live e2e (one flow at a time).
 - [ ] **Phase 7 — Monetization:** plans, quotas, Stripe + in-app purchases, Pro features.
 - [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
       (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.

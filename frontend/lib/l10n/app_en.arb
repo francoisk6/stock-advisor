@@ -1161,5 +1161,84 @@
   "navHome": "Home",
   "navPortfolio": "Portfolio",
   "navPractice": "Practice",
-  "navLearn": "Learn"
+  "navLearn": "Learn",
+  "learnIntro": "Short lessons with a quick quiz, and a glossary of every term in plain words.",
+  "lessonsForYou": "Lessons for you",
+  "lessonsMore": "More lessons",
+  "lessonsAllDone": "You've finished every lesson that fits your interests. Well done!",
+  "lessonMinutes": "{minutes} min",
+  "@lessonMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonDone": "Done · {score}/{total} on the quiz",
+  "@lessonDone": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "levelIntermediate": "Intermediate",
+  "glossaryOpen": "Glossary",
+  "glossaryOpenHint": "Look up any investing term in plain words",
+  "lessonKeyTerms": "Words in this lesson",
+  "quizTitle": "Quick quiz",
+  "quizIntro": "Three questions to check what stuck. Every answer is explained afterwards.",
+  "quizCheck": "Check my answers",
+  "quizAnswerAll": "Answer all {count} questions first.",
+  "@quizAnswerAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "quizScore": "You got {score} out of {total}.",
+  "@quizScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "quizBest": "Your best so far: {best}/{total}",
+  "@quizBest": {
+    "placeholders": {
+      "best": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "quizRight": "Right",
+  "quizWrong": "Not quite. The answer: {answer}",
+  "@quizWrong": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "quizRetry": "Try again",
+  "lessonNote": "Educational information only, not financial advice.",
+  "actionLesson": "Lesson: {name}",
+  "@actionLesson": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

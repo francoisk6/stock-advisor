@@ -16,6 +16,7 @@ from app.core.errors import AppError
 from app.db.models import Asset, User
 from app.db.session import SessionLocal
 from app.learn import glossary
+from app.learn import lessons as lessons_content
 from app.market_data import service as market
 from app.market_data.types import ProviderError, Quote, Range
 from app.news import service as news_service
@@ -525,6 +526,22 @@ async def practice_trade(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     return await _with_asset(ctx, args, run)
 
 
+async def find_lesson(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
+    lesson = lessons_content.find(str(args.get("topic", "")))
+    if lesson is None:
+        return ToolResult({"found": False, "note": "No lesson on that topic yet."})
+    return ToolResult(
+        {
+            "found": True,
+            "title": lesson.title,
+            "minutes": lesson.minutes,
+            "summary": lesson.summary,
+            "note": "The app shows a card that opens the lesson; don't add a link.",
+        },
+        action={"type": "lesson", "lesson_id": lesson.id, "name": lesson.title},
+    )
+
+
 async def list_alerts(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     alerts = await alerts_service.list_for_user(ctx.session, ctx.user)
     return ToolResult(
@@ -631,6 +648,17 @@ TOOLS: dict[str, Tool] = {
             ),
             explain_term,
             lambda a: f"Looking up “{a.get('term', '')}” in the glossary…",
+        ),
+        Tool(
+            _spec(
+                "find_lesson",
+                "Find the app's short lesson (with a quiz) on a topic, when the user wants "
+                "to learn about it or asks for a lesson.",
+                {"topic": {"type": "string"}},
+                ["topic"],
+            ),
+            find_lesson,
+            lambda a: "Looking for a lesson…",
         ),
         Tool(
             _spec("get_watchlist", "The user's watchlist with latest prices.", {}, []),

@@ -88,7 +88,10 @@ def find(query: str, lang: str = DEFAULT_LANG) -> Term | None:
     if q.endswith("s") and q[:-1] in index:
         return index[q[:-1]]
     padded = f" {q} "
+    # "exchange rates" should find "exchange rate", not the shorter "exchange".
+    singular = " " + " ".join(w[:-1] if len(w) > 3 and w.endswith("s") else w for w in q.split())
+    singular += " "
     for name in sorted(index, key=len, reverse=True):
-        if len(name) >= 2 and f" {name} " in padded:
+        if len(name) >= 2 and (f" {name} " in padded or f" {name} " in singular):
             return index[name]
     return None

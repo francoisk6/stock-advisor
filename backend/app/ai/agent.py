@@ -25,6 +25,7 @@ from app.ai.types import AIUnavailable, ChatMessage, TextDelta, ToolCall, ToolCa
 from app.core.config import settings
 from app.db.models import Asset, ChatConversation, User
 from app.learn import glossary
+from app.learn import lessons as lessons_content
 from app.services import chat as chat_service
 
 logger = logging.getLogger(__name__)
@@ -146,7 +147,7 @@ def claims_unmade_action(
 ) -> bool:
     """The answer says something was bought/added/created, but no action happened this turn
     (an action tool that was refused doesn't count)."""
-    if any(a.get("type") != "glossary_term" for a in actions or []):
+    if any(a.get("type") not in ("glossary_term", "lesson") for a in actions or []):
         return False
     if tools_used & STATE_TOOLS:
         return False
@@ -159,12 +160,15 @@ _CARD_TOOLS = {
     "alert_created": "create_alert",
     "practice_order": "practice_trade",
     "glossary_term": "explain_term",
+    "lesson": "find_lesson",
 }
 
 
 def _card_call(card: dict[str, Any]) -> ToolCall:
     """The tool call that produced an action card (enough for the model to recognise it)."""
     name = _CARD_TOOLS.get(card.get("type", ""), str(card.get("type")))
+    if name == "find_lesson":
+        return ToolCall(name, {"topic": card.get("name")})
     if name == "explain_term":
         return ToolCall(name, {"term": card.get("name")})
     args: dict[str, Any] = {"asset": card.get("symbol")}
@@ -192,6 +196,18 @@ def history_messages(message: Any) -> list[ChatMessage]:
 
 # "What's my portfolio worth?" is about the user's things, not a definition.
 _ABOUT_THEIR_THINGS = re.compile(r"\b(my|mine|our|your)\b", re.IGNORECASE)
+
+
+# "I'd like to learn how diversification works": the model explained from memory instead of
+# offering the lesson, so the backend looks the lesson up first.
+_LEARNING_INTENT = re.compile(r"\b(learn|lessons?|teach me|quiz|course)\b", re.IGNORECASE)
+
+
+def lesson_asked(question: str) -> str | None:
+    """The lesson topic of a "teach me / I want to learn …" question, if a lesson covers it."""
+    if not _LEARNING_INTENT.search(question):
+        return None
+    return question if lessons_content.find(question) else None
 
 
 def glossary_term_asked(question: str) -> str | None:
@@ -315,6 +331,11 @@ async def _model_turn(
     nudged = False
     action_retried = False
     figures_retried = False
+    if topic := lesson_asked(question):
+        lookup = [ToolCall("find_lesson", {"topic": topic})]
+        messages.append(ChatMessage("assistant", "", tool_calls=lookup))
+        async for event in _run_calls(lookup, ctx, actions, messages, tools_used):
+            yield event
     if term := glossary_term_asked(question):
         # The small model often explains terms from memory: give it the vetted text first.
         lookup = [ToolCall("explain_term", {"term": term})]

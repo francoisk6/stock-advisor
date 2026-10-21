@@ -1,0 +1,482 @@
+[
+  {
+    "id": "what-is-a-stock",
+    "title": "What is a stock?",
+    "minutes": 4,
+    "level": "beginner",
+    "topics": ["stocks"],
+    "summary": "What you really own when you buy a share, why prices move, and how you can gain or lose.",
+    "sections": [
+      {
+        "heading": "A small piece of a company",
+        "body": "A company's ownership is split into many equal **shares**. Buying one makes you a part-owner, together with everyone else who holds its shares. You don't run the company, but you share in how it does: if it grows and earns more, its shares tend to become worth more."
+      },
+      {
+        "heading": "Why the price moves",
+        "body": "A share price is simply the last price at which a buyer and a seller agreed. When more people want to buy than sell, the price rises; when more want to sell, it falls. What people expect matters a lot: on results day a company can fall even with a profit, if the profit was smaller than investors hoped."
+      },
+      {
+        "heading": "How you can gain, and lose",
+        "body": "You can gain in two ways: the price rises above what you paid, or the company pays **dividends** (part of its profit). Neither is guaranteed. Prices can fall, sometimes a lot, and dividends can be cut or stopped. The most you can lose on a share is what you paid for it."
+      },
+      {
+        "heading": "Where shares are traded",
+        "body": "Shares are bought and sold on **exchanges** such as Nasdaq, the London Stock Exchange or Saudi Tadawul. Each exchange has opening hours; outside them, prices of its shares don't change."
+      }
+    ],
+    "terms": ["stock", "share", "exchange", "dividend", "market-cap"],
+    "quiz": [
+      {
+        "question": "Owning one share of a company means…",
+        "options": [
+          "You lent money to the company",
+          "You own a small part of the company",
+          "You are guaranteed a yearly payment",
+          "You can sell it at any time, even when the exchange is closed"
+        ],
+        "answer": 1,
+        "explanation": "A share is a piece of ownership. Lending money to a company is a bond, payments aren't guaranteed, and trading only happens while the exchange is open."
+      },
+      {
+        "question": "On results day, what usually moves a share price the most?",
+        "options": [
+          "The number of shares you own",
+          "The time of day you check the app",
+          "Whether the results beat or miss what investors expected",
+          "The year the company was founded"
+        ],
+        "answer": 2,
+        "explanation": "Prices already reflect what investors expect. Results that are better or worse than expected are what move the price."
+      },
+      {
+        "question": "A company pays a dividend. Which statement is true?",
+        "options": [
+          "Dividends are guaranteed forever",
+          "Dividends stop the share price from falling",
+          "Only cryptocurrencies pay dividends",
+          "The company can cut or stop its dividend"
+        ],
+        "answer": 3,
+        "explanation": "Dividends are paid out of profits and decided by the company. They can be cut or stopped, and the share price can still fall."
+      }
+    ]
+  },
+  {
+    "id": "reading-a-price-chart",
+    "title": "How to read a price chart",
+    "minutes": 4,
+    "level": "beginner",
+    "topics": ["all"],
+    "summary": "Line and candle charts, time ranges, and what a chart can (and can't) tell you.",
+    "sections": [
+      {
+        "heading": "Line charts",
+        "body": "A line chart joins the closing prices of each period. It's the quickest way to see the general direction: up, down or sideways. The percentage under the chart compares the last price with the first price of the range you picked."
+      },
+      {
+        "heading": "Candles",
+        "body": "Each **candle** shows one period. The thick body runs from the opening to the closing price; the thin lines (wicks) show the highest and lowest prices. In this app a green candle closed higher than it opened, a red one lower."
+      },
+      {
+        "heading": "Pick more than one range",
+        "body": "One day can look dramatic while the year is calm, and a strong year can hide a bad week. Looking at a short and a long range together gives a fairer picture. The **52-week range** shows where today's price sits within the past year."
+      },
+      {
+        "heading": "What charts can't do",
+        "body": "A chart shows what already happened. Patterns and **trends** can change at any time, and nobody can reliably tell the next move from a chart alone."
+      }
+    ],
+    "terms": ["candlestick", "day-range", "52-week-range", "volume", "trend"],
+    "quiz": [
+      {
+        "question": "In this app, a green candle means…",
+        "options": [
+          "The company made a profit",
+          "The price closed higher than it opened in that period",
+          "Trading volume was high",
+          "It's a good time to buy"
+        ],
+        "answer": 1,
+        "explanation": "Candle colour only compares the closing price with the opening price of that period. It says nothing about profits, volume or what to do."
+      },
+      {
+        "question": "The 1Y chart shows +20%. What does that tell you?",
+        "options": [
+          "The price is about 20% higher than one year ago",
+          "It will rise 20% next year",
+          "It rose 20% every month",
+          "The company's profit grew 20%"
+        ],
+        "answer": 0,
+        "explanation": "The figure compares today's price with the price at the start of the range. It describes the past, not the future or the company's profit."
+      },
+      {
+        "question": "Why look at more than one time range?",
+        "options": [
+          "Longer ranges predict the future more accurately",
+          "Changing the range changes the price",
+          "A short range can hide the bigger picture, and a long one hides recent swings",
+          "Only short ranges include dividends"
+        ],
+        "answer": 2,
+        "explanation": "Each range shows a different slice of history. Together they give a fairer picture; none of them predicts what comes next."
+      }
+    ]
+  },
+  {
+    "id": "risk-and-diversification",
+    "title": "Risk and diversification",
+    "minutes": 5,
+    "level": "beginner",
+    "topics": ["all"],
+    "summary": "Why losses hurt more than equal gains help, and how spreading your money lowers risk.",
+    "sections": [
+      {
+        "heading": "Ups and downs",
+        "body": "**Volatility** is how much a price tends to swing. Bigger swings mean bigger possible gains, but also bigger possible losses. Crypto and small companies are usually more volatile than large companies or broad funds."
+      },
+      {
+        "heading": "Losses need bigger gains to recover",
+        "body": "If something falls 50%, it must then rise 100% to get back to where it started, because the rise is calculated from a smaller number. That's why large losses take a long time to repair."
+      },
+      {
+        "heading": "Don't put all your eggs in one basket",
+        "body": "**Diversification** means spreading money over many companies, sectors, regions and types of investment, so one bad result hurts less. It lowers risk but doesn't remove it: whole markets can fall together, and investments that move together (high correlation) spread risk less than it seems."
+      },
+      {
+        "heading": "Match risk to time",
+        "body": "Money you need soon has little time to recover from a drop, so it's usually kept in calmer places. Your **time horizon** and how you'd feel seeing a 20% fall both shape how much risk suits you."
+      }
+    ],
+    "terms": ["volatility", "drawdown", "diversification", "correlation", "risk-tolerance", "time-horizon"],
+    "quiz": [
+      {
+        "question": "An investment falls 50%. How much must it then rise to get back to where it started?",
+        "options": ["25%", "50%", "75%", "100%"],
+        "answer": 3,
+        "explanation": "$100 falling 50% leaves $50. Getting from $50 back to $100 is a rise of $50 on $50: 100%."
+      },
+      {
+        "question": "Which is the most diversified?",
+        "options": [
+          "Funds covering many companies, sectors and regions",
+          "All your money in one tech company",
+          "Two cryptocurrencies",
+          "The same stock bought twice"
+        ],
+        "answer": 0,
+        "explanation": "Spreading over many different businesses and places means one bad result matters less."
+      },
+      {
+        "question": "Money you'll need next year is usually…",
+        "options": [
+          "Best put in the most volatile investment",
+          "Kept somewhere calmer, because there's little time to recover from a drop",
+          "Safe in any investment",
+          "Guaranteed to grow if invested"
+        ],
+        "answer": 1,
+        "explanation": "A short time horizon leaves little time to recover from a fall, so calmer places usually fit money needed soon."
+      }
+    ]
+  },
+  {
+    "id": "funds-and-etfs",
+    "title": "Funds and ETFs",
+    "minutes": 4,
+    "level": "beginner",
+    "topics": ["etfs", "stocks"],
+    "summary": "How one purchase can hold hundreds of companies, and why small fees matter.",
+    "sections": [
+      {
+        "heading": "Many investments in one",
+        "body": "An **ETF** (exchange-traded fund) holds a basket of investments and trades on an exchange like a single stock. Buying one share spreads your money over everything inside it."
+      },
+      {
+        "heading": "Following an index",
+        "body": "Many ETFs simply copy an **index** such as the S&P 500 (about 500 large US companies). If the companies in the index rise on average, the fund rises; if they fall, it falls too. An ETF is not protection against losses."
+      },
+      {
+        "heading": "Fees add up",
+        "body": "Funds charge a yearly fee, the **expense ratio**, taken from the fund's value. 0.10% costs about $1 a year per $1,000; 1% costs $10. Over many years the difference compounds, so for funds that do the same thing, lower fees usually leave you with more."
+      },
+      {
+        "heading": "Comparing funds",
+        "body": "Check what the fund holds (which index, region or sector), its fee, and how big and actively traded it is. Two funds with similar names can hold very different things."
+      }
+    ],
+    "terms": ["etf", "index", "expense-ratio", "mutual-fund", "diversification"],
+    "quiz": [
+      {
+        "question": "One share of an S&P 500 ETF gives you…",
+        "options": [
+          "A guaranteed return",
+          "Ownership of the stock exchange",
+          "A small slice of about 500 large US companies",
+          "One share of a company called S&P"
+        ],
+        "answer": 2,
+        "explanation": "The fund holds the companies of the index, so one share of it is a small slice of all of them."
+      },
+      {
+        "question": "Two funds follow the same index. One charges 0.05% a year, the other 1%. Over many years…",
+        "options": [
+          "The cheaper one usually leaves you with more money",
+          "Fees make no difference",
+          "The expensive one is always better",
+          "Both cost the same in the end"
+        ],
+        "answer": 0,
+        "explanation": "They hold the same companies, so the fee is the main difference, and it compounds year after year."
+      },
+      {
+        "question": "Can an index ETF lose value?",
+        "options": [
+          "No, ETFs are guaranteed",
+          "Only on weekends",
+          "Only if you sell it",
+          "Yes: if the companies in it fall, the ETF falls too"
+        ],
+        "answer": 3,
+        "explanation": "An ETF is only worth what it holds. When those investments fall, so does the fund."
+      }
+    ]
+  },
+  {
+    "id": "what-moves-crypto",
+    "title": "What moves crypto?",
+    "minutes": 5,
+    "level": "beginner",
+    "topics": ["crypto"],
+    "summary": "Why cryptocurrencies swing so much, what stablecoins are, and how to keep your coins safe.",
+    "sections": [
+      {
+        "heading": "Price = what buyers will pay",
+        "body": "A **cryptocurrency** like Bitcoin has no company profits behind it. Its price is set only by what buyers are willing to pay, so news, regulation, big holders buying or selling, and the general mood can move it a lot. Moves of 5–10% in a day are common."
+      },
+      {
+        "heading": "Open all the time",
+        "body": "Crypto trades 24 hours a day, every day, on many exchanges around the world. Big moves can happen at night or on weekends, when stock markets are closed."
+      },
+      {
+        "heading": "Stablecoins",
+        "body": "**Stablecoins** such as USDT and USDC aim to stay at $1, backed by reserves. They're used to move money between crypto exchanges. Stable is the goal, not a promise: some have lost their $1 value before."
+      },
+      {
+        "heading": "Keep your coins safe",
+        "body": "Whoever has a **wallet**'s recovery phrase or private key controls its coins. Never share it: real support staff never ask for it. Be wary of promises of guaranteed or very high returns; they are a classic sign of a scam."
+      }
+    ],
+    "terms": ["cryptocurrency", "blockchain", "volatility", "stablecoin", "wallet", "market-cap"],
+    "quiz": [
+      {
+        "question": "Why do crypto prices often swing more than shares of large companies?",
+        "options": [
+          "Crypto exchanges close at night",
+          "Their price depends only on what buyers will pay, with no company profits behind it",
+          "Crypto pays very large dividends",
+          "Governments set the price every day"
+        ],
+        "answer": 1,
+        "explanation": "Without profits or dividends to anchor the price, mood and news can move it much more."
+      },
+      {
+        "question": "Someone offering \"support\" asks for your wallet's recovery phrase. You should…",
+        "options": [
+          "Share it so they can help",
+          "Share only half of it",
+          "Never share it: whoever has it controls your coins",
+          "Post it online as a backup"
+        ],
+        "answer": 2,
+        "explanation": "The recovery phrase is the key to your coins. Anyone asking for it is trying to take them."
+      },
+      {
+        "question": "A stablecoin…",
+        "options": [
+          "Aims to stay at a fixed price such as $1, but that isn't guaranteed",
+          "Can never lose value",
+          "Always grows over time",
+          "Is another name for Bitcoin"
+        ],
+        "answer": 0,
+        "explanation": "Stablecoins try to hold a fixed value, but some have broken that link in the past."
+      }
+    ]
+  },
+  {
+    "id": "currencies-and-your-money",
+    "title": "Currencies and your money",
+    "minutes": 4,
+    "level": "beginner",
+    "topics": ["forex", "stocks", "all"],
+    "summary": "How exchange rates change what foreign investments are worth to you.",
+    "sections": [
+      {
+        "heading": "Two prices at once",
+        "body": "When you own something priced in another currency, its value to you depends on two things: its own price and the **exchange rate**. Even if the investment doesn't move, its value in your currency changes when the rate does."
+      },
+      {
+        "heading": "An example",
+        "body": "Your home currency is the euro and you own a US share worth $1,000. If the dollar weakens from 0.92 € to 0.85 € per dollar, your share is worth 850 € instead of 920 €, even though its dollar price didn't change."
+      },
+      {
+        "heading": "Pegged currencies",
+        "body": "Some currencies are pegged: the central bank keeps the rate fixed. The Saudi riyal has been held at about 3.75 riyals per US dollar for decades. Pegs reduce currency swings but are a policy choice, not a law of nature."
+      },
+      {
+        "heading": "Pence and cents",
+        "body": "London share prices are often shown in pence (GBp): 2,000 GBp is £20. Johannesburg uses cents (ZAc). The app converts them for you in the practice account and your portfolio."
+      }
+    ],
+    "terms": ["exchange-rate", "central-bank", "interest-rate", "inflation"],
+    "quiz": [
+      {
+        "question": "Your home currency is the euro. You own a US share that doesn't move, but the dollar weakens against the euro. In euros, your share is…",
+        "options": ["Worth more", "Worth the same", "Worth less", "Suspended from trading"],
+        "answer": 2,
+        "explanation": "Each dollar now buys fewer euros, so the same dollar value is fewer euros."
+      },
+      {
+        "question": "A London share price shown as 2,000 GBp is…",
+        "options": ["£2,000", "£20", "€2,000", "2,000 points"],
+        "answer": 1,
+        "explanation": "GBp means pence; 100 pence make one pound, so 2,000 pence is £20."
+      },
+      {
+        "question": "The Saudi riyal is pegged to the US dollar. That means…",
+        "options": [
+          "The central bank keeps it at about 3.75 riyals per dollar",
+          "It can never change under any circumstances",
+          "It moves freely every second",
+          "It is a cryptocurrency"
+        ],
+        "answer": 0,
+        "explanation": "A peg is kept in place by the central bank. It's very stable, but it is a policy that could in theory change."
+      }
+    ]
+  },
+  {
+    "id": "reading-company-numbers",
+    "title": "Reading a company's key numbers",
+    "minutes": 5,
+    "level": "intermediate",
+    "topics": ["stocks"],
+    "summary": "Market cap, P/E, earnings per share, dividend yield and beta, and how to compare them fairly.",
+    "sections": [
+      {
+        "heading": "Size: market cap",
+        "body": "**Market cap** = share price × number of shares. It tells you how big the market thinks a company is, and makes companies with very different share prices comparable."
+      },
+      {
+        "heading": "Price vs profit: P/E and EPS",
+        "body": "**EPS** is the profit per share over the last year. The **P/E ratio** divides the share price by it: a P/E of 20 means investors pay $20 per $1 of yearly profit. A high P/E often reflects high expectations; a low one, slow growth or worries. Compare companies in the same industry."
+      },
+      {
+        "heading": "Income: dividend yield",
+        "body": "**Dividend yield** = yearly dividends ÷ share price. A $50 share paying $2 a year yields 4%. A very high yield can be a warning sign: it sometimes appears because the price fell sharply."
+      },
+      {
+        "heading": "Swings: beta",
+        "body": "**Beta** compares a stock's past moves with the whole market. 1.5 means about 50% bigger swings; 0.7, calmer. It's based on history, so it can change."
+      },
+      {
+        "heading": "Numbers aren't verdicts",
+        "body": "No single number says whether a company is a good investment. They are clues to compare like with like, together with what the company does and the risks it faces."
+      }
+    ],
+    "terms": ["market-cap", "eps", "pe-ratio", "dividend-yield", "beta", "valuation"],
+    "quiz": [
+      {
+        "question": "Company A has a P/E of 40, company B a P/E of 12. What can you say for sure?",
+        "options": [
+          "A is a better company",
+          "B's price will rise",
+          "A is in trouble",
+          "Investors currently pay more for each dollar of A's profit"
+        ],
+        "answer": 3,
+        "explanation": "P/E only compares price with profit. It doesn't say which company is better or where prices go next."
+      },
+      {
+        "question": "A share costs $50 and pays $2 a year in dividends. Its dividend yield is…",
+        "options": ["2%", "4%", "25%", "50%"],
+        "answer": 1,
+        "explanation": "$2 ÷ $50 = 0.04, which is 4%."
+      },
+      {
+        "question": "A stock with a beta of 1.5 has historically…",
+        "options": [
+          "Moved about 50% more than the market",
+          "Moved half as much as the market",
+          "Never fallen",
+          "Paid a 1.5% dividend"
+        ],
+        "answer": 0,
+        "explanation": "Beta above 1 means bigger swings than the market in the past; 1.5 is about 50% bigger."
+      }
+    ]
+  },
+  {
+    "id": "practicing-with-orders",
+    "title": "Practicing with orders",
+    "minutes": 4,
+    "level": "beginner",
+    "topics": ["all"],
+    "summary": "How buying and selling works, what happens when markets are closed, and paper vs locked-in gains.",
+    "sections": [
+      {
+        "heading": "Practice first",
+        "body": "**Paper trading** means practicing with virtual money and real prices. In the Practice tab you start with $10,000 of practice money. Nothing there is real, and practice results can't be withdrawn."
+      },
+      {
+        "heading": "Market and limit orders",
+        "body": "A **market order** buys or sells at the best price available now. A **limit order** only trades at a price you choose or better, so it may never fill. The practice account uses market orders to keep things simple."
+      },
+      {
+        "heading": "When the market is closed",
+        "body": "Stocks only trade while their exchange is open. An order placed on a Saturday waits and fills at the first price after the market opens, which can be quite different from Friday's close. Crypto trades all the time."
+      },
+      {
+        "heading": "Paper gains vs locked-in gains",
+        "body": "While you still own something, its gain or loss is **unrealized**: it can still change. Once you sell, the result is **realized** (locked in). Your **cost basis** (average price paid) is what both are measured against."
+      }
+    ],
+    "terms": ["paper-trading", "market-order", "limit-order", "unrealized-gain", "realized-gain", "cost-basis"],
+    "quiz": [
+      {
+        "question": "On a Saturday you place a practice order to buy a US stock. What happens?",
+        "options": [
+          "It fills immediately at Friday's price",
+          "It is cancelled",
+          "It waits and fills at the first price after the market opens",
+          "It fills at a random price"
+        ],
+        "answer": 2,
+        "explanation": "US exchanges are closed at weekends, so the order waits for Monday's opening price."
+      },
+      {
+        "question": "You bought at $100. The price is now $120 and you haven't sold. Your $20 per share is…",
+        "options": [
+          "An unrealized gain that can still change",
+          "Locked in for good",
+          "A dividend",
+          "A fee"
+        ],
+        "answer": 0,
+        "explanation": "Until you sell, the gain is only on paper and moves with the price."
+      },
+      {
+        "question": "What's the main point of practicing with virtual money?",
+        "options": [
+          "Practice gains can be withdrawn",
+          "To learn how orders and gains work without risking real money",
+          "Prices in the practice account are made up",
+          "It predicts how the market will move"
+        ],
+        "answer": 1,
+        "explanation": "Practice uses real prices but virtual money, so you can learn without risk. Real investing feels different, though: real losses are harder to sit through."
+      }
+    ]
+  }
+]

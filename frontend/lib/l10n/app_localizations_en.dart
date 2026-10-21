@@ -1631,4 +1631,85 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navLearn => 'Learn';
+
+  @override
+  String get learnIntro =>
+      'Short lessons with a quick quiz, and a glossary of every term in plain words.';
+
+  @override
+  String get lessonsForYou => 'Lessons for you';
+
+  @override
+  String get lessonsMore => 'More lessons';
+
+  @override
+  String get lessonsAllDone =>
+      'You\'ve finished every lesson that fits your interests. Well done!';
+
+  @override
+  String lessonMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String lessonDone(int score, int total) {
+    return 'Done · $score/$total on the quiz';
+  }
+
+  @override
+  String get levelIntermediate => 'Intermediate';
+
+  @override
+  String get glossaryOpen => 'Glossary';
+
+  @override
+  String get glossaryOpenHint => 'Look up any investing term in plain words';
+
+  @override
+  String get lessonKeyTerms => 'Words in this lesson';
+
+  @override
+  String get quizTitle => 'Quick quiz';
+
+  @override
+  String get quizIntro =>
+      'Three questions to check what stuck. Every answer is explained afterwards.';
+
+  @override
+  String get quizCheck => 'Check my answers';
+
+  @override
+  String quizAnswerAll(int count) {
+    return 'Answer all $count questions first.';
+  }
+
+  @override
+  String quizScore(int score, int total) {
+    return 'You got $score out of $total.';
+  }
+
+  @override
+  String quizBest(int best, int total) {
+    return 'Your best so far: $best/$total';
+  }
+
+  @override
+  String get quizRight => 'Right';
+
+  @override
+  String quizWrong(String answer) {
+    return 'Not quite. The answer: $answer';
+  }
+
+  @override
+  String get quizRetry => 'Try again';
+
+  @override
+  String get lessonNote =>
+      'Educational information only, not financial advice.';
+
+  @override
+  String actionLesson(String name) {
+    return 'Lesson: $name';
+  }
 }

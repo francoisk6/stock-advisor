@@ -35,6 +35,23 @@ with sync_playwright() as p:
         )
 
         tab(page, "Learn").click()
+        wait_for_text(page, "Lessons for you")
+        page.get_by_role("button", name=re.compile(r"^Risk and diversification")).click()
+        wait_for_text(page, "Losses need bigger gains to recover")
+        # 50% fall -> 100% rise (right), diversified funds (right), "most volatile" (wrong).
+        page.get_by_role("radio", name="100%").click()
+        page.get_by_role("radio", name=re.compile(r"^Funds covering many")).click()
+        page.get_by_role("radio", name=re.compile(r"^Best put in the most volatile")).click()
+        page.mouse.move(550, 600)
+        page.mouse.wheel(0, 1500)  # Flutter only exposes what's near the visible area
+        button(page, "Check my answers").click()
+        wait_for_text(page, "You got 2 out of 3.")
+        wait_for_text(page, r"Not quite\. The answer: Kept somewhere calmer")
+        step("lesson read and quiz checked, with explanations")
+
+        tab(page, "Learn").click()  # back to the tab's first page
+        wait_for_text(page, r"Done · 2/3 on the quiz")
+        page.get_by_role("button", name=re.compile(r"^Glossary")).click()
         wait_for_text(page, r"Beta How much a stock tends to move")
         page.get_by_role("textbox").click()
         page.wait_for_timeout(300)

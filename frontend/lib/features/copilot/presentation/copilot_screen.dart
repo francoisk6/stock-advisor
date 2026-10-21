@@ -421,6 +421,7 @@ class _ActionCard extends StatelessWidget {
         ),
       ),
       'practice_order' => (Icons.sports_esports_outlined, _practiceText(l10n)),
+      'lesson' => (Icons.school_outlined, l10n.actionLesson(name)),
       'glossary_term' => (
         Icons.menu_book_outlined,
         l10n.actionGlossaryTerm(name),
@@ -443,7 +444,7 @@ class _ActionCard extends StatelessWidget {
         ),
       );
     }
-    if (card['type'] == 'glossary_term') {
+    if (card['type'] == 'glossary_term' || card['type'] == 'lesson') {
       return Card(
         margin: const EdgeInsets.only(top: 8),
         child: ListTile(
@@ -451,7 +452,11 @@ class _ActionCard extends StatelessWidget {
           leading: Icon(icon),
           title: Text(text),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.go('/learn/${card['term_id']}'),
+          onTap: () => context.go(
+            card['type'] == 'lesson'
+                ? '/learn/lessons/${card['lesson_id']}'
+                : '/learn/${card['term_id']}',
+          ),
         ),
       );
     }
