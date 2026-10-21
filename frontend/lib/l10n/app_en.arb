@@ -632,5 +632,534 @@
         "type": "String"
       }
     }
-  }
+  },
+  "practiceTitle": "Practice",
+  "practiceIntro": "Practice with virtual money and real prices. Nothing here is real money, and nothing is advice.",
+  "practiceTotalValue": "Total value",
+  "practiceTotalValueHelp": "Your practice cash plus what your practice investments are worth at the latest prices. You started with {start}.",
+  "@practiceTotalValueHelp": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceSince": "since {date}",
+  "@practiceSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceCash": "Cash available",
+  "practiceCashHelp": "Practice money you can still use. Money set aside for orders that are waiting for their market to open is not included.",
+  "practiceInvested": "Invested",
+  "practiceInvestedHelp": "What your practice holdings are worth right now, at the latest prices.",
+  "practiceRealized": "Locked in by selling",
+  "practiceRealizedHelp": "Gains or losses you made final by selling. Holdings you still have can still go up or down.",
+  "practiceHoldings": "Your holdings",
+  "practiceEmpty": "You haven't bought anything yet. Open any stock or coin and tap “Practice buy”, or ask the Copilot, e.g. “Buy $500 of Apple in my practice account”.",
+  "practiceFindAsset": "Find something to practice with",
+  "practiceWaiting": "Waiting for the market to open",
+  "practiceHistory": "Recent trades",
+  "practiceReset": "Start over",
+  "practiceResetTitle": "Start over with {amount}?",
+  "@practiceResetTitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceResetBody": "Your practice holdings and trade history will be cleared and you'll get {amount} of practice money again.",
+  "@practiceResetBody": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceResetDone": "Your practice account starts again with {amount}.",
+  "@practiceResetDone": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceCancelOrder": "Cancel order",
+  "practiceOrderCancelled": "Order cancelled.",
+  "practicePositionLine": "{quantity} · bought at {price} on average",
+  "@practicePositionLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceShare": "{percent} of your account",
+  "@practiceShare": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceGainHelp": "How much this holding has gained or lost since you bought it (current value minus what you paid). It only becomes final when you sell.",
+  "orderBuyAmount": "Buy {amount} of {symbol}",
+  "@orderBuyAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "orderBuyUnits": "Buy {quantity} {symbol}",
+  "@orderBuyUnits": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "orderSellAmount": "Sell {amount} of {symbol}",
+  "@orderSellAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "orderSellUnits": "Sell {quantity} {symbol}",
+  "@orderSellUnits": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "historyBought": "Bought {quantity} {symbol}",
+  "@historyBought": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "historySold": "Sold {quantity} {symbol}",
+  "@historySold": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "historyFill": "at {price} · {total} in total",
+  "@historyFill": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "historyGain": "Locked in {gain}",
+  "@historyGain": {
+    "placeholders": {
+      "gain": {
+        "type": "String"
+      }
+    }
+  },
+  "statusWaiting": "Waiting",
+  "statusCancelled": "Cancelled",
+  "statusRejected": "Not carried out",
+  "statusUndone": "Undone",
+  "tradeBuyTitle": "Practice buy: {symbol}",
+  "@tradeBuyTitle": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeSellTitle": "Practice sell: {symbol}",
+  "@tradeSellTitle": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeInDollars": "Dollars",
+  "tradeInUnits": "Units",
+  "tradeAmountLabel": "Amount in US dollars",
+  "tradeUnitsLabel": "Number of units",
+  "tradePrice": "Price now: {price}",
+  "@tradePrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "tradePriceConverted": "Price now: {price} ≈ {usd}",
+  "@tradePriceConverted": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "usd": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeEstimateUnits": "≈ {quantity} {symbol}",
+  "@tradeEstimateUnits": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeEstimateCost": "≈ {amount}",
+  "@tradeEstimateCost": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeAvailable": "Practice cash available: {amount}",
+  "@tradeAvailable": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeHeld": "You have {quantity} {symbol}",
+  "@tradeHeld": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeSellAll": "Sell all",
+  "tradeClosed": "The market is closed. Your order will wait and fill at the first price after it opens, which can differ from the price shown.",
+  "tradeConfirmBuy": "Buy with practice money",
+  "tradeConfirmSell": "Sell (practice)",
+  "tradeBought": "Bought {quantity} {symbol} for {total} (practice).",
+  "@tradeBought": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeSold": "Sold {quantity} {symbol} for {total} (practice).",
+  "@tradeSold": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeWaiting": "Order placed. It will fill when the market opens.",
+  "tradeErrorAmount": "Enter an amount above zero.",
+  "tradeErrorCash": "That's more than your practice cash ({amount}).",
+  "@tradeErrorCash": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeErrorHeld": "You have {quantity} to sell.",
+  "@tradeErrorHeld": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "tradeNote": "Virtual money, real prices: practice only, not advice.",
+  "practiceCardBody": "Try it with virtual money and see how it would have gone.",
+  "practiceCardHeld": "You have {quantity} in your practice account, worth {value}.",
+  "@practiceCardHeld": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "practiceBuy": "Practice buy",
+  "practiceSell": "Practice sell",
+  "practiceIndexNote": "An index is a score, so it can't be bought directly. Funds (ETFs) that follow it can.",
+  "actionPracticeBought": "Practice: bought {quantity} {symbol} for {total}",
+  "@actionPracticeBought": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "actionPracticeSold": "Practice: sold {quantity} {symbol} for {total}",
+  "@actionPracticeSold": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "actionPracticeWaiting": "Practice: order for {symbol} waits for the market to open",
+  "@actionPracticeWaiting": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "actionPracticeRejected": "Practice order for {symbol} not carried out",
+  "@actionPracticeRejected": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "portfolioTitle": "My portfolio",
+  "portfolioPrivacy": "Track what you really own. You enter it yourself: we don't connect to banks or brokers, and only you can see it.",
+  "portfolioEmpty": "Add the stocks, funds or coins you own to see what they're worth together, how your money is spread, and the risks to keep in mind.",
+  "portfolioAdd": "Add a holding",
+  "portfolioTotalHelp": "What everything you entered is worth at the latest prices, in {currency}. Prices in other currencies are converted at today's exchange rates.",
+  "@portfolioTotalHelp": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "portfolioGain": "Gain or loss",
+  "portfolioGainHelp": "Total value minus what you paid. Amounts in other currencies use today's exchange rate, so currency moves are included.",
+  "portfolioToday": "Today: {change}",
+  "@portfolioToday": {
+    "placeholders": {
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "portfolioShowIn": "Show values in",
+  "portfolioRisk": "Risk overview",
+  "riskConcentration": "{symbol} is {percent} of your portfolio. If it fell 30%, your whole portfolio would fall about {drop}.",
+  "@riskConcentration": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "drop": {
+        "type": "String"
+      }
+    }
+  },
+  "riskCrypto": "{percent} is in crypto, which can rise or fall 10% or more in a day.",
+  "@riskCrypto": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "riskForeign": "{percent} is priced in currencies other than {currency}, so exchange rates move its value too.",
+  "@riskForeign": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "riskFew": "{count, plural, =1{You have 1 holding. With so few, one bad result matters a lot; spreading across more can lower risk.} other{You have {count} holdings. With few holdings, one bad result matters a lot; spreading across more can lower risk.}}",
+  "@riskFew": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "riskOneRegion": "Everything is in one region ({region}). Problems there would hit all of it at once.",
+  "@riskOneRegion": {
+    "placeholders": {
+      "region": {
+        "type": "String"
+      }
+    }
+  },
+  "riskSpread": "Your money is spread over {count} holdings, and none is more than {percent} of the total.",
+  "@riskSpread": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "riskNote": "General information to help you think about risk, not advice.",
+  "portfolioAllocation": "How your money is spread",
+  "allocationType": "Type",
+  "allocationRegion": "Region",
+  "allocationCurrency": "Currency",
+  "holdingLine": "{quantity} · paid {price} on average",
+  "@holdingLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingAddTitle": "Add {symbol} to your portfolio",
+  "@holdingAddTitle": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingEditTitle": "Edit {symbol}",
+  "@holdingEditTitle": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingQuantity": "Units you own",
+  "holdingAveragePrice": "Average price paid ({currency})",
+  "@holdingAveragePrice": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingAveragePriceHelp": "Bought at different prices? Use the average. Today's price is filled in to start.",
+  "holdingBoughtOn": "Bought on (optional)",
+  "holdingNote": "Note (optional)",
+  "holdingDelete": "Remove from portfolio",
+  "holdingDeleteConfirm": "Remove {symbol} from your portfolio?",
+  "@holdingDeleteConfirm": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingSaved": "Saved to your portfolio.",
+  "holdingRemoved": "{symbol} removed from your portfolio.",
+  "@holdingRemoved": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingAddMore": "You already track {symbol}: these units will be added and the average price updated.",
+  "@holdingAddMore": {
+    "placeholders": {
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingErrorQuantity": "Enter how many units you own.",
+  "holdingErrorPrice": "Enter the price you paid.",
+  "pickAssetTitle": "Which one do you own?",
+  "pickAssetHint": "Search a company, fund or coin",
+  "portfolioCardHeld": "You own {quantity}, worth {value}.",
+  "@portfolioCardHeld": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "portfolioCardBody": "Own this? Add it to see its value with the rest of your investments.",
+  "portfolioCardAdd": "Add to my portfolio",
+  "portfolioCardEdit": "Edit holding",
+  "navHome": "Home",
+  "navPortfolio": "Portfolio",
+  "navPractice": "Practice",
+  "navLearn": "Learn"
 }

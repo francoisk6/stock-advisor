@@ -18,9 +18,12 @@ import '../../features/learn/presentation/term_screen.dart';
 import '../../features/market/presentation/asset_screen.dart';
 import '../../features/market/presentation/search_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/portfolio/presentation/portfolio_screen.dart';
+import '../../features/practice/presentation/practice_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
+import 'app_shell.dart';
 
 /// Only for signed-out users; signed-in users are sent home.
 const _guestOnly = {'/login', '/register', '/forgot-password'};
@@ -59,6 +62,15 @@ String? authRedirect(AuthState auth, Uri uri) {
   }
 }
 
+/// Asset pages live inside each tab (`/assets/1`, `/portfolio/assets/1`, …) so "back"
+/// returns to the tab the user came from; links use `assetLocation`.
+GoRoute _assetRoute() => GoRoute(
+  path: 'assets/:id',
+  builder: (context, state) =>
+      // A malformed id falls through to the API's friendly "not found".
+      AssetScreen(assetId: int.tryParse(state.pathParameters['id']!) ?? 0),
+);
+
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ValueNotifier<AuthState>(ref.read(authControllerProvider));
   ref.listen(authControllerProvider, (_, next) => authState.value = next);
@@ -69,55 +81,83 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: authState,
     redirect: (context, state) => authRedirect(authState.value, state.uri),
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const HomeScreen(),
-        // Nested so /profile opens on top of home and gets a back button.
-        routes: [
-          GoRoute(
-            path: 'profile',
-            builder: (context, state) => const ProfileScreen(),
-          ),
-          GoRoute(
-            path: 'brief',
-            builder: (context, state) => const BriefScreen(),
-          ),
-          GoRoute(
-            path: 'copilot',
-            builder: (context, state) => CopilotScreen(
-              assetId: int.tryParse(state.uri.queryParameters['asset'] ?? ''),
-            ),
-          ),
-          GoRoute(
-            path: 'notifications',
-            builder: (context, state) => const NotificationsScreen(),
-          ),
-          GoRoute(
-            path: 'alerts',
-            builder: (context, state) => const AlertsScreen(),
-          ),
-          GoRoute(
-            path: 'search',
-            builder: (context, state) => const SearchScreen(),
-          ),
-          GoRoute(
-            path: 'learn',
-            builder: (context, state) => const GlossaryScreen(),
+      // The signed-in app: four tabs, each with its own page stack (see AppShell).
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, shell) => AppShell(shell: shell),
+        branches: [
+          StatefulShellBranch(
             routes: [
               GoRoute(
-                path: ':id',
-                builder: (context, state) =>
-                    TermScreen(termId: state.pathParameters['id']!),
+                path: '/',
+                builder: (context, state) => const HomeScreen(),
+                // Nested so /profile opens on top of home and gets a back button.
+                routes: [
+                  GoRoute(
+                    path: 'profile',
+                    builder: (context, state) => const ProfileScreen(),
+                  ),
+                  GoRoute(
+                    path: 'brief',
+                    builder: (context, state) => const BriefScreen(),
+                  ),
+                  GoRoute(
+                    path: 'copilot',
+                    builder: (context, state) => CopilotScreen(
+                      assetId: int.tryParse(
+                        state.uri.queryParameters['asset'] ?? '',
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'notifications',
+                    builder: (context, state) => const NotificationsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'alerts',
+                    builder: (context, state) => const AlertsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'search',
+                    builder: (context, state) => const SearchScreen(),
+                  ),
+                  _assetRoute(),
+                ],
               ),
             ],
           ),
-          GoRoute(
-            path: 'assets/:id',
-            builder: (context, state) =>
-                // A malformed id falls through to the API's friendly "not found".
-                AssetScreen(
-                  assetId: int.tryParse(state.pathParameters['id']!) ?? 0,
-                ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/portfolio',
+                builder: (context, state) => const PortfolioScreen(),
+                routes: [_assetRoute()],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/practice',
+                builder: (context, state) => const PracticeScreen(),
+                routes: [_assetRoute()],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/learn',
+                builder: (context, state) => const GlossaryScreen(),
+                routes: [
+                  _assetRoute(), // before ':id', which would match "assets"
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) =>
+                        TermScreen(termId: state.pathParameters['id']!),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),

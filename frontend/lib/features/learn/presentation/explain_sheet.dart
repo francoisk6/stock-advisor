@@ -19,6 +19,7 @@ Future<void> showExplainSheet(
 }) {
   final router = GoRouter.of(context);
   return showModalBottomSheet<void>(
+    useRootNavigator: true, // above the tab bar
     context: context,
     showDragHandle: true,
     isScrollControlled: true,

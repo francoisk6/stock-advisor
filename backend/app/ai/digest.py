@@ -11,7 +11,7 @@ from app.ai.agent import resolve_citations
 from app.ai.types import ChatMessage, TextDelta
 from app.core.money import format_money, format_percent
 from app.core.time import utcnow
-from app.db.models import Asset, Digest, User
+from app.db.models import Asset, Digest, Holding, User
 from app.db.session import SessionLocal
 from app.market_data import service as market
 from app.news import service as news_service
@@ -40,9 +40,21 @@ SYSTEM = (
 
 
 async def brief_assets(session: AsyncSession, user: User) -> list[Asset]:
-    """The user's watchlist, or popular assets in their markets if the watchlist is empty."""
+    """The user's portfolio holdings (largest amount invested first, roughly: currencies
+    aren't converted here) and watchlist, or popular assets in their markets if both are
+    empty."""
+    held = await session.execute(
+        select(Holding)
+        .where(Holding.user_id == user.id)
+        .order_by((Holding.quantity * Holding.average_price).desc())
+    )
     watchlist = await watchlist_service.get_default(session, user)
-    assets = [item.asset for item in watchlist.items]
+    assets = list(
+        {
+            a.id: a
+            for a in [h.asset for h in held.scalars()] + [item.asset for item in watchlist.items]
+        }.values()
+    )
     if not assets:
         assets = await market.popular_for(session, user.profile)
     return assets[:MAX_ASSETS]

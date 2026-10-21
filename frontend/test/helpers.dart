@@ -13,6 +13,10 @@ import 'package:stock_adviser/features/market/data/market_api.dart';
 import 'package:stock_adviser/features/market/domain/market.dart';
 import 'package:stock_adviser/features/notifications/data/notifications_api.dart';
 import 'package:stock_adviser/features/notifications/domain/app_notification.dart';
+import 'package:stock_adviser/features/portfolio/data/portfolio_api.dart';
+import 'package:stock_adviser/features/portfolio/domain/portfolio.dart';
+import 'package:stock_adviser/features/practice/data/practice_api.dart';
+import 'package:stock_adviser/features/practice/domain/practice.dart';
 import 'package:stock_adviser/features/watchlist/data/watchlist_api.dart';
 
 User testUser({
@@ -118,6 +122,8 @@ Future<void> pumpApp(
   List<Asset> watchlist = const [],
   NotificationInbox inbox = const NotificationInbox(unreadCount: 0, items: []),
   Brief? brief,
+  FakePracticeApi? practice,
+  FakePortfolioApi? portfolio,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -136,6 +142,8 @@ Future<void> pumpApp(
         ),
         // The home screen's market list, without network.
         glossaryProvider.overrideWith((ref) async => testGlossary),
+        practiceApiProvider.overrideWithValue(practice ?? FakePracticeApi()),
+        portfolioApiProvider.overrideWithValue(portfolio ?? FakePortfolioApi()),
         popularAssetsProvider.overrideWith(
           (ref, type) async => [
             for (final a in popular)
@@ -218,4 +226,307 @@ Asset testAsset({
 class FakeSecureStorage implements FlutterSecureStorage {
   @override
   dynamic noSuchMethod(Invocation invocation) => Future<void>.value();
+}
+
+Map<String, dynamic> _assetJson(Asset a) => {
+  'id': a.id,
+  'symbol': a.symbol,
+  'name': a.name,
+  'asset_type': a.assetType,
+  'exchange': a.exchange,
+  'country': null,
+  'region': a.region,
+  'currency': a.currency,
+  'logo_url': null,
+};
+
+Map<String, dynamic> testOrderJson({
+  int id = 1,
+  Asset? asset,
+  String side = 'buy',
+  String status = 'filled',
+  double? quantity,
+  double? amountUsd = 500,
+  double filledQuantity = 2,
+  double price = 250,
+  double? gainUsd,
+}) => {
+  'id': id,
+  'asset': _assetJson(asset ?? testAsset(symbol: 'AAPL', name: 'Apple Inc.')),
+  'side': side,
+  'quantity': quantity,
+  'amount_usd': amountUsd,
+  'status': status,
+  'source': 'app',
+  'created_at': '2026-10-18T10:00:00',
+  'filled_at': status == 'filled' ? '2026-10-18T10:00:00' : null,
+  'filled_quantity': status == 'filled' ? filledQuantity : null,
+  'price': status == 'filled' ? price : null,
+  'currency': status == 'filled' ? 'USD' : null,
+  'fx_rate': status == 'filled' ? 1.0 : null,
+  'total_usd': status == 'filled' ? filledQuantity * price : null,
+  'gain_usd': gainUsd,
+  'reserved_usd': status == 'pending' ? 500.0 : 0.0,
+  'note': status == 'rejected' ? 'Not enough practice cash.' : null,
+};
+
+PracticeAccount testPracticeAccount({
+  bool holding = false,
+  List<Map<String, dynamic>> pending = const [],
+}) {
+  final apple = testAsset(symbol: 'AAPL', name: 'Apple Inc.', currency: 'USD');
+  return PracticeAccount.fromJson({
+    'starting_cash': 10000.0,
+    'cash': holding ? 9500.0 : 10000.0,
+    'reserved_usd': 0.0,
+    'available_cash': holding ? 9500.0 : 10000.0,
+    'positions_value': holding ? 600.0 : 0.0,
+    'total_value': holding ? 10100.0 : 10000.0,
+    'gain_usd': holding ? 100.0 : 0.0,
+    'gain_percent': holding ? 1.0 : 0.0,
+    'realized_usd': 0.0,
+    'started_at': '2026-10-18T09:00:00',
+    'prices_complete': true,
+    'positions': [
+      if (holding)
+        {
+          'asset': _assetJson(apple),
+          'quantity': 2.0,
+          'average_price': 250.0,
+          'currency': 'USD',
+          'price': 300.0,
+          'change_percent': 1.0,
+          'usd_rate': 1.0,
+          'as_of': '2026-10-18T10:00:00',
+          'cost_usd': 500.0,
+          'value_usd': 600.0,
+          'gain_usd': 100.0,
+          'gain_percent': 20.0,
+          'share_percent': 5.94,
+        },
+    ],
+    'pending': pending,
+  });
+}
+
+/// Practice API stand-in: a fixed account and quote; records what the app asked for.
+class FakePracticeApi implements PracticeApi {
+  FakePracticeApi({
+    PracticeAccount? account,
+    this.orders = const [],
+    this.marketOpen = true,
+    this.held = 0,
+  }) : state = account ?? testPracticeAccount();
+
+  PracticeAccount state;
+  List<Map<String, dynamic>> orders;
+  bool marketOpen;
+  double held;
+  final placed = <Map<String, Object?>>[];
+  final cancelled = <int>[];
+  final undone = <int>[];
+  int resets = 0;
+
+  @override
+  Future<PracticeAccount> account() async => state;
+
+  @override
+  Future<PracticeAccount> reset() async {
+    resets++;
+    return state = testPracticeAccount();
+  }
+
+  @override
+  Future<PracticeQuote> quote(int assetId) async => PracticeQuote(
+    price: 250,
+    currency: 'USD',
+    usdPrice: 250,
+    marketOpen: marketOpen,
+    heldQuantity: held,
+    availableCash: state.availableCash,
+  );
+
+  @override
+  Future<PracticeOrder> order({
+    required int assetId,
+    required String side,
+    double? quantity,
+    double? amountUsd,
+  }) async {
+    placed.add({
+      'asset_id': assetId,
+      'side': side,
+      'quantity': quantity,
+      'amount_usd': amountUsd,
+    });
+    return PracticeOrder.fromJson(
+      testOrderJson(
+        side: side,
+        status: marketOpen ? 'filled' : 'pending',
+        quantity: quantity,
+        amountUsd: amountUsd,
+        filledQuantity: quantity ?? (amountUsd! / 250),
+      ),
+    );
+  }
+
+  @override
+  Future<List<PracticeOrder>> history() async => [
+    for (final o in orders) PracticeOrder.fromJson(o),
+  ];
+
+  @override
+  Future<void> cancel(int orderId) async => cancelled.add(orderId);
+
+  @override
+  Future<void> undo(int orderId) async => undone.add(orderId);
+}
+
+Map<String, dynamic> testHoldingJson({
+  int id = 1,
+  Asset? asset,
+  double quantity = 10,
+  double averagePrice = 150,
+  double value = 2000,
+  double gain = 500,
+  double share = 72.07,
+}) => {
+  'id': id,
+  'asset': _assetJson(
+    asset ?? testAsset(symbol: 'AAPL', name: 'Apple Inc.', currency: 'USD'),
+  ),
+  'quantity': quantity,
+  'average_price': averagePrice,
+  'currency': 'USD',
+  'bought_on': null,
+  'note': null,
+  'price': 200.0,
+  'change_percent': 1.0,
+  'value': value,
+  'cost': value - gain,
+  'gain': gain,
+  'gain_percent': gain / (value - gain) * 100,
+  'share_percent': share,
+};
+
+Portfolio testPortfolio({bool empty = false, String currency = 'USD'}) =>
+    Portfolio.fromJson({
+      'currency': currency,
+      'total_value': empty ? 0.0 : 2775.0,
+      'total_cost': empty ? 0.0 : 2100.0,
+      'gain': empty ? 0.0 : 675.0,
+      'gain_percent': empty ? null : 32.14,
+      'day_change': empty ? 0.0 : 25.0,
+      'prices_complete': true,
+      'holdings': empty
+          ? <Map<String, dynamic>>[]
+          : [
+              testHoldingJson(),
+              testHoldingJson(
+                id: 2,
+                asset: testAsset(
+                  id: 2,
+                  symbol: 'BTC',
+                  name: 'Bitcoin',
+                  type: 'crypto',
+                  currency: 'USD',
+                ),
+                quantity: 0.01,
+                averagePrice: 60000,
+                value: 775,
+                gain: 175,
+                share: 27.93,
+              ),
+            ],
+      'by_type': empty
+          ? []
+          : [
+              {'key': 'stock', 'value': 2000.0, 'percent': 72.07},
+              {'key': 'crypto', 'value': 775.0, 'percent': 27.93},
+            ],
+      'by_region': empty
+          ? []
+          : [
+              {'key': 'north_america', 'value': 2000.0, 'percent': 72.07},
+              {'key': 'global', 'value': 775.0, 'percent': 27.93},
+            ],
+      'by_currency': empty
+          ? []
+          : [
+              {'key': 'USD', 'value': 2775.0, 'percent': 100.0},
+            ],
+      'risks': empty
+          ? []
+          : [
+              {
+                'code': 'concentration',
+                'level': 'caution',
+                'params': {
+                  'symbol': 'AAPL',
+                  'percent': 72.1,
+                  'drop_if_30': 21.6,
+                },
+              },
+              {
+                'code': 'crypto_share',
+                'level': 'caution',
+                'params': {'percent': 27.9},
+              },
+            ],
+    });
+
+/// Portfolio API stand-in: a fixed portfolio; records adds, edits, removals.
+class FakePortfolioApi implements PortfolioApi {
+  FakePortfolioApi({Portfolio? portfolio})
+    : state = portfolio ?? testPortfolio(empty: true);
+
+  Portfolio state;
+  final added = <Map<String, Object?>>[];
+  final edited = <Map<String, Object?>>[];
+  final removed = <int>[];
+  final currencies = <String>[];
+
+  @override
+  Future<Portfolio> get() async => state;
+
+  @override
+  Future<Portfolio> add({
+    required int assetId,
+    required double quantity,
+    required double averagePrice,
+    DateTime? boughtOn,
+    String? note,
+  }) async {
+    added.add({
+      'asset_id': assetId,
+      'quantity': quantity,
+      'average_price': averagePrice,
+    });
+    return state = testPortfolio();
+  }
+
+  @override
+  Future<Portfolio> update(
+    int holdingId, {
+    required double quantity,
+    required double averagePrice,
+    DateTime? boughtOn,
+    String? note,
+  }) async {
+    edited.add({
+      'id': holdingId,
+      'quantity': quantity,
+      'average_price': averagePrice,
+    });
+    return state;
+  }
+
+  @override
+  Future<void> delete(int holdingId) async => removed.add(holdingId);
+
+  @override
+  Future<Portfolio> setCurrency(String currency) async {
+    currencies.add(currency);
+    return state = testPortfolio(currency: currency);
+  }
 }

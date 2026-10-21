@@ -2091,6 +2091,696 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Glossary: {name}'**
   String actionGlossaryTerm(String name);
+
+  /// No description provided for @practiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get practiceTitle;
+
+  /// No description provided for @practiceIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice with virtual money and real prices. Nothing here is real money, and nothing is advice.'**
+  String get practiceIntro;
+
+  /// No description provided for @practiceTotalValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Total value'**
+  String get practiceTotalValue;
+
+  /// No description provided for @practiceTotalValueHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Your practice cash plus what your practice investments are worth at the latest prices. You started with {start}.'**
+  String practiceTotalValueHelp(String start);
+
+  /// No description provided for @practiceSince.
+  ///
+  /// In en, this message translates to:
+  /// **'since {date}'**
+  String practiceSince(String date);
+
+  /// No description provided for @practiceCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash available'**
+  String get practiceCash;
+
+  /// No description provided for @practiceCashHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice money you can still use. Money set aside for orders that are waiting for their market to open is not included.'**
+  String get practiceCashHelp;
+
+  /// No description provided for @practiceInvested.
+  ///
+  /// In en, this message translates to:
+  /// **'Invested'**
+  String get practiceInvested;
+
+  /// No description provided for @practiceInvestedHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'What your practice holdings are worth right now, at the latest prices.'**
+  String get practiceInvestedHelp;
+
+  /// No description provided for @practiceRealized.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked in by selling'**
+  String get practiceRealized;
+
+  /// No description provided for @practiceRealizedHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Gains or losses you made final by selling. Holdings you still have can still go up or down.'**
+  String get practiceRealizedHelp;
+
+  /// No description provided for @practiceHoldings.
+  ///
+  /// In en, this message translates to:
+  /// **'Your holdings'**
+  String get practiceHoldings;
+
+  /// No description provided for @practiceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t bought anything yet. Open any stock or coin and tap “Practice buy”, or ask the Copilot, e.g. “Buy \$500 of Apple in my practice account”.'**
+  String get practiceEmpty;
+
+  /// No description provided for @practiceFindAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Find something to practice with'**
+  String get practiceFindAsset;
+
+  /// No description provided for @practiceWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the market to open'**
+  String get practiceWaiting;
+
+  /// No description provided for @practiceHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent trades'**
+  String get practiceHistory;
+
+  /// No description provided for @practiceReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Start over'**
+  String get practiceReset;
+
+  /// No description provided for @practiceResetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start over with {amount}?'**
+  String practiceResetTitle(String amount);
+
+  /// No description provided for @practiceResetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your practice holdings and trade history will be cleared and you\'ll get {amount} of practice money again.'**
+  String practiceResetBody(String amount);
+
+  /// No description provided for @practiceResetDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your practice account starts again with {amount}.'**
+  String practiceResetDone(String amount);
+
+  /// No description provided for @practiceCancelOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel order'**
+  String get practiceCancelOrder;
+
+  /// No description provided for @practiceOrderCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Order cancelled.'**
+  String get practiceOrderCancelled;
+
+  /// No description provided for @practicePositionLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} · bought at {price} on average'**
+  String practicePositionLine(String quantity, String price);
+
+  /// No description provided for @practiceShare.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} of your account'**
+  String practiceShare(String percent);
+
+  /// No description provided for @practiceGainHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'How much this holding has gained or lost since you bought it (current value minus what you paid). It only becomes final when you sell.'**
+  String get practiceGainHelp;
+
+  /// No description provided for @orderBuyAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {amount} of {symbol}'**
+  String orderBuyAmount(String amount, String symbol);
+
+  /// No description provided for @orderBuyUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {quantity} {symbol}'**
+  String orderBuyUnits(String quantity, String symbol);
+
+  /// No description provided for @orderSellAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell {amount} of {symbol}'**
+  String orderSellAmount(String amount, String symbol);
+
+  /// No description provided for @orderSellUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell {quantity} {symbol}'**
+  String orderSellUnits(String quantity, String symbol);
+
+  /// No description provided for @historyBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought {quantity} {symbol}'**
+  String historyBought(String quantity, String symbol);
+
+  /// No description provided for @historySold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold {quantity} {symbol}'**
+  String historySold(String quantity, String symbol);
+
+  /// No description provided for @historyFill.
+  ///
+  /// In en, this message translates to:
+  /// **'at {price} · {total} in total'**
+  String historyFill(String price, String total);
+
+  /// No description provided for @historyGain.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked in {gain}'**
+  String historyGain(String gain);
+
+  /// No description provided for @statusWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting'**
+  String get statusWaiting;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelled;
+
+  /// No description provided for @statusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not carried out'**
+  String get statusRejected;
+
+  /// No description provided for @statusUndone.
+  ///
+  /// In en, this message translates to:
+  /// **'Undone'**
+  String get statusUndone;
+
+  /// No description provided for @tradeBuyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice buy: {symbol}'**
+  String tradeBuyTitle(String symbol);
+
+  /// No description provided for @tradeSellTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice sell: {symbol}'**
+  String tradeSellTitle(String symbol);
+
+  /// No description provided for @tradeInDollars.
+  ///
+  /// In en, this message translates to:
+  /// **'Dollars'**
+  String get tradeInDollars;
+
+  /// No description provided for @tradeInUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Units'**
+  String get tradeInUnits;
+
+  /// No description provided for @tradeAmountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount in US dollars'**
+  String get tradeAmountLabel;
+
+  /// No description provided for @tradeUnitsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of units'**
+  String get tradeUnitsLabel;
+
+  /// No description provided for @tradePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price now: {price}'**
+  String tradePrice(String price);
+
+  /// No description provided for @tradePriceConverted.
+  ///
+  /// In en, this message translates to:
+  /// **'Price now: {price} ≈ {usd}'**
+  String tradePriceConverted(String price, String usd);
+
+  /// No description provided for @tradeEstimateUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {quantity} {symbol}'**
+  String tradeEstimateUnits(String quantity, String symbol);
+
+  /// No description provided for @tradeEstimateCost.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {amount}'**
+  String tradeEstimateCost(String amount);
+
+  /// No description provided for @tradeAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice cash available: {amount}'**
+  String tradeAvailable(String amount);
+
+  /// No description provided for @tradeHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {quantity} {symbol}'**
+  String tradeHeld(String quantity, String symbol);
+
+  /// No description provided for @tradeSellAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell all'**
+  String get tradeSellAll;
+
+  /// No description provided for @tradeClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'The market is closed. Your order will wait and fill at the first price after it opens, which can differ from the price shown.'**
+  String get tradeClosed;
+
+  /// No description provided for @tradeConfirmBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy with practice money'**
+  String get tradeConfirmBuy;
+
+  /// No description provided for @tradeConfirmSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell (practice)'**
+  String get tradeConfirmSell;
+
+  /// No description provided for @tradeBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought {quantity} {symbol} for {total} (practice).'**
+  String tradeBought(String quantity, String symbol, String total);
+
+  /// No description provided for @tradeSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold {quantity} {symbol} for {total} (practice).'**
+  String tradeSold(String quantity, String symbol, String total);
+
+  /// No description provided for @tradeWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Order placed. It will fill when the market opens.'**
+  String get tradeWaiting;
+
+  /// No description provided for @tradeErrorAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an amount above zero.'**
+  String get tradeErrorAmount;
+
+  /// No description provided for @tradeErrorCash.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s more than your practice cash ({amount}).'**
+  String tradeErrorCash(String amount);
+
+  /// No description provided for @tradeErrorHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {quantity} to sell.'**
+  String tradeErrorHeld(String quantity);
+
+  /// No description provided for @tradeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual money, real prices: practice only, not advice.'**
+  String get tradeNote;
+
+  /// No description provided for @practiceCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Try it with virtual money and see how it would have gone.'**
+  String get practiceCardBody;
+
+  /// No description provided for @practiceCardHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {quantity} in your practice account, worth {value}.'**
+  String practiceCardHeld(String quantity, String value);
+
+  /// No description provided for @practiceBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice buy'**
+  String get practiceBuy;
+
+  /// No description provided for @practiceSell.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice sell'**
+  String get practiceSell;
+
+  /// No description provided for @practiceIndexNote.
+  ///
+  /// In en, this message translates to:
+  /// **'An index is a score, so it can\'t be bought directly. Funds (ETFs) that follow it can.'**
+  String get practiceIndexNote;
+
+  /// No description provided for @actionPracticeBought.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice: bought {quantity} {symbol} for {total}'**
+  String actionPracticeBought(String quantity, String symbol, String total);
+
+  /// No description provided for @actionPracticeSold.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice: sold {quantity} {symbol} for {total}'**
+  String actionPracticeSold(String quantity, String symbol, String total);
+
+  /// No description provided for @actionPracticeWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice: order for {symbol} waits for the market to open'**
+  String actionPracticeWaiting(String symbol);
+
+  /// No description provided for @actionPracticeRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice order for {symbol} not carried out'**
+  String actionPracticeRejected(String symbol);
+
+  /// No description provided for @portfolioTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My portfolio'**
+  String get portfolioTitle;
+
+  /// No description provided for @portfolioPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Track what you really own. You enter it yourself: we don\'t connect to banks or brokers, and only you can see it.'**
+  String get portfolioPrivacy;
+
+  /// No description provided for @portfolioEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the stocks, funds or coins you own to see what they\'re worth together, how your money is spread, and the risks to keep in mind.'**
+  String get portfolioEmpty;
+
+  /// No description provided for @portfolioAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a holding'**
+  String get portfolioAdd;
+
+  /// No description provided for @portfolioTotalHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'What everything you entered is worth at the latest prices, in {currency}. Prices in other currencies are converted at today\'s exchange rates.'**
+  String portfolioTotalHelp(String currency);
+
+  /// No description provided for @portfolioGain.
+  ///
+  /// In en, this message translates to:
+  /// **'Gain or loss'**
+  String get portfolioGain;
+
+  /// No description provided for @portfolioGainHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Total value minus what you paid. Amounts in other currencies use today\'s exchange rate, so currency moves are included.'**
+  String get portfolioGainHelp;
+
+  /// No description provided for @portfolioToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today: {change}'**
+  String portfolioToday(String change);
+
+  /// No description provided for @portfolioShowIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Show values in'**
+  String get portfolioShowIn;
+
+  /// No description provided for @portfolioRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Risk overview'**
+  String get portfolioRisk;
+
+  /// No description provided for @riskConcentration.
+  ///
+  /// In en, this message translates to:
+  /// **'{symbol} is {percent} of your portfolio. If it fell 30%, your whole portfolio would fall about {drop}.'**
+  String riskConcentration(String symbol, String percent, String drop);
+
+  /// No description provided for @riskCrypto.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} is in crypto, which can rise or fall 10% or more in a day.'**
+  String riskCrypto(String percent);
+
+  /// No description provided for @riskForeign.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} is priced in currencies other than {currency}, so exchange rates move its value too.'**
+  String riskForeign(String percent, String currency);
+
+  /// No description provided for @riskFew.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{You have 1 holding. With so few, one bad result matters a lot; spreading across more can lower risk.} other{You have {count} holdings. With few holdings, one bad result matters a lot; spreading across more can lower risk.}}'**
+  String riskFew(int count);
+
+  /// No description provided for @riskOneRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is in one region ({region}). Problems there would hit all of it at once.'**
+  String riskOneRegion(String region);
+
+  /// No description provided for @riskSpread.
+  ///
+  /// In en, this message translates to:
+  /// **'Your money is spread over {count} holdings, and none is more than {percent} of the total.'**
+  String riskSpread(String count, String percent);
+
+  /// No description provided for @riskNote.
+  ///
+  /// In en, this message translates to:
+  /// **'General information to help you think about risk, not advice.'**
+  String get riskNote;
+
+  /// No description provided for @portfolioAllocation.
+  ///
+  /// In en, this message translates to:
+  /// **'How your money is spread'**
+  String get portfolioAllocation;
+
+  /// No description provided for @allocationType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get allocationType;
+
+  /// No description provided for @allocationRegion.
+  ///
+  /// In en, this message translates to:
+  /// **'Region'**
+  String get allocationRegion;
+
+  /// No description provided for @allocationCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get allocationCurrency;
+
+  /// No description provided for @holdingLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} · paid {price} on average'**
+  String holdingLine(String quantity, String price);
+
+  /// No description provided for @holdingAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {symbol} to your portfolio'**
+  String holdingAddTitle(String symbol);
+
+  /// No description provided for @holdingEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {symbol}'**
+  String holdingEditTitle(String symbol);
+
+  /// No description provided for @holdingQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Units you own'**
+  String get holdingQuantity;
+
+  /// No description provided for @holdingAveragePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Average price paid ({currency})'**
+  String holdingAveragePrice(String currency);
+
+  /// No description provided for @holdingAveragePriceHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought at different prices? Use the average. Today\'s price is filled in to start.'**
+  String get holdingAveragePriceHelp;
+
+  /// No description provided for @holdingBoughtOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Bought on (optional)'**
+  String get holdingBoughtOn;
+
+  /// No description provided for @holdingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get holdingNote;
+
+  /// No description provided for @holdingDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from portfolio'**
+  String get holdingDelete;
+
+  /// No description provided for @holdingDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {symbol} from your portfolio?'**
+  String holdingDeleteConfirm(String symbol);
+
+  /// No description provided for @holdingSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your portfolio.'**
+  String get holdingSaved;
+
+  /// No description provided for @holdingRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{symbol} removed from your portfolio.'**
+  String holdingRemoved(String symbol);
+
+  /// No description provided for @holdingAddMore.
+  ///
+  /// In en, this message translates to:
+  /// **'You already track {symbol}: these units will be added and the average price updated.'**
+  String holdingAddMore(String symbol);
+
+  /// No description provided for @holdingErrorQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter how many units you own.'**
+  String get holdingErrorQuantity;
+
+  /// No description provided for @holdingErrorPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the price you paid.'**
+  String get holdingErrorPrice;
+
+  /// No description provided for @pickAssetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which one do you own?'**
+  String get pickAssetTitle;
+
+  /// No description provided for @pickAssetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search a company, fund or coin'**
+  String get pickAssetHint;
+
+  /// No description provided for @portfolioCardHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'You own {quantity}, worth {value}.'**
+  String portfolioCardHeld(String quantity, String value);
+
+  /// No description provided for @portfolioCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Own this? Add it to see its value with the rest of your investments.'**
+  String get portfolioCardBody;
+
+  /// No description provided for @portfolioCardAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to my portfolio'**
+  String get portfolioCardAdd;
+
+  /// No description provided for @portfolioCardEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit holding'**
+  String get portfolioCardEdit;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navPortfolio.
+  ///
+  /// In en, this message translates to:
+  /// **'Portfolio'**
+  String get navPortfolio;
+
+  /// No description provided for @navPractice.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get navPractice;
+
+  /// No description provided for @navLearn.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn'**
+  String get navLearn;
 }
 
 class _AppLocalizationsDelegate

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../alerts/data/alerts_api.dart';
+import '../../practice/data/practice_api.dart';
 import '../../live/live_controller.dart';
 import '../../watchlist/data/watchlist_api.dart';
 import '../data/chat_api.dart';
@@ -216,6 +217,9 @@ class CopilotController extends Notifier<CopilotState> {
         await ref.read(alertsApiProvider).delete(card['alert_id'] as int);
         ref.invalidate(alertsProvider(null));
         ref.invalidate(alertsProvider(card['asset_id'] as int));
+      case 'practice_order':
+        await ref.read(practiceApiProvider).undo(card['order_id'] as int);
+        refreshAll(ref.invalidate);
     }
     final messages = [...state.messages];
     final actions = [...messages[messageIndex].actions];
@@ -230,6 +234,8 @@ class CopilotController extends Notifier<CopilotState> {
     } else if (card['type'] == 'alert_created') {
       ref.invalidate(alertsProvider(null));
       ref.invalidate(alertsProvider(card['asset_id'] as int));
+    } else if (card['type'] == 'practice_order') {
+      refreshAll(ref.invalidate);
     }
   }
 }

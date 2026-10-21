@@ -1,6 +1,7 @@
 """Tools the copilot can call. Results are compact JSON facts (with source + time) for the model;
 app actions also return a card the chat shows (and the user can undo from)."""
 
+import re
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
@@ -13,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.types import ToolCall, ToolSpec
 from app.core.errors import AppError
 from app.db.models import Asset, User
+from app.db.session import SessionLocal
 from app.learn import glossary
 from app.market_data import service as market
 from app.market_data.types import ProviderError, Quote, Range
@@ -20,6 +22,8 @@ from app.news import service as news_service
 from app.news import web_search as web
 from app.repositories import assets as assets_repo
 from app.services import alerts as alerts_service
+from app.services import portfolio as portfolio_service
+from app.services import practice as practice_service
 from app.services import watchlist as watchlist_service
 
 ASSET_PARAM = {
@@ -41,6 +45,7 @@ class ToolContext:
     # Short references the model cites ("n1", "w2") -> (url, source name), swapped in after
     # the answer.
     sources: dict[str, tuple[str, str]] = field(default_factory=dict)
+    question: str = ""  # the user's message this turn (checks that trades were asked for)
 
     def cite(self, prefix: str, url: str, label: str) -> str:
         for ref, (known, _) in self.sources.items():
@@ -344,6 +349,182 @@ async def explain_term(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     )
 
 
+def _money(value: Any) -> float:
+    return round(float(value), 2)
+
+
+async def get_practice_account(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
+    s = await practice_service.summary(ctx.session, ctx.user)
+    start = s.account.starting_cash
+    return ToolResult(
+        {
+            "note": "Practice account: virtual US dollars, real prices. Not real money.",
+            "started_utc": s.account.started_at.date().isoformat(),
+            "starting_cash_usd": _money(start),
+            "cash_usd": _money(s.account.cash),
+            "available_cash_usd": _money(s.available_cash),
+            "total_value_usd": _money(s.total_value),
+            "gain_usd": _money(s.gain_usd),
+            "gain_percent": round(float(s.gain_usd / start * 100), 2),
+            "realized_gain_usd": _money(s.realized_usd),
+            "positions": [
+                {
+                    "symbol": v.position.asset.symbol,
+                    "name": v.position.asset.name,
+                    "quantity": float(v.position.quantity),
+                    "value_usd": None if v.value_usd is None else _money(v.value_usd),
+                    "cost_usd": _money(v.position.cost_usd),
+                    "gain_usd": None if v.gain_usd is None else _money(v.gain_usd),
+                }
+                for v in s.positions
+            ],
+            "waiting_orders": [
+                {
+                    "side": o.side,
+                    "symbol": o.asset.symbol,
+                    "quantity": None if o.quantity is None else float(o.quantity),
+                    "amount_usd": None if o.amount_usd is None else _money(o.amount_usd),
+                    "note": "waits for the market to open",
+                }
+                for o in s.pending
+            ],
+        }
+    )
+
+
+# Plain descriptions of the portfolio risk notes, for the model.
+RISK_TEXT = {
+    "concentration": "{symbol} is {percent}% of the portfolio; if it fell 30%, the whole "
+    "portfolio would fall about {drop_if_30}%.",
+    "crypto_share": "{percent}% is in crypto, which can swing a lot in a day.",
+    "foreign_currency": "{percent}% is priced in currencies other than {currency}, so "
+    "exchange rates move its value too.",
+    "few_holdings": "Only {count} holdings: one bad result matters a lot.",
+    "one_region": "Everything is in one region ({region}).",
+    "spread": "Spread over {count} holdings; the biggest is {top_percent}%.",
+}
+
+
+async def get_portfolio(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
+    p = await portfolio_service.summary(ctx.session, ctx.user)
+    if not p.holdings:
+        return ToolResult({"holdings": [], "note": "The user hasn't added any holdings yet."})
+    cur = p.currency
+    return ToolResult(
+        {
+            "note": f"Real holdings the user entered by hand; values in {cur} at today's "
+            "exchange rates.",
+            "currency": cur,
+            "total_value": _money(p.total_value),
+            "gain": _money(p.gain),
+            "change_today": _money(p.day_change),
+            "holdings": [
+                {
+                    "symbol": h.holding.asset.symbol,
+                    "name": h.holding.asset.name,
+                    "quantity": float(h.holding.quantity),
+                    "value": None if h.value is None else _money(h.value),
+                    "gain": None if h.gain is None else _money(h.gain),
+                    "share_percent": None if h.value is None else round(p.share(h.value), 1),
+                }
+                for h in p.holdings
+            ],
+            "by_type_percent": {k: round(p.share(v), 1) for k, v in p.by_type.items()},
+            "risk_notes": [RISK_TEXT[r.code].format(**r.params) for r in p.risks],
+        }
+    )
+
+
+def practice_card(order: Any, asset: Asset) -> dict[str, Any]:
+    def f(value: Decimal | None) -> float | None:
+        return None if value is None else float(value)
+
+    return {
+        "type": "practice_order",
+        "order_id": order.id,
+        "asset_id": asset.id,
+        "symbol": asset.symbol,
+        "name": asset.name,
+        "side": order.side,
+        "status": order.status,
+        "quantity": f(
+            order.filled_quantity if order.filled_quantity is not None else order.quantity
+        ),
+        "amount_usd": f(order.amount_usd),
+        "total_usd": f(order.total_usd),
+        "note": order.note,
+    }
+
+
+# A trade size the user actually gave: a number, or "all"/"everything"/"half".
+_SIZE_GIVEN = re.compile(r"\d|\b(all|everything|half|whole)\b", re.IGNORECASE)
+_SELL_ALL = re.compile(r"\b(all|everything|whole)\b", re.IGNORECASE)
+_NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?")
+
+
+async def practice_trade(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
+    if ctx.question and not _SIZE_GIVEN.search(ctx.question):
+        # The model picked "$500" for "I want to buy some Apple": never trade a made-up size.
+        return ToolResult(
+            {
+                "error": "The user didn't say how much. Don't trade yet: ask how much they "
+                "want to buy or sell, in dollars or units, in their practice account."
+            }
+        )
+    try:
+        side = practice_service.Side(str(args.get("side", "")).lower())
+    except ValueError:
+        return ToolResult({"error": "side must be buy or sell."})
+    raw_quantity = args.get("quantity")
+    sell_all = str(raw_quantity).strip().lower() == "all"
+    if side == practice_service.Side.sell and _SELL_ALL.search(ctx.question):
+        # "Sell all my bitcoin": the model once passed a dollar amount from an earlier turn.
+        sell_all, raw_quantity, args = True, None, {**args, "amount_usd": None}
+    try:
+        quantity = None if raw_quantity in (None, "") or sell_all else Decimal(str(raw_quantity))
+        amount = args.get("amount_usd")
+        amount_usd = None if amount in (None, "") else Decimal(str(amount).lstrip("$"))
+    except InvalidOperation:
+        return ToolResult({"error": "quantity and amount_usd must be numbers."})
+    given = amount_usd if amount_usd is not None else quantity
+    numbers = {Decimal(n.replace(",", "")) for n in _NUMBER.findall(ctx.question)}
+    if given is not None and numbers and given not in numbers:
+        return ToolResult(
+            {
+                "error": f"The user's message doesn't mention {given}. Use exactly the amount "
+                "they gave, or ask them how much."
+            }
+        )
+
+    async def run(asset: Asset) -> ToolResult:
+        # Own session: a refused order must not leave the chat's session holding a row lock.
+        async with SessionLocal() as session:
+            user = await session.get(User, ctx.user.id)
+            own_asset = await session.get(Asset, asset.id)
+            nonlocal quantity
+            if sell_all and side == practice_service.Side.sell:
+                _, quantity = await practice_service.cash_and_holding(session, user, asset.id)
+                if not quantity:
+                    return ToolResult({"error": f"There is no {asset.symbol} to sell."})
+            order = await practice_service.place_order(
+                session,
+                user,
+                own_asset,
+                side,
+                quantity=quantity,
+                amount_usd=amount_usd,
+                source="copilot",
+            )
+            card = practice_card(order, own_asset)
+        result = {k: v for k, v in card.items() if k not in ("type", "order_id", "asset_id")}
+        result["practice_money"] = True
+        if order.status == "pending":
+            result["note"] = "The market is closed; the order waits and fills when it opens."
+        return ToolResult(result, card)
+
+    return await _with_asset(ctx, args, run)
+
+
 async def list_alerts(ctx: ToolContext, args: dict[str, Any]) -> ToolResult:
     alerts = await alerts_service.list_for_user(ctx.session, ctx.user)
     return ToolResult(
@@ -490,6 +671,45 @@ TOOLS: dict[str, Tool] = {
             ),
             create_alert,
             lambda a: f"Creating an alert for {a.get('asset', '')}…",
+        ),
+        Tool(
+            _spec(
+                "get_portfolio",
+                "The user's REAL portfolio (holdings they entered by hand): value, gains, "
+                "allocation and risk notes. Read-only.",
+                {},
+                [],
+            ),
+            get_portfolio,
+            lambda a: "Looking at your portfolio…",
+        ),
+        Tool(
+            _spec(
+                "get_practice_account",
+                "The user's practice account (virtual dollars, real prices): cash, "
+                "holdings, gains and waiting orders.",
+                {},
+                [],
+            ),
+            get_practice_account,
+            lambda a: "Checking your practice account…",
+        ),
+        Tool(
+            _spec(
+                "practice_trade",
+                "Buy or sell in the user's practice account (virtual dollars) — use it for "
+                "every buy/sell request, e.g. 'sell all my bitcoin' -> side sell, quantity "
+                "'all'. Give amount_usd (dollars) OR quantity (units, or 'all').",
+                {
+                    "asset": ASSET_PARAM,
+                    "side": {"type": "string", "enum": ["buy", "sell"]},
+                    "amount_usd": {"type": "number"},
+                    "quantity": {"type": "string", "description": "Units, e.g. '2', or 'all'"},
+                },
+                ["asset", "side"],
+            ),
+            practice_trade,
+            lambda a: f"Placing a practice {a.get('side', 'trade')} for {a.get('asset', '')}…",
         ),
         Tool(
             _spec("list_alerts", "The user's price alerts.", {}, []),

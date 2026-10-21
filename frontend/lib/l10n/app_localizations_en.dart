@@ -1165,4 +1165,470 @@ class AppLocalizationsEn extends AppLocalizations {
   String actionGlossaryTerm(String name) {
     return 'Glossary: $name';
   }
+
+  @override
+  String get practiceTitle => 'Practice';
+
+  @override
+  String get practiceIntro =>
+      'Practice with virtual money and real prices. Nothing here is real money, and nothing is advice.';
+
+  @override
+  String get practiceTotalValue => 'Total value';
+
+  @override
+  String practiceTotalValueHelp(String start) {
+    return 'Your practice cash plus what your practice investments are worth at the latest prices. You started with $start.';
+  }
+
+  @override
+  String practiceSince(String date) {
+    return 'since $date';
+  }
+
+  @override
+  String get practiceCash => 'Cash available';
+
+  @override
+  String get practiceCashHelp =>
+      'Practice money you can still use. Money set aside for orders that are waiting for their market to open is not included.';
+
+  @override
+  String get practiceInvested => 'Invested';
+
+  @override
+  String get practiceInvestedHelp =>
+      'What your practice holdings are worth right now, at the latest prices.';
+
+  @override
+  String get practiceRealized => 'Locked in by selling';
+
+  @override
+  String get practiceRealizedHelp =>
+      'Gains or losses you made final by selling. Holdings you still have can still go up or down.';
+
+  @override
+  String get practiceHoldings => 'Your holdings';
+
+  @override
+  String get practiceEmpty =>
+      'You haven\'t bought anything yet. Open any stock or coin and tap “Practice buy”, or ask the Copilot, e.g. “Buy \$500 of Apple in my practice account”.';
+
+  @override
+  String get practiceFindAsset => 'Find something to practice with';
+
+  @override
+  String get practiceWaiting => 'Waiting for the market to open';
+
+  @override
+  String get practiceHistory => 'Recent trades';
+
+  @override
+  String get practiceReset => 'Start over';
+
+  @override
+  String practiceResetTitle(String amount) {
+    return 'Start over with $amount?';
+  }
+
+  @override
+  String practiceResetBody(String amount) {
+    return 'Your practice holdings and trade history will be cleared and you\'ll get $amount of practice money again.';
+  }
+
+  @override
+  String practiceResetDone(String amount) {
+    return 'Your practice account starts again with $amount.';
+  }
+
+  @override
+  String get practiceCancelOrder => 'Cancel order';
+
+  @override
+  String get practiceOrderCancelled => 'Order cancelled.';
+
+  @override
+  String practicePositionLine(String quantity, String price) {
+    return '$quantity · bought at $price on average';
+  }
+
+  @override
+  String practiceShare(String percent) {
+    return '$percent of your account';
+  }
+
+  @override
+  String get practiceGainHelp =>
+      'How much this holding has gained or lost since you bought it (current value minus what you paid). It only becomes final when you sell.';
+
+  @override
+  String orderBuyAmount(String amount, String symbol) {
+    return 'Buy $amount of $symbol';
+  }
+
+  @override
+  String orderBuyUnits(String quantity, String symbol) {
+    return 'Buy $quantity $symbol';
+  }
+
+  @override
+  String orderSellAmount(String amount, String symbol) {
+    return 'Sell $amount of $symbol';
+  }
+
+  @override
+  String orderSellUnits(String quantity, String symbol) {
+    return 'Sell $quantity $symbol';
+  }
+
+  @override
+  String historyBought(String quantity, String symbol) {
+    return 'Bought $quantity $symbol';
+  }
+
+  @override
+  String historySold(String quantity, String symbol) {
+    return 'Sold $quantity $symbol';
+  }
+
+  @override
+  String historyFill(String price, String total) {
+    return 'at $price · $total in total';
+  }
+
+  @override
+  String historyGain(String gain) {
+    return 'Locked in $gain';
+  }
+
+  @override
+  String get statusWaiting => 'Waiting';
+
+  @override
+  String get statusCancelled => 'Cancelled';
+
+  @override
+  String get statusRejected => 'Not carried out';
+
+  @override
+  String get statusUndone => 'Undone';
+
+  @override
+  String tradeBuyTitle(String symbol) {
+    return 'Practice buy: $symbol';
+  }
+
+  @override
+  String tradeSellTitle(String symbol) {
+    return 'Practice sell: $symbol';
+  }
+
+  @override
+  String get tradeInDollars => 'Dollars';
+
+  @override
+  String get tradeInUnits => 'Units';
+
+  @override
+  String get tradeAmountLabel => 'Amount in US dollars';
+
+  @override
+  String get tradeUnitsLabel => 'Number of units';
+
+  @override
+  String tradePrice(String price) {
+    return 'Price now: $price';
+  }
+
+  @override
+  String tradePriceConverted(String price, String usd) {
+    return 'Price now: $price ≈ $usd';
+  }
+
+  @override
+  String tradeEstimateUnits(String quantity, String symbol) {
+    return '≈ $quantity $symbol';
+  }
+
+  @override
+  String tradeEstimateCost(String amount) {
+    return '≈ $amount';
+  }
+
+  @override
+  String tradeAvailable(String amount) {
+    return 'Practice cash available: $amount';
+  }
+
+  @override
+  String tradeHeld(String quantity, String symbol) {
+    return 'You have $quantity $symbol';
+  }
+
+  @override
+  String get tradeSellAll => 'Sell all';
+
+  @override
+  String get tradeClosed =>
+      'The market is closed. Your order will wait and fill at the first price after it opens, which can differ from the price shown.';
+
+  @override
+  String get tradeConfirmBuy => 'Buy with practice money';
+
+  @override
+  String get tradeConfirmSell => 'Sell (practice)';
+
+  @override
+  String tradeBought(String quantity, String symbol, String total) {
+    return 'Bought $quantity $symbol for $total (practice).';
+  }
+
+  @override
+  String tradeSold(String quantity, String symbol, String total) {
+    return 'Sold $quantity $symbol for $total (practice).';
+  }
+
+  @override
+  String get tradeWaiting =>
+      'Order placed. It will fill when the market opens.';
+
+  @override
+  String get tradeErrorAmount => 'Enter an amount above zero.';
+
+  @override
+  String tradeErrorCash(String amount) {
+    return 'That\'s more than your practice cash ($amount).';
+  }
+
+  @override
+  String tradeErrorHeld(String quantity) {
+    return 'You have $quantity to sell.';
+  }
+
+  @override
+  String get tradeNote =>
+      'Virtual money, real prices: practice only, not advice.';
+
+  @override
+  String get practiceCardBody =>
+      'Try it with virtual money and see how it would have gone.';
+
+  @override
+  String practiceCardHeld(String quantity, String value) {
+    return 'You have $quantity in your practice account, worth $value.';
+  }
+
+  @override
+  String get practiceBuy => 'Practice buy';
+
+  @override
+  String get practiceSell => 'Practice sell';
+
+  @override
+  String get practiceIndexNote =>
+      'An index is a score, so it can\'t be bought directly. Funds (ETFs) that follow it can.';
+
+  @override
+  String actionPracticeBought(String quantity, String symbol, String total) {
+    return 'Practice: bought $quantity $symbol for $total';
+  }
+
+  @override
+  String actionPracticeSold(String quantity, String symbol, String total) {
+    return 'Practice: sold $quantity $symbol for $total';
+  }
+
+  @override
+  String actionPracticeWaiting(String symbol) {
+    return 'Practice: order for $symbol waits for the market to open';
+  }
+
+  @override
+  String actionPracticeRejected(String symbol) {
+    return 'Practice order for $symbol not carried out';
+  }
+
+  @override
+  String get portfolioTitle => 'My portfolio';
+
+  @override
+  String get portfolioPrivacy =>
+      'Track what you really own. You enter it yourself: we don\'t connect to banks or brokers, and only you can see it.';
+
+  @override
+  String get portfolioEmpty =>
+      'Add the stocks, funds or coins you own to see what they\'re worth together, how your money is spread, and the risks to keep in mind.';
+
+  @override
+  String get portfolioAdd => 'Add a holding';
+
+  @override
+  String portfolioTotalHelp(String currency) {
+    return 'What everything you entered is worth at the latest prices, in $currency. Prices in other currencies are converted at today\'s exchange rates.';
+  }
+
+  @override
+  String get portfolioGain => 'Gain or loss';
+
+  @override
+  String get portfolioGainHelp =>
+      'Total value minus what you paid. Amounts in other currencies use today\'s exchange rate, so currency moves are included.';
+
+  @override
+  String portfolioToday(String change) {
+    return 'Today: $change';
+  }
+
+  @override
+  String get portfolioShowIn => 'Show values in';
+
+  @override
+  String get portfolioRisk => 'Risk overview';
+
+  @override
+  String riskConcentration(String symbol, String percent, String drop) {
+    return '$symbol is $percent of your portfolio. If it fell 30%, your whole portfolio would fall about $drop.';
+  }
+
+  @override
+  String riskCrypto(String percent) {
+    return '$percent is in crypto, which can rise or fall 10% or more in a day.';
+  }
+
+  @override
+  String riskForeign(String percent, String currency) {
+    return '$percent is priced in currencies other than $currency, so exchange rates move its value too.';
+  }
+
+  @override
+  String riskFew(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'You have $count holdings. With few holdings, one bad result matters a lot; spreading across more can lower risk.',
+      one:
+          'You have 1 holding. With so few, one bad result matters a lot; spreading across more can lower risk.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String riskOneRegion(String region) {
+    return 'Everything is in one region ($region). Problems there would hit all of it at once.';
+  }
+
+  @override
+  String riskSpread(String count, String percent) {
+    return 'Your money is spread over $count holdings, and none is more than $percent of the total.';
+  }
+
+  @override
+  String get riskNote =>
+      'General information to help you think about risk, not advice.';
+
+  @override
+  String get portfolioAllocation => 'How your money is spread';
+
+  @override
+  String get allocationType => 'Type';
+
+  @override
+  String get allocationRegion => 'Region';
+
+  @override
+  String get allocationCurrency => 'Currency';
+
+  @override
+  String holdingLine(String quantity, String price) {
+    return '$quantity · paid $price on average';
+  }
+
+  @override
+  String holdingAddTitle(String symbol) {
+    return 'Add $symbol to your portfolio';
+  }
+
+  @override
+  String holdingEditTitle(String symbol) {
+    return 'Edit $symbol';
+  }
+
+  @override
+  String get holdingQuantity => 'Units you own';
+
+  @override
+  String holdingAveragePrice(String currency) {
+    return 'Average price paid ($currency)';
+  }
+
+  @override
+  String get holdingAveragePriceHelp =>
+      'Bought at different prices? Use the average. Today\'s price is filled in to start.';
+
+  @override
+  String get holdingBoughtOn => 'Bought on (optional)';
+
+  @override
+  String get holdingNote => 'Note (optional)';
+
+  @override
+  String get holdingDelete => 'Remove from portfolio';
+
+  @override
+  String holdingDeleteConfirm(String symbol) {
+    return 'Remove $symbol from your portfolio?';
+  }
+
+  @override
+  String get holdingSaved => 'Saved to your portfolio.';
+
+  @override
+  String holdingRemoved(String symbol) {
+    return '$symbol removed from your portfolio.';
+  }
+
+  @override
+  String holdingAddMore(String symbol) {
+    return 'You already track $symbol: these units will be added and the average price updated.';
+  }
+
+  @override
+  String get holdingErrorQuantity => 'Enter how many units you own.';
+
+  @override
+  String get holdingErrorPrice => 'Enter the price you paid.';
+
+  @override
+  String get pickAssetTitle => 'Which one do you own?';
+
+  @override
+  String get pickAssetHint => 'Search a company, fund or coin';
+
+  @override
+  String portfolioCardHeld(String quantity, String value) {
+    return 'You own $quantity, worth $value.';
+  }
+
+  @override
+  String get portfolioCardBody =>
+      'Own this? Add it to see its value with the rest of your investments.';
+
+  @override
+  String get portfolioCardAdd => 'Add to my portfolio';
+
+  @override
+  String get portfolioCardEdit => 'Edit holding';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navPortfolio => 'Portfolio';
+
+  @override
+  String get navPractice => 'Practice';
+
+  @override
+  String get navLearn => 'Learn';
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/format/numbers.dart';
 import '../../../core/errors/api_error.dart';
 import '../../../core/widgets/snack.dart';
 import '../../../l10n/app_localizations.dart';
@@ -184,6 +185,7 @@ class _CopilotScreenState extends ConsumerState<CopilotScreen> {
   Future<void> _showHistory(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     await showModalBottomSheet<void>(
+      useRootNavigator: true, // above the tab bar
       context: context,
       showDragHandle: true,
       builder: (sheetContext) => Consumer(
@@ -377,6 +379,25 @@ class _ActionCard extends StatelessWidget {
   final Map<String, dynamic> card;
   final VoidCallback onUndo;
 
+  String _practiceText(AppLocalizations l10n) {
+    final symbol = card['symbol'] as String;
+    final quantity = formatQuantity((card['quantity'] as num? ?? 0).toDouble());
+    final total = formatMoney(
+      (card['total_usd'] as num? ?? 0).toDouble(),
+      'USD',
+    );
+    return switch (card['status']) {
+      'filled' when card['side'] == 'sell' => l10n.actionPracticeSold(
+        quantity,
+        symbol,
+        total,
+      ),
+      'filled' => l10n.actionPracticeBought(quantity, symbol, total),
+      'pending' => l10n.actionPracticeWaiting(symbol),
+      _ => l10n.actionPracticeRejected(symbol),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -399,12 +420,29 @@ class _ActionCard extends StatelessWidget {
           ),
         ),
       ),
+      'practice_order' => (Icons.sports_esports_outlined, _practiceText(l10n)),
       'glossary_term' => (
         Icons.menu_book_outlined,
         l10n.actionGlossaryTerm(name),
       ),
       _ => (Icons.check, card['type'].toString()),
     };
+    // Practice orders that weren't carried out have nothing to undo.
+    final undoable =
+        card['type'] != 'practice_order' ||
+        const {'filled', 'pending'}.contains(card['status']);
+    if (!undoable) {
+      return Card(
+        margin: const EdgeInsets.only(top: 8),
+        child: ListTile(
+          dense: true,
+          leading: Icon(icon),
+          title: Text(text),
+          subtitle: card['note'] == null ? null : Text(card['note'] as String),
+          onTap: () => context.go('/practice'),
+        ),
+      );
+    }
     if (card['type'] == 'glossary_term') {
       return Card(
         margin: const EdgeInsets.only(top: 8),
@@ -429,7 +467,11 @@ class _ActionCard extends StatelessWidget {
               ? const TextStyle(decoration: TextDecoration.lineThrough)
               : null,
         ),
-        onTap: () => context.go('/assets/${card['asset_id']}'),
+        onTap: () => context.go(
+          card['type'] == 'practice_order'
+              ? '/practice'
+              : '/assets/${card['asset_id']}',
+        ),
         trailing: undone
             ? Text(l10n.actionUndone)
             : TextButton(onPressed: onUndo, child: Text(l10n.actionUndo)),

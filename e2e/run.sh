@@ -20,11 +20,28 @@ export E2E_OUTBOX="$WORK/outbox" E2E_ARTIFACTS="$WORK"
 export E2E_BASE_URL="http://localhost:$WEB_PORT" E2E_API_URL="http://localhost:$API_PORT/api/v1"
 PIDS=()
 
+TEST_PGID=""
 cleanup() {
   for pid in "${PIDS[@]}"; do kill "$pid" 2>/dev/null || true; done
+  for pid in "${PIDS[@]}"; do wait "$pid" 2>/dev/null || true; done  # ports free on return
+  # Each test runs in its own process group (setsid), so its Playwright driver and Chrome
+  # can be stopped without touching anything else. NEVER pkill chrome/playwright by name:
+  # evolution's bot workers run Playwright browsers as the same user.
+  [[ -n "$TEST_PGID" ]] && kill -- "-$TEST_PGID" 2>/dev/null || true
   rm -rf "$E2E_OUTBOX"
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
+
+# Evolution runs on this server and has priority: don't start when it's busy or memory is
+# short (the build, Chrome and the API need ~4 GB), and run every step at the lowest CPU
+# priority. (ionice would do nothing: sda uses mq-deadline, which ignores I/O classes.)
+load=$(cut -d' ' -f1 /proc/loadavg)
+avail_mb=$(awk '/MemAvailable/{print int($2/1024)}' /proc/meminfo)
+if [[ -z "${E2E_FORCE:-}" ]] && { (( ${load%.*} >= 4 )) || (( avail_mb < 6000 )); }; then
+  echo "Server busy (load $load, ${avail_mb} MB free memory) — not starting. E2E_FORCE=1 overrides."
+  exit 1
+fi
+LOW="nice -n 19"
 
 # Never fight other services for the ports (evolution runs on this server).
 for port in $API_PORT $WEB_PORT; do
@@ -34,7 +51,7 @@ for port in $API_PORT $WEB_PORT; do
 done
 
 if [[ -z "${SKIP_BUILD:-}" ]]; then
-  (cd "$ROOT/frontend" && nice -n 19 flutter build web --output "$WEB_DIR" \
+  (cd "$ROOT/frontend" && $LOW flutter build web --output "$WEB_DIR" \
     --dart-define=API_BASE_URL="$E2E_API_URL" >/dev/null)
 fi
 
@@ -42,23 +59,34 @@ fi
 (cd "$ROOT/backend" && EMAIL_BACKEND=outbox EMAIL_OUTBOX_DIR="$E2E_OUTBOX" \
   FRONTEND_URL="$E2E_BASE_URL" CORS_ORIGINS="[\"$E2E_BASE_URL\"]" \
   ALERT_CHECK_SECONDS=3 LIVE_PRICE_SECONDS=5 \
-  exec nice -n 10 .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port $API_PORT \
+  exec $LOW .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port $API_PORT \
   >"$WORK/api.log" 2>&1) &
 PIDS+=($!)
-python3 "$ROOT/e2e/spa_server.py" "$WEB_DIR" $WEB_PORT &
+$LOW python3 "$ROOT/e2e/spa_server.py" "$WEB_DIR" $WEB_PORT &
 PIDS+=($!)
 
-for _ in $(seq 1 40); do
-  curl -sf "$E2E_API_URL/health" >/dev/null \
-    && curl -sf -o /dev/null "$E2E_BASE_URL/" && break
+# Startup reads a lot from the (shared, spinning) disk: allow up to 90 s.
+ready=""
+for _ in $(seq 1 180); do
+  if curl -sf "$E2E_API_URL/health" >/dev/null && curl -sf -o /dev/null "$E2E_BASE_URL/"; then
+    ready=1; break
+  fi
   sleep 0.5
 done
+if [[ -z "$ready" ]]; then
+  echo "The e2e API/web server didn't start — log: $WORK/api.log"; tail -5 "$WORK/api.log"; exit 1
+fi
 
 cd "$ROOT/e2e"
 status=0
 for test in ${E2E_TESTS:-test_*.py}; do
   echo "== $test"
-  nice -n 10 python3 "$test" 2>&1 | grep -v "GL Driver" || status=1
+  setsid $LOW python3 "$test" > "$WORK/$test.log" 2>&1 &
+  TEST_PGID=$!  # setsid makes the test the leader of a new group: pgid == pid
+  wait "$TEST_PGID" || status=1
+  kill -- "-$TEST_PGID" 2>/dev/null || true  # anything the test left running
+  TEST_PGID=""
+  grep -v "GL Driver" "$WORK/$test.log" || true
 done
 [[ $status -eq 0 ]] && echo "All e2e flows passed." || echo "E2E FAILED — screenshots/logs in $WORK"
 exit $status

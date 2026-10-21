@@ -120,3 +120,4 @@ def test_news_questions_are_told_apart() -> None:
     assert glossary_term_asked("Explain market cap") == "Market capitalization"
     assert glossary_term_asked("How is Apple doing?") is None
     assert glossary_term_asked("What is the weather?") is None
+    assert glossary_term_asked("What's my portfolio worth?") is None

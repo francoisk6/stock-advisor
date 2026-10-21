@@ -5,7 +5,7 @@ import re
 from playwright.sync_api import expect, sync_playwright
 
 from helpers import (
-    ARTIFACTS, BASE, api, button, delete_account, enable_semantics, fill, step, unique_email,
+    ARTIFACTS, BASE, api, button, delete_account, enable_semantics, fill, step, tab, unique_email,
     wait_for_text,
 )
 
@@ -34,7 +34,7 @@ with sync_playwright() as p:
             timeout=15000
         )
 
-        button(page, "Learn").click()
+        tab(page, "Learn").click()
         wait_for_text(page, r"Beta How much a stock tends to move")
         page.get_by_role("textbox").click()
         page.wait_for_timeout(300)

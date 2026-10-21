@@ -14,6 +14,8 @@ import '../../alerts/presentation/create_alert_sheet.dart';
 import '../../copilot/application/copilot_controller.dart';
 import '../../live/live_controller.dart';
 import '../../live/live_interest.dart';
+import '../../portfolio/presentation/portfolio_card.dart';
+import '../../practice/presentation/practice_card.dart';
 import '../../watchlist/data/watchlist_api.dart';
 import '../data/market_api.dart';
 import '../../learn/presentation/explain_sheet.dart';
@@ -91,6 +93,10 @@ class _AssetScreenState extends ConsumerState<AssetScreen> {
                     _chartSection(context, d),
                     const SizedBox(height: 16),
                     _AlertsCard(asset: d.asset),
+                    const SizedBox(height: 16),
+                    PortfolioCard(asset: d.asset),
+                    const SizedBox(height: 16),
+                    PracticeCard(asset: d.asset),
                     const SizedBox(height: 16),
                     KeyFiguresCard(
                       figures: buildKeyFigures(l10n, d),

@@ -252,3 +252,153 @@ async def test_open_with_an_old_price_counts_as_closed(
     fakes["yahoo"].as_of = utcnow() - timedelta(days=2)  # "open", but Friday's price
     waiting = (await order(client, user, "AAPL", "buy", quantity="1")).json()
     assert waiting["status"] == "pending"
+
+
+async def test_copilot_trades_with_practice_money(
+    client: AsyncClient, user: dict, llm, fakes
+) -> None:
+    from tests.test_copilot import ask, call, say
+
+    llm(
+        call("practice_trade", asset="AAPL", side="buy", amount_usd=400),
+        say("Done: you bought 2 AAPL in your practice account."),
+    )
+    events = await ask(user, "Buy $400 of Apple")
+    card = events[-1]["actions"][0]
+    assert card["type"] == "practice_order" and card["status"] == "filled"
+    assert card["quantity"] == 2 and card["total_usd"] == 400 and card["side"] == "buy"
+
+    # The card's Undo uses the practice API.
+    undone = await client.post(f"/practice/orders/{card['order_id']}/undo", headers=bearer(user))
+    assert undone.json()["status"] == "undone"
+    assert (await account(client, user))["cash"] == 10000
+
+    scripted = llm(
+        call("practice_trade", asset="AAPL", side="sell", quantity="all"),
+        say("You don't own any Apple in your practice account."),
+    )
+    events = await ask(user, "Sell all my Apple")
+    result = next(m.content for m in scripted.calls[1] if m.role == "tool")
+    assert "There is no AAPL to sell" in result and events[-1]["actions"] == []
+
+    scripted = llm(
+        call("practice_trade", asset="AAPL", side="buy", amount_usd=50000),
+        say("You don't have enough practice cash for that."),
+    )
+    await ask(user, "Buy $50,000 of Apple")
+    result = next(m.content for m in scripted.calls[1] if m.role == "tool")
+    assert "of practice cash available" in result
+    # The refused order didn't leave the account locked: the app can still trade.
+    assert (await order(client, user, "AAPL", "buy", quantity="1")).status_code == 201
+
+
+async def test_copilot_reads_the_practice_account(user: dict, client: AsyncClient, llm, fakes):
+    from tests.test_copilot import ask, call, say
+
+    await order(client, user, "AAPL", "buy", quantity="3")
+    scripted = llm(call("get_practice_account"), say("You hold 3 AAPL."))
+    await ask(user, "How is my practice account doing?")
+    import json
+
+    data = json.loads(next(m.content for m in scripted.calls[1] if m.role == "tool"))
+    assert data["cash_usd"] == 9400 and data["positions"][0]["symbol"] == "AAPL"
+    assert data["note"].startswith("Practice account")
+
+
+async def test_claimed_trades_must_really_happen(
+    client: AsyncClient, user: dict, llm, fakes
+) -> None:
+    from tests.test_copilot import ask, call, say
+
+    await order(client, user, "AAPL", "buy", quantity="2")
+    scripted = llm(
+        say("In your practice account, you sold all your Apple."),  # no tool: not true
+        call("practice_trade", asset="AAPL", side="sell", quantity="all"),
+        say("Sold 2 AAPL in your practice account."),
+    )
+    events = await ask(user, "Sell all my apple")
+    retry = scripted.calls[1][-1].content
+    assert retry.startswith("Your answer says something was done")
+    assert "“Sell all my apple”" in retry
+    assert events[-1]["actions"][0]["status"] == "filled"
+    assert (await account(client, user))["positions"] == []
+
+    llm(say("You sold all your Apple."), say("Done, you sold it all."))
+    events = await ask(user, "Sell all my apple")
+    assert events[-1]["text"].startswith("Sorry, I couldn't do that this time")
+
+
+def test_action_claims_are_recognised() -> None:
+    from app.ai.agent import claims_unmade_action
+
+    assert claims_unmade_action("In your practice account, you sold all your Bitcoin.", set())
+    assert claims_unmade_action("Apple has been added to your watchlist.", set())
+    assert not claims_unmade_action("You sold it earlier.", {"get_practice_account"})
+    sold = [{"type": "practice_order", "status": "filled"}]
+    assert not claims_unmade_action("You sold 2 AAPL.", {"practice_trade"}, sold)
+    # The tool was called but refused: claiming a trade is still false.
+    assert claims_unmade_action("You bought $500 of Apple.", {"practice_trade"}, [])
+    assert not claims_unmade_action("Would you like to add it to your watchlist?", set())
+    assert not claims_unmade_action("Apple sold more iPhones this year.", set())
+    assert not claims_unmade_action("I found that investors sold Bitcoin on Friday.", set())
+    assert claims_unmade_action("I've just placed a practice order for you.", set())
+
+
+async def test_history_shows_which_tools_did_past_actions(
+    client: AsyncClient, user: dict, llm, fakes
+) -> None:
+    from tests.test_copilot import ask, call, say
+
+    llm(call("practice_trade", asset="AAPL", side="buy", quantity="1"), say("Bought 1 AAPL."))
+    first = await ask(user, "Buy 1 Apple")
+    scripted = llm(say("You have 1 AAPL."))
+    await ask(user, "What do I have?", conversation_id=first[0]["conversation_id"])
+    sent = scripted.calls[0]
+    answer_at = next(i for i, m in enumerate(sent) if m.content == "Bought 1 AAPL.")
+    call_msg, result_msg = sent[answer_at - 2], sent[answer_at - 1]
+    assert call_msg.role == "assistant" and call_msg.tool_calls[0].name == "practice_trade"
+    assert call_msg.tool_calls[0].arguments == {"asset": "AAPL", "side": "buy"}
+    assert result_msg.role == "tool" and '"status": "filled"' in result_msg.content
+
+
+async def test_no_trade_without_a_size_from_the_user(user: dict, llm, fakes) -> None:
+    from tests.test_copilot import ask, call, say
+
+    scripted = llm(
+        call("practice_trade", asset="AAPL", side="buy", amount_usd=500),  # $500 made up
+        say("How much Apple would you like to buy in your practice account?"),
+    )
+    events = await ask(user, "I want to buy some Apple")
+    result = next(m.content for m in scripted.calls[1] if m.role == "tool")
+    assert "didn't say how much" in result and events[-1]["actions"] == []
+
+
+async def test_trade_sizes_come_from_the_user(client: AsyncClient, user: dict, llm, fakes) -> None:
+    from tests.test_copilot import ask, call, say
+
+    await order(client, user, "AAPL", "buy", quantity="3")
+    # "Sell all" sells everything, whatever amount the model passes.
+    llm(call("practice_trade", asset="AAPL", side="sell", amount_usd=200), say("Sold."))
+    events = await ask(user, "Sell all my apple")
+    assert events[-1]["actions"][0]["quantity"] == 3
+    assert (await account(client, user))["positions"] == []
+
+    scripted = llm(call("practice_trade", asset="AAPL", side="buy", amount_usd=500), say("?"))
+    await ask(user, "Buy $200 of Apple")
+    result = next(m.content for m in scripted.calls[1] if m.role == "tool")
+    assert "doesn't mention 500" in result
+
+
+def test_buy_sell_judgements_are_dropped() -> None:
+    from app.ai.agent import drop_advice
+
+    text = (
+        "Apple is at $343.46 (per Yahoo Finance).  Since you're a beginner, buying Apple is a "
+        "good starting point. Prices can go down too.\n- You should buy more.\n- Volume is high."
+    )
+    assert drop_advice(text) == (
+        "Apple is at $343.46 (per Yahoo Finance).  Prices can go down too.\n- Volume is high."
+    )
+    assert drop_advice("This is not advice.") == "This is not advice."
+    assert drop_advice("I recommend you start small. Ask me anything.") == "Ask me anything."
+    assert drop_advice("Apple at $343.46 is a good buy. It moved 0.4%.") == "It moved 0.4%."

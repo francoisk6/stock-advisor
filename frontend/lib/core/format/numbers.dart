@@ -57,3 +57,26 @@ String formatNumber(double value, {String? locale, int decimals = 2}) =>
       locale: locale,
       decimalDigits: value == value.roundToDouble() ? 0 : decimals,
     ).format(value);
+
+/// Cash amounts always use cents: 0.5 -> "$0.50" (prices of tiny coins use more digits).
+String formatMoney(double value, String currency, {String? locale}) =>
+    NumberFormat.currency(
+      locale: locale,
+      name: currency,
+      symbol: _symbol(currency),
+      decimalDigits: 2,
+    ).format(value);
+
+/// 123.4 -> "+$123.40", -5 -> "-$5.00": gains and losses always show their sign.
+String formatSignedMoney(double value, String currency, {String? locale}) {
+  final sign = value > 0
+      ? '+'
+      : value < 0
+      ? '-'
+      : '';
+  return '$sign${formatMoney(value.abs(), currency, locale: locale)}';
+}
+
+/// Units held or traded: whole numbers stay whole, fractions keep up to 8 decimals.
+String formatQuantity(double value, {String? locale}) =>
+    NumberFormat('#,##0.########', locale).format(value);

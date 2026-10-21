@@ -83,6 +83,8 @@ class NotificationsScreen extends ConsumerWidget {
                             controller.markRead(n.id);
                             if (n.kind == 'digest') {
                               context.go('/brief');
+                            } else if (n.kind == 'practice') {
+                              context.go('/practice');
                             } else if (n.assetId != null) {
                               context.go('/assets/${n.assetId}');
                             }

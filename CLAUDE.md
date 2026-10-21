@@ -185,6 +185,33 @@ Implemented (Phase 2) in `backend/app/market_data/`:
   fills at the first price after the open (closed markets re-asked every 5 min) and notifies
   (kind `practice`). Undo = only the latest filled order of an asset. Positions keep cost in
   USD and local currency; realized gains from sells' `cost_usd_removed`.
+- Practice app (`features/practice/`): Practice screen (value, gain, cash/invested, holdings,
+  waiting orders with cancel, recent trades, start over), `TradeSheet` (dollars or units, live
+  preview with FX, closed-market notice, sell all), `PracticeCard` on asset pages; `practice`
+  notifications open /practice and refresh it. Notifiers refresh themselves with
+  `ref.invalidateSelf()` (`ref.invalidate(ownProvider)` throws inside a notifier).
+- Copilot practice tools: `get_practice_account`, `practice_trade` (own DB session, so a refused
+  order never leaves the chat session holding a row lock). Found with the real model, guarded
+  in code: it refused "sell all my bitcoin" as real money (rule: every buy/sell is practice);
+  claimed trades it never made (`claims_unmade_action` → retract + retry, then an honest "nothing
+  was changed"); invented sizes ("$500" for "buy some Apple"; reused "$200" from the previous
+  turn for "sell all") → the tool only accepts sizes found in the user's message, and "all"
+  in it means everything; slipped in buy advice → `drop_advice` removes such sentences.
+  Past actions are replayed to the model as tool-call/result messages (`history_messages`);
+  a plain-text note about them got copied into answers.
+- Portfolio tracker (`app/services/portfolio.py`, `/portfolio` API, `holdings` table): one row
+  per asset (units + average price in the asset's currency; adding again averages). Values in
+  the profile's `preferred_currency` (changed on the Portfolio screen; the app then reloads
+  the user) at today's FX. Allocation by type/region/currency; risk overview = rule codes +
+  numbers (`concentration` ≥ 40%, `crypto_share` ≥ 20%, `foreign_currency` ≥ 50%,
+  `few_holdings` < 5, `one_region`, else `spread`) worded by the app (`riskText`) and for the
+  model (`tools.RISK_TEXT`). Free limit `portfolio_holdings` = 50 (set by migration). The
+  copilot reads it (`get_portfolio`, read-only); the morning brief covers holdings first.
+- More model guards (real-model findings): figures with no lookup in the turn are retracted
+  once, then replaced by an honest "couldn't look that up" (worked examples / "If…" questions
+  excepted); "due to/because of" only counts as an invented cause when nothing was looked
+  up; "what's my portfolio…" is not a definition question; prompt rule 5b separates "My
+  portfolio" (real) from the practice account (virtual).
 
 ### Live updates & background jobs (Phase 3)
 - `app/realtime/hub.py`: one WebSocket per open app at `/api/v1/ws` (protocol in the module
@@ -278,7 +305,7 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       per day), nightly stored daily prices (chart fallback), morning brief at 06:00 Beirut
       (in-app + optional email). Push notifications: Android phase. Verified unit + live e2e.
 - [ ] **Phase 6 — Learning & practice:** steps: 1 glossary + explain-this ✓ · 2 practice account
-      backend ✓ · 3 practice app UI · 4 portfolio tracker · 5 bottom navigation · 6 lessons + quizzes.
+      backend ✓ · 3 practice app UI ✓ · 4 portfolio tracker ✓ · 5 bottom navigation ✓ · 6 lessons + quizzes.
 - [ ] **Phase 7 — Monetization:** plans, quotas, Stripe + in-app purchases, Pro features.
 - [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
       (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.
@@ -355,6 +382,13 @@ stock-advisor-dev/
 - Every key figure needs a plain-language explanation (`statText` in `market/presentation/labels.dart`).
 - Section titles use `Semantics(header: true, container: true)` — without `container` Flutter
   merges the heading with the text next to it. Decorative avatars use `ExcludeSemantics`.
+- Navigation (`core/router/app_shell.dart`): `StatefulShellRoute.indexedStack` with four tabs
+  (Home · Portfolio · Practice · Learn), each keeping its page stack; bottom `NavigationBar`
+  below 1000 px wide, `NavigationRail` above (its body is wrapped in a semantics container —
+  without it pages hid the rail from screen readers). Asset pages exist in each tab
+  (`/assets/1`, `/practice/assets/1`, …): link with `assetLocation(context, id)` so "back"
+  returns to that tab. Bottom sheets use `useRootNavigator: true` (otherwise the tab bar
+  covers their buttons). e2e: tabs are announced "Practice Tab 3 of 4" → `helpers.tab()`.
 - Live prices: wrap screens in `LiveInterest(name, assetIds)` and read prices with
   `liveQuote(ref, asset)`; `LiveController` owns the socket (reconnect + token refresh).
 - Messages: `showSnack(messenger, text)` replaces the current SnackBar (no queueing).
@@ -428,6 +462,9 @@ flutter build web --dart-define=GOOGLE_WEB_CLIENT_ID=<id>
 # --- end-to-end (from repo root; own ports 8290/8291, safe while dev servers run) ---
 bash e2e/run.sh            # SKIP_BUILD=1 reuses the build; E2E_TESTS=test_market_flow.py
                            # (backend runs with ALERT_CHECK_SECONDS=3 for the alerts flow)
+# Shared server: run ONE flow at a time; run.sh refuses at load ≥ 4 or < 6 GB free memory
+# (E2E_FORCE=1 overrides) and only ever kills its own process group. Never pkill chrome /
+# playwright by name — evolution's bot workers run Playwright Chrome as the same user.
 # e2e text checks: use helpers.wait_for_text — Flutter merges neighbouring texts into one label;
 # while the mouse hovers a button its tooltip text is appended to the button's name.
 flutter analyze && flutter test

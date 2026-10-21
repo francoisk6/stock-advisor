@@ -110,3 +110,8 @@ def delete_account(email_addr: str, password: str) -> None:
         api("/users/me", {"password": password}, token=token, method="DELETE")
     except Exception:
         pass
+
+
+def tab(page: Page, name: str):
+    """A main tab (bottom bar / side rail), announced as e.g. "Practice Tab 3 of 4"."""
+    return page.get_by_role("button", name=re.compile(rf"^{re.escape(name)} Tab \d of \d"))

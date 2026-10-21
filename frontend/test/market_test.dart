@@ -96,6 +96,7 @@ class FakeMarketApi implements MarketApi {
 Future<FakeMarketApi> openAsset(
   WidgetTester tester, {
   double changePercent = 1.5,
+  FakePracticeApi? practice,
 }) async {
   tester.view.physicalSize = const Size(900, 2400);
   tester.view.devicePixelRatio = 1;
@@ -105,6 +106,7 @@ Future<FakeMarketApi> openAsset(
     tester,
     AuthState.authenticated(testUser()),
     overrides: [marketApiProvider.overrideWithValue(api)],
+    practice: practice,
   );
   return api;
 }

@@ -8,6 +8,7 @@ from app.db.models.digest import Digest
 from app.db.models.insight import AssetInsight
 from app.db.models.news import NewsArticle, NewsArticleAsset
 from app.db.models.plan import Plan, UserPlan
+from app.db.models.portfolio import Holding
 from app.db.models.practice import PracticeAccount, PracticeOrder, PracticePosition
 from app.db.models.profile import UserProfile
 from app.db.models.token import EmailToken, RefreshToken
@@ -22,6 +23,7 @@ __all__ = [
     "ChatMessageRow",
     "Digest",
     "EmailToken",
+    "Holding",
     "JobRun",
     "NewsArticle",
     "NewsArticleAsset",

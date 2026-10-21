@@ -49,11 +49,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () => context.go('/copilot'),
           ),
           IconButton(
-            tooltip: l10n.learnTitle,
-            icon: const Icon(Icons.school_outlined),
-            onPressed: () => context.go('/learn'),
-          ),
-          IconButton(
             tooltip: unread > 0
                 ? '${l10n.notificationsTitle} (${l10n.unreadBadge(unread)})'
                 : l10n.notificationsTitle,

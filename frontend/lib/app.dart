@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/live/live_controller.dart';
+import 'features/practice/data/practice_api.dart';
 import 'l10n/app_localizations.dart';
 
 final _messengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -30,14 +31,18 @@ class StockAdviserApp extends ConsumerWidget {
           l10n == null) {
         return;
       }
+      if (next.kind == 'practice') {
+        refreshAll(ref.invalidate); // an order filled
+      }
       messenger.showSnackBar(
         SnackBar(
           content: Text(next.title),
           duration: const Duration(seconds: 8),
-          action: next.kind == 'digest'
+          action: next.kind == 'digest' || next.kind == 'practice'
               ? SnackBarAction(
                   label: l10n.viewAction,
-                  onPressed: () => router.go('/brief'),
+                  onPressed: () =>
+                      router.go(next.kind == 'digest' ? '/brief' : '/practice'),
                 )
               : next.assetId == null
               ? null

@@ -22,6 +22,7 @@ class CreateAlertSheet extends ConsumerStatefulWidget {
 
   static Future<bool?> show(BuildContext context, Asset asset, double? price) =>
       showModalBottomSheet<bool>(
+        useRootNavigator: true, // above the tab bar
         context: context,
         isScrollControlled: true,
         showDragHandle: true,
