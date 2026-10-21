@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from sqlalchemy import update
 
 from app.core.time import utcnow
-from app.db.models import Alert, Plan
+from app.db.models import Alert
 from app.db.session import SessionLocal
 from app.jobs.runner import run_alert_check
 from app.market_data import service
@@ -37,22 +37,6 @@ async def asset_id(client: AsyncClient, user: dict, query: str) -> int:
     return hits.json()[0]["id"]
 
 
-async def set_free_limit(key: str, value: int) -> None:
-    async with SessionLocal() as session:
-        plan = (await session.execute(Plan.__table__.select().where(Plan.code == "free"))).first()
-        limits = dict(plan.limits)
-        limits[key] = value
-        await session.execute(update(Plan).where(Plan.code == "free").values(limits=limits))
-        await session.commit()
-
-
-@pytest.fixture
-async def restore_limits():
-    yield
-    await set_free_limit("watchlist_assets", 25)
-    await set_free_limit("alerts", 10)
-
-
 # --- watchlist ------------------------------------------------------------------------------
 
 
@@ -60,7 +44,7 @@ async def test_watchlist_add_remove_and_detail_flag(
     client: AsyncClient, user: dict, fakes: dict
 ) -> None:
     empty = (await client.get("/watchlist", headers=bearer(user))).json()
-    assert empty["name"] == "My watchlist" and empty["items"] == [] and empty["limit"] == 25
+    assert empty["name"] == "My watchlist" and empty["items"] == [] and empty["limit"] == 3
 
     aramco = await asset_id(client, user, "2222")
     btc = await asset_id(client, user, "btc")
@@ -83,9 +67,9 @@ async def test_watchlist_add_remove_and_detail_flag(
 
 
 async def test_watchlist_plan_limit(
-    client: AsyncClient, user: dict, fakes: dict, restore_limits
+    client: AsyncClient, user: dict, fakes: dict, free_limits
 ) -> None:
-    await set_free_limit("watchlist_assets", 1)
+    await free_limits(watchlist_assets=1)
     first = await asset_id(client, user, "2222")
     second = await asset_id(client, user, "btc")
     assert (await client.put(f"/watchlist/assets/{first}", headers=bearer(user))).status_code == 200
@@ -147,9 +131,9 @@ async def test_alert_crud_validation_and_ownership(
 
 
 async def test_alert_plan_limit_counts_active_only(
-    client: AsyncClient, user: dict, fakes: dict, restore_limits
+    client: AsyncClient, user: dict, fakes: dict, free_limits
 ) -> None:
-    await set_free_limit("alerts", 1)
+    await free_limits(alerts=1)
     btc = await asset_id(client, user, "btc")
     first = await create_alert(client, user, btc, "price_above", 200)
     blocked = await client.post(

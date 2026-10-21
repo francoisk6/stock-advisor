@@ -6,6 +6,7 @@ class AppError(Exception):
     """Domain error with a user-friendly message, rendered as {"detail": message}."""
 
     status_code = status.HTTP_400_BAD_REQUEST
+    code: str | None = None  # machine-readable kind, e.g. "plan_limit" (the app reacts to it)
 
     def __init__(self, message: str, status_code: int | None = None) -> None:
         super().__init__(message)
@@ -29,4 +30,7 @@ class NotFoundError(AppError):
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def _handle_app_error(_: Request, exc: AppError) -> JSONResponse:
-        return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
+        content = {"detail": exc.message}
+        if exc.code:
+            content["code"] = exc.code
+        return JSONResponse(status_code=exc.status_code, content=content)

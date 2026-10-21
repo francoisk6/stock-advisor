@@ -160,3 +160,29 @@ async def user(client: AsyncClient) -> dict:
     tokens = await register(client)
     await onboard(client, tokens, assets=["stocks", "crypto"], regions=["middle_east"])
     return tokens
+
+
+@pytest.fixture
+async def free_limits():
+    """Change Free-plan limits for one test: `await free_limits(alerts=1)`. The limits that were
+    there before are restored exactly afterwards (plans aren't cleared between tests)."""
+    from sqlalchemy import select, update
+
+    from app.db.models import Plan
+
+    async with SessionLocal() as session:
+        original = dict(
+            (await session.execute(select(Plan.limits).where(Plan.code == "free"))).scalar_one()
+        )
+
+    async def change(**limits) -> None:
+        async with SessionLocal() as session:
+            await session.execute(
+                update(Plan).where(Plan.code == "free").values(limits={**original, **limits})
+            )
+            await session.commit()
+
+    yield change
+    async with SessionLocal() as session:
+        await session.execute(update(Plan).where(Plan.code == "free").values(limits=original))
+        await session.commit()

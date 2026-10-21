@@ -20,7 +20,7 @@ async def test_register_creates_free_user_and_sends_verification(client: AsyncCl
     assert user["email_verified"] is False
     assert user["has_password"] is True
     assert user["plan"]["code"] == "free"
-    assert user["plan"]["limits"]["watchlist_assets"] == 25
+    assert user["plan"]["limits"]["watchlist_assets"] == 3
     assert user["profile"]["onboarding_completed_at"] is None
     assert [e.to for e in memory_outbox] == ["ana@example.com"]
     assert "/verify-email?token=" in memory_outbox[0].text

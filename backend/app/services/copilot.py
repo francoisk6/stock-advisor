@@ -10,6 +10,7 @@ from app.db.models import User
 from app.db.session import SessionLocal
 from app.repositories import assets as assets_repo
 from app.services import chat as chat_service
+from app.services.users import active_plan
 
 MAX_QUESTION_LENGTH = 2000
 
@@ -37,8 +38,10 @@ async def handle(user_id: int, request: dict[str, Any]) -> AsyncIterator[dict[st
         if limit is not None and used >= limit:
             yield {
                 "event": "error",
-                "detail": f"You've used all {limit} copilot questions for today. "
-                "They reset at midnight (UTC).",
+                "code": "plan_limit",
+                "detail": f"You've used all {limit} copilot questions for today on the "
+                f"{active_plan(user).name} plan. They reset at midnight (UTC). "
+                "Pro (coming soon) has no daily limit.",
             }
             return
 

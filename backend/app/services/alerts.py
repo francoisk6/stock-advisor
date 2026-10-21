@@ -22,7 +22,7 @@ from app.market_data import service as market
 from app.market_data.types import Quote
 from app.services import email as email_service
 from app.services import notifications as notifications_service
-from app.services.plans import check_limit
+from app.services.plans import PRO_SOON, check_limit
 
 
 class AlertKind(str, Enum):
@@ -35,7 +35,8 @@ class AlertKind(str, Enum):
 ONE_SHOT = {AlertKind.price_above, AlertKind.price_below}
 MAX_MOVE_PERCENT = Decimal("50")
 LIMIT_MESSAGE = (
-    "Your {plan} plan allows up to {limit} active alerts. Delete or pause one to add another."
+    "The {plan} plan allows up to {limit} active alerts. Delete or pause one to add another. "
+    + PRO_SOON
 )
 
 

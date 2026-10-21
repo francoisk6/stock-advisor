@@ -315,7 +315,9 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       account ($10,000 virtual, closed markets wait, copilot trades with undo), portfolio tracker
       (allocation + plain risk overview, values in your currency), tab navigation, 8 lessons with
       quizzes and progress. Verified unit + live e2e (one flow at a time).
-- [ ] **Phase 7 — Monetization:** plans, quotas, Stripe + in-app purchases, Pro features.
+- [ ] **Phase 7 — Monetization (payments later):** steps: 1 plan limits + prices ✓ · 2 plan &
+      usage API · 3 plans screen, upgrade prompts, interest sign-up · 4 grant Pro to testers.
+      Stripe + in-app purchases move to launch.
 - [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
       (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.
 
@@ -351,7 +353,11 @@ stock-advisor-dev/
 - Enumerated values are stored as `VARCHAR` and validated by Pydantic enums (`app/schemas/`),
   not MySQL `ENUM` (easier migrations).
 - User-facing errors: raise `AppError` subclasses (`app/core/errors.py`) with a plain-language
-  message; the frontend shows `detail` as-is.
+  message; the frontend shows `detail` as-is. A subclass may set `code` (sent as `"code"`, e.g.
+  `plan_limit` from `PlanLimitReached`) so the app can react (upgrade prompt).
+- Tests that change plan limits use the `free_limits(**changes)` fixture (restores the exact
+  previous limits): plans aren't cleared between tests, and hard-coded "restores" once left the
+  test DB on old limits.
 - Auth: access JWT (15 min) + opaque refresh token stored hashed, rotated on each use; reuse
   after a 10 s grace revokes the whole family. Email tokens are single-use and hashed.
   Login errors never reveal whether an email exists. Rate limits are in-memory (one worker).
@@ -505,6 +511,10 @@ nice -n 19 flutter build web        # low priority: shared server
   live FX rate); orders on closed markets wait for the open; no fees/shorting/leverage; the
   copilot may place practice trades (undo card), never real ones. Learning hub (lessons +
   quizzes) added as step 6. Glossary content served by the backend (shared with the copilot).
+- 2026-10-21 — Phase 7 (payments later): Pro = $4.99/month or $39.99/year (USD), not for sale
+  yet. Free: 3 watchlist assets, 5 copilot questions/day (were 25/30); Pro: unlimited both (the
+  one-at-a-time model queue stays; revisit when the AI moves off this server). Users over a new
+  limit keep what they have but can't add more. Stripe / store billing at launch.
 - 2026-10-17 — Phase 4: copilot on qwen3:4b-instruct (non-thinking) for speed on CPU; chat
   streamed over the existing WebSocket; app actions run immediately with undo cards; web and
   news search deferred to Phase 5.

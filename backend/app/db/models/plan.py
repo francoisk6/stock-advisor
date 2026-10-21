@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import JSON, BigInteger, Boolean, DateTime, ForeignKey, String
+from sqlalchemy import JSON, BigInteger, Boolean, DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -22,6 +23,9 @@ class Plan(TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     limits: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    # Prices in US dollars (None: not for sale). Payment providers come at launch.
+    price_monthly_usd: Mapped[Decimal | None] = mapped_column(Numeric(8, 2))
+    price_yearly_usd: Mapped[Decimal | None] = mapped_column(Numeric(8, 2))
 
 
 class UserPlan(TimestampMixin, Base):

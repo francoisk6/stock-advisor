@@ -30,26 +30,26 @@ with sync_playwright() as p:
         expect(page.get_by_role("button", name="Ask Copilot")).to_be_visible(timeout=15000)
         page.get_by_role("button", name="Ask Copilot").click()
         wait_for_text(page, "Hi Cora!")
-        wait_for_text(page, "30 questions left today")
+        wait_for_text(page, "5 questions left today")
         step("copilot opens with starters and the daily allowance")
 
         page.get_by_role("button", name="How is Bitcoin doing this week?").click()
         # The answer must quote a dollar price taken from the tool, then finish.
         wait_for_text(page, r"\$\d[\d,]*", timeout=180)
-        wait_for_text(page, "29 questions left today", timeout=180)
+        wait_for_text(page, "4 questions left today", timeout=180)
         step("answer streamed with a real price; allowance counted")
 
         fill(page, "Ask about a stock, coin or market…", "Add Saudi Aramco to my watchlist")
         page.keyboard.press("Enter")
         wait_for_text(page, r"Added Saudi Aramco \(Saudi Arabian Oil Company\) to your watchlist", timeout=180)
-        wait_for_text(page, "28 questions left today", timeout=180)
+        wait_for_text(page, "3 questions left today", timeout=180)
         watchlist = api("/watchlist", token=tokens["access_token"], method="GET")
         assert [i["symbol"] for i in watchlist["items"]] == ["2222.SR"], watchlist["items"]
         step("app action: Aramco really added, with an action card")
 
         fill(page, "Ask about a stock, coin or market…", "Why did Bitcoin move today?")
         page.keyboard.press("Enter")
-        wait_for_text(page, "27 questions left today", timeout=240)
+        wait_for_text(page, "2 questions left today", timeout=240)
         snapshot = page.locator("body").aria_snapshot()
         assert "](n" not in snapshot and "](w" not in snapshot, "unresolved citation shown"
         convo = api("/chat/conversations", token=tokens["access_token"], method="GET")[0]

@@ -4,7 +4,6 @@ from collections.abc import AsyncIterator
 import httpx
 import pytest
 from httpx import AsyncClient
-from sqlalchemy import update
 
 from app.ai import agent
 from app.ai.ollama import OllamaProvider, parse_tool_calls
@@ -18,8 +17,6 @@ from app.ai.types import (
     ToolCalls,
     ToolSpec,
 )
-from app.db.models import Plan
-from app.db.session import SessionLocal
 from app.market_data import service as market
 from app.market_data.types import Range
 from app.services import copilot
@@ -84,7 +81,7 @@ async def test_plain_answer_is_streamed_and_saved(client: AsyncClient, user: dic
     assert kinds(events) == ["conversation", "status", "delta", "delta", "done"]
     assert events[0]["title"] == "hi there"
     done = events[-1]
-    assert done["text"] == "Hello Ana!" and done["remaining_today"] == 29
+    assert done["text"] == "Hello Ana!" and done["remaining_today"] == 4  # Free: 5 a day
 
     system = scripted.calls[0][0]
     assert system.role == "system"
@@ -168,43 +165,15 @@ async def test_tool_errors_are_explained_by_the_model(user: dict, llm, fakes) ->
     assert events[-1]["event"] == "done"
 
 
-async def test_daily_limit(user: dict, llm) -> None:
-    async with SessionLocal() as session:
-        await session.execute(
-            update(Plan)
-            .where(Plan.code == "free")
-            .values(
-                limits={
-                    "watchlist_assets": 25,
-                    "ai_messages_per_day": 1,
-                    "alerts": 10,
-                    "digests_per_day": 1,
-                }
-            )
-        )
-        await session.commit()
-    try:
-        llm(say("one"), say("two"))
-        first = await ask(user, "first")
-        second = await ask(user, "second")
-        assert first[-1]["event"] == "done" and first[-1]["remaining_today"] == 0
-        assert kinds(second) == ["error"]
-        assert "used all 1 copilot questions" in second[0]["detail"]
-    finally:
-        async with SessionLocal() as session:
-            await session.execute(
-                update(Plan)
-                .where(Plan.code == "free")
-                .values(
-                    limits={
-                        "watchlist_assets": 25,
-                        "ai_messages_per_day": 30,
-                        "alerts": 10,
-                        "digests_per_day": 1,
-                    }
-                )
-            )
-            await session.commit()
+async def test_daily_limit(user: dict, llm, free_limits) -> None:
+    await free_limits(ai_messages_per_day=1)
+    llm(say("one"), say("two"))
+    first = await ask(user, "first")
+    second = await ask(user, "second")
+    assert first[-1]["event"] == "done" and first[-1]["remaining_today"] == 0
+    assert kinds(second) == ["error"] and second[0]["code"] == "plan_limit"
+    assert "used all 1 copilot questions for today on the Free plan" in second[0]["detail"]
+    assert "Pro (coming soon) has no daily limit" in second[0]["detail"]
 
 
 async def test_model_down_and_endless_tools(client: AsyncClient, user: dict, llm, fakes) -> None:
@@ -212,7 +181,7 @@ async def test_model_down_and_endless_tools(client: AsyncClient, user: dict, llm
     events = await ask(user, "hello?")
     assert events[-1] == {"event": "error", "detail": agent.UNAVAILABLE}
     usage = (await client.get("/chat/usage", headers=bearer(user))).json()
-    assert usage == {"used_today": 0, "limit": 30}  # failed answers don't count
+    assert usage == {"used_today": 0, "limit": 5}  # failed answers don't count
 
     llm(*[call("get_quote", asset="BTC")] * 10)
     events = await ask(user, "loop forever")

@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.errors import AppError, NotFoundError
 from app.db.models import Asset, Holding, User
 from app.market_data import service as market
-from app.services.plans import check_limit
+from app.services.plans import PRO_SOON, check_limit
 
 CENT = Decimal("0.01")
 UNIT = Decimal("0.00000001")
@@ -269,7 +269,7 @@ async def add(
             user,
             "portfolio_holdings",
             count or 0,
-            "Your {plan} plan can track up to {limit} holdings.",
+            "The {plan} plan can track up to {limit} holdings. " + PRO_SOON,
         )
         holding = Holding(
             user_id=user.id,

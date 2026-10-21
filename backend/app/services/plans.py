@@ -5,6 +5,10 @@ from app.services.users import active_plan
 
 class PlanLimitReached(AppError):
     status_code = 403
+    code = "plan_limit"
+
+
+PRO_SOON = "Pro (coming soon) has no limit."
 
 
 def plan_limit(user: User, key: str) -> int | None:

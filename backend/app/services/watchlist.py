@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Asset, User, Watchlist, WatchlistItem
-from app.services.plans import check_limit
+from app.services.plans import PRO_SOON, check_limit
 
 DEFAULT_NAME = "My watchlist"
 
@@ -37,8 +37,8 @@ async def add(session: AsyncSession, user: User, asset: Asset) -> Watchlist:
         user,
         "watchlist_assets",
         len(watchlist.items),
-        "Your {plan} plan allows up to {limit} assets in your watchlist. "
-        "Remove one to add another.",
+        "The {plan} plan allows up to {limit} assets in your watchlist. "
+        "Remove one to add another. " + PRO_SOON,
     )
     position = max((i.position for i in watchlist.items), default=-1) + 1
     watchlist.items.append(WatchlistItem(asset_id=asset.id, asset=asset, position=position))
