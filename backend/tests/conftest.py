@@ -186,3 +186,20 @@ async def free_limits():
     async with SessionLocal() as session:
         await session.execute(update(Plan).where(Plan.code == "free").values(limits=original))
         await session.commit()
+
+
+@pytest.fixture
+def fakes(monkeypatch: pytest.MonkeyPatch):
+    """Fake Yahoo/CoinGecko providers (never call real APIs in unit tests)."""
+    from app.market_data import service as market
+    from app.market_data.types import Range
+    from tests.fakes import FakeProvider
+
+    providers = {
+        "yahoo": FakeProvider("yahoo"),
+        "coingecko": FakeProvider("coingecko", (Range.d1,)),
+    }
+    monkeypatch.setattr(market, "providers", providers)
+    market.cache.clear()
+    yield providers
+    market.cache.clear()

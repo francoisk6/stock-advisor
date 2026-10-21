@@ -32,8 +32,9 @@ def active_plan(user: User) -> Plan:
         for up in user.plans
         if up.status == "active" and (up.ends_at is None or up.ends_at > now)
     ]
-    # Latest active subscription wins (e.g. Pro started after Free).
-    return max(current, key=lambda up: up.started_at).plan
+    # Latest active subscription wins (e.g. Pro started after Free); the newer row breaks a
+    # tie within the same second (a tester granted Pro right after signing up).
+    return max(current, key=lambda up: (up.started_at, up.id or 0)).plan
 
 
 def to_user_out(user: User) -> UserOut:

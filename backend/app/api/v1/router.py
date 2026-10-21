@@ -10,6 +10,7 @@ from app.api.v1 import (
     learn,
     live,
     notifications,
+    plans,
     portfolio,
     practice,
     users,
@@ -29,4 +30,5 @@ api_router.include_router(digest.router)
 api_router.include_router(learn.router)
 api_router.include_router(practice.router)
 api_router.include_router(portfolio.router)
+api_router.include_router(plans.router)
 api_router.include_router(live.router)

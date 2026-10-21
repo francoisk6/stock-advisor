@@ -17,11 +17,8 @@ from app.ai.types import (
     ToolCalls,
     ToolSpec,
 )
-from app.market_data import service as market
-from app.market_data.types import Range
 from app.services import copilot
 from tests.conftest import bearer, register
-from tests.fakes import FakeProvider
 
 
 class ScriptedLLM:
@@ -52,18 +49,6 @@ def say(*parts: str) -> list[ProviderEvent]:
 
 def call(name: str, **arguments) -> list[ProviderEvent]:
     return [ToolCalls([ToolCall(name, arguments)])]
-
-
-@pytest.fixture
-def fakes(monkeypatch: pytest.MonkeyPatch) -> dict[str, FakeProvider]:
-    providers = {
-        "yahoo": FakeProvider("yahoo"),
-        "coingecko": FakeProvider("coingecko", (Range.d1,)),
-    }
-    monkeypatch.setattr(market, "providers", providers)
-    market.cache.clear()
-    yield providers
-    market.cache.clear()
 
 
 async def ask(user: dict, text: str, **extra) -> list[dict]:

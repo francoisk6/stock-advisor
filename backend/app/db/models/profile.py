@@ -33,4 +33,7 @@ class UserProfile(TimestampMixin, Base):
         Boolean, nullable=False, default=False, server_default=false()
     )
 
+    # "Tell me when Pro is ready" (payments come at launch).
+    pro_interest_at: Mapped[datetime | None] = mapped_column(DateTime)
+
     user: Mapped[User] = relationship(back_populates="profile")
