@@ -1,8 +1,8 @@
 # Terms of use
 
-Last updated: [TO FILL: date the beta opens]
+Last updated: 22 October 2026
 
-These terms apply to Universal Stock Advisor ("the app"), run by [TO FILL: operator name]. By creating an account you agree to them. Contact: [TO FILL: contact email].
+These terms apply to Universal Stock Advisor ("the app"), run by Francois Kassis. By creating an account you agree to them. Contact: francois.kassis@gmail.com.
 
 ## A closed beta
 
@@ -22,7 +22,7 @@ Practice trades use virtual money at real prices. Practice results can't be with
 
 ## Your account
 
-Keep your sign-in details safe and tell us if you think someone else used your account. You must be at least [TO FILL: minimum age, e.g. 18] years old. Don't misuse the app: no attempts to break or overload it, no scraping, no use against the law.
+Keep your sign-in details safe and tell us if you think someone else used your account. You must be at least 18 years old. Don't misuse the app: no attempts to break or overload it, no scraping, no use against the law.
 
 ## Plans
 

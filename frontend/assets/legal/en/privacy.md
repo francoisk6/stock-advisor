@@ -1,8 +1,8 @@
 # Privacy policy
 
-Last updated: [TO FILL: date the beta opens]
+Last updated: 22 October 2026
 
-Universal Stock Advisor ("the app", "we") is run by [TO FILL: operator name]. This page explains what we collect, why, and the choices you have. Contact: [TO FILL: contact email].
+Universal Stock Advisor ("the app", "we") is run by Francois Kassis. This page explains what we collect, why, and the choices you have. Contact: francois.kassis@gmail.com.
 
 ## What we collect
 
@@ -27,15 +27,15 @@ We don't sell your data, and we don't show ads.
 - **Market data and news** come from outside sources (for example price and news providers). We request prices and headlines from them; we don't send them your personal data.
 - **Web search** for the Copilot goes through our own search service, which queries public search engines with the words of your question, not with your identity.
 - **Google**, only if you choose "Sign in with Google".
-- **Email delivery** through our email provider ([TO FILL: email provider]).
+- **Email delivery** through our email provider, Google (Gmail).
 
 ## How long we keep it
 
-As long as you have an account. When you delete your account (Profile → Delete account), your data is deleted, apart from what the law requires us to keep and backups, which are overwritten within [TO FILL: e.g. 14] days.
+As long as you have an account. When you delete your account (Profile → Delete account), your data is deleted, apart from what the law requires us to keep and backups, which are overwritten within 14 days.
 
 ## Your choices and rights
 
-You can see and change most of your data in the app, turn email off in Profile, and delete your account at any time. You can also ask us for a copy of your data or ask questions at [TO FILL: contact email]. Depending on where you live you may have further rights under data-protection law.
+You can see and change most of your data in the app, turn email off in Profile, and delete your account at any time. You can also ask us for a copy of your data or ask questions at francois.kassis@gmail.com. Depending on where you live you may have further rights under data-protection law.
 
 ## Security
 
