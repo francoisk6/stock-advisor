@@ -34,8 +34,9 @@ cyberia/idm/sodetel/terranet bot workers, mailbot). Stock Adviser must never deg
   **dedicated MySQL user** granted on those DBs only. Never touch other schemas or global config.
 - Ports: never use 80, 8000, 8008, 8080, 8100, 3306. Our range is **8200–8299**:
   backend API `8200`, Flutter web dev `8210`, SearXNG `8220`, e2e API/web `8290`/`8291`,
-  **production** API `8250` (127.0.0.1), Caddy's unused HTTP port `8298`. Public: **443 only**
-  (Caddy, production beta; see docs/PRODUCTION.md).
+  **production** API `8250` on the WireGuard address **10.0.0.2 only** (the VPS nginx at
+  10.0.0.1 is the public door, as for evolution); the prod web app is an Apache vhost on :8000
+  (`infra/apache/`). Nothing of ours listens publicly on this server (docs/PRODUCTION.md).
   Ollama stays on `127.0.0.1:11434`.
   Dev services bind to `127.0.0.1` by default; use `0.0.0.0` only for LAN testing (see
   "LAN access"). `0.0.0.0` also exposes them on the WireGuard interface (10.0.0.2).
@@ -323,8 +324,9 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       Stripe + in-app purchases move to launch.
 - [ ] **Phase 8 — Closed web beta:** steps: 1 beta gate + production hardening + legal pages ✓ ·
       2–6 prepared, waiting for the owner (docs/PRODUCTION.md: network/DNS, secrets, the sudo
-      steps): prod copy + own DB + `stock-advisor-api` system service on 127.0.0.1:8250,
-      Caddy HTTPS on 443, email, backups + health alerts (cron), `infra/deploy.sh <tag>`.
+      steps): prod copy + own DB + `stock-advisor-api` system service on 10.0.0.2:8250,
+      Apache vhost on :8000 for the web app, VPS nginx + certbot (evolution's pattern), email,
+      backups + health alerts (cron), `infra/deploy.sh <tag>`.
       Public launch, stores, payments and licensed data come after the beta.
 
 ## Repository layout
@@ -338,7 +340,8 @@ stock-advisor-dev/
 ├── frontend/           Flutter app — web + android (lib/core, lib/features, lib/l10n, test/)
 ├── e2e/                Playwright browser flows (run.sh starts backend + web build, cleans up)
 ├── infra/              mysql/ · ollama/ · docker/ install scripts · searxng/ (compose + settings)
-│                       · prod/ (DB, service, backup, health, setup) · caddy/ · deploy.sh
+│                       · prod/ (DB, service, backup, health, setup) · apache/ (our vhost)
+│                       · nginx/ (VPS site) · deploy.sh
 └── docs/               RUNBOOK.md (run/build/release/setup), PRODUCTION.md (beta deploy)
 ```
 
@@ -538,11 +541,13 @@ nice -n 19 flutter build web        # low priority: shared server
   yet. Free: 3 watchlist assets, 5 copilot questions/day (were 25/30); Pro: unlimited both (the
   one-at-a-time model queue stays; revisit when the AI moves off this server). Users over a new
   limit keep what they have but can't add more. Stripe / store billing at launch.
-- 2026-10-22 — Phase 8 = invite-only **web** beta on this server: own HTTPS proxy (Caddy) on
-  port 443 (Apache keeps 80, untouched) → 443 is the one deliberate public port (exception to
-  the 127.0.0.1 rule); `http://` on the bare domain still reaches evolution's Apache, so only
-  share `https://` links until a redirect or a move. Free data sources (yfinance, Google News)
-  stay for the closed beta only. AI stays on local Ollama. Mobile stores later.
+- 2026-10-22 — Phase 8 = invite-only **web** beta, hosted like evolution's production: the VPS
+  (164.92.140.58) nginx + certbot terminates HTTPS (and redirects http→https) and forwards over
+  WireGuard to this server — web app via **our own Apache vhost on :8000** (owner's explicit OK;
+  installed only through `infra/apache/install_vhost.sh`, which config-tests before a graceful
+  reload), API straight to 10.0.0.2:8250. DNS → the VPS IP. Free data sources (yfinance, Google
+  News) stay for the closed beta only. AI stays on local Ollama. Mobile stores later.
+  (`/home/evo/stock-advisor` was world-writable; set to 755.)
 - 2026-10-17 — Phase 4: copilot on qwen3:4b-instruct (non-thinking) for speed on CPU; chat
   streamed over the existing WebSocket; app actions run immediately with undo cards; web and
   news search deferred to Phase 5.

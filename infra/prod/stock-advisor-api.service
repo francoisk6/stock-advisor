@@ -1,17 +1,18 @@
 # Production API (closed web beta) as a system service running as user evo.
 # Installed by infra/prod/install_service.sh (sudo). Evolution has priority: low CPU priority,
-# capped CPU and memory, one worker, listening on 127.0.0.1 only (Caddy is the public door).
+# capped CPU and memory, one worker. Listens only on the WireGuard address 10.0.0.2 (not the
+# LAN, not the internet): the VPS nginx (10.0.0.1) is the public door, as for evolution.
 #   sudo systemctl {status,restart} stock-advisor-api     journalctl -u stock-advisor-api
 [Unit]
-Description=Universal Stock Advisor API (production, 127.0.0.1:8250)
-After=network-online.target mysql.service
-Wants=network-online.target
+Description=Universal Stock Advisor API (production, 10.0.0.2:8250 over WireGuard)
+After=network-online.target mysql.service wg-quick@wg0.service
+Wants=network-online.target wg-quick@wg0.service
 
 [Service]
 User=evo
 Group=evo
 WorkingDirectory=/home/evo/stock-advisor/stock-advisor-prod/backend
-ExecStart=/home/evo/stock-advisor/stock-advisor-prod/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8250 --workers 1 --proxy-headers --forwarded-allow-ips 127.0.0.1 --no-server-header
+ExecStart=/home/evo/stock-advisor/stock-advisor-prod/backend/.venv/bin/uvicorn app.main:app --host 10.0.0.2 --port 8250 --workers 1 --proxy-headers --forwarded-allow-ips 10.0.0.1 --no-server-header
 Nice=10
 CPUQuota=150%
 MemoryMax=1500M

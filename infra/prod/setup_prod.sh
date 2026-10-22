@@ -31,5 +31,7 @@ Next (see docs/PRODUCTION.md):
   1. Edit $PROD/backend/.env
   2. bash $DEV/infra/prod/create_prod_db.sh        # uses sudo mysql; own DB + user only
   3. sudo bash $DEV/infra/prod/install_service.sh   # the API service (one systemd file)
+     sudo bash $DEV/infra/apache/install_vhost.sh    # our vhost on Apache :8000 (tested first)
+     + the VPS nginx site and certbot (docs/PRODUCTION.md)
   4. Fill the [TO FILL] parts of frontend/assets/legal/en/*.md, commit, tag, deploy.
 NEXT

@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
-# Every 5 minutes (cron): is the production API up, directly and through Caddy's HTTPS?
+# Every 5 minutes (cron): is production up — the API directly (WireGuard address), then the
+# whole public path (VPS nginx → WireGuard → API + database, and the web app via Apache)?
 # Emails OPS_ALERT_EMAIL after 2 failed checks in a row, and again when it's back.
-# Checks from this machine (Caddy is reached via 127.0.0.1, so no router "hairpin" needed);
-# an outside uptime monitor is still worth adding for "is it reachable from the internet".
 set -uo pipefail
 
 PROD="$HOME/stock-advisor/stock-advisor-prod"
 STATE="$HOME/.cache/stock-advisor-health"
-API_HOST="api.universal-stock-advisor.trade"
+API="https://api.universal-stock-advisor.trade/api/v1"
+WEB="https://universal-stock-advisor.trade/"
 mkdir -p "$(dirname "$STATE")"
 
 problem=""
-curl -fsS -m 10 "http://127.0.0.1:8250/api/v1/health" >/dev/null || problem="API not answering on 127.0.0.1:8250"
+curl -fsS -m 10 "http://10.0.0.2:8250/api/v1/health" >/dev/null \
+  || problem="API not answering on 10.0.0.2:8250 (service or WireGuard down)"
 if [[ -z "$problem" ]]; then
-  curl -fsS -m 10 --resolve "$API_HOST:443:127.0.0.1" "https://$API_HOST/api/v1/health/db" >/dev/null \
-    || problem="HTTPS (Caddy) or the database check failing"
+  curl -fsS -m 15 "$API/health/db" >/dev/null \
+    || problem="Public API path failing (VPS nginx, certificate, WireGuard or database)"
+fi
+if [[ -z "$problem" ]]; then
+  curl -fsS -m 15 -o /dev/null "$WEB" || problem="Web app not served (VPS nginx or Apache vhost)"
 fi
 
 failures=$(cat "$STATE" 2>/dev/null || echo 0)

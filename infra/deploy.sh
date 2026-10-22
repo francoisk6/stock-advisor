@@ -39,11 +39,12 @@ nice -n 19 flutter build web --release --output build/prod-web \
   ${GOOGLE_ID:+--dart-define=GOOGLE_WEB_CLIENT_ID=$GOOGLE_ID} >/dev/null
 mkdir -p "$WEB_DIR"
 rsync -a --delete build/prod-web/ "$WEB_DIR/"
-echo "== web app built and published"
+chmod -R a+rX "$WEB_DIR"   # Apache (www-data) serves it
+echo "== web app built and published (Apache serves it as-is; no reload needed)"
 
 sudo systemctl restart stock-advisor-api
 for _ in $(seq 1 60); do
-  if curl -fsS -m 3 http://127.0.0.1:8250/api/v1/health/db >/dev/null 2>&1; then
+  if curl -fsS -m 3 http://10.0.0.2:8250/api/v1/health/db >/dev/null 2>&1; then
     echo "== $TAG is live"; exit 0
   fi
   sleep 2
