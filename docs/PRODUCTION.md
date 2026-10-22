@@ -45,7 +45,7 @@ out a **tag**. Secrets: `stock-advisor-prod/backend/.env` (chmod 600, never comm
 
 Quick checks on the home server (before switching the VPS): `curl -s http://10.0.0.2:8250/api/v1/health` and
 `curl -sI http://127.0.0.1:8251/` (200 with our index.html after the first deploy; 404 before).
-If a firewall (ufw) is active here, allow 10.0.0.1 → port 8250 on `wg0` (8000 already works for evolution).
+If a firewall (ufw) is active here, allow 10.0.0.1 → ports 8250 and 8251 on `wg0`.
 
 ## Last step — switch the VPS from dev to production
 
