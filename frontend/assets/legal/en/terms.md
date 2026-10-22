@@ -38,4 +38,4 @@ You can delete your account at any time in Profile. We may suspend accounts that
 
 ## Changes and law
 
-We may update these terms and will show the date above; important changes will be announced in the app or by email. These terms are governed by the law of [TO FILL: country / jurisdiction].
+We may update these terms and will show the date above; important changes will be announced in the app or by email. These terms are governed by the law of Lebanon.
