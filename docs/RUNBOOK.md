@@ -13,7 +13,7 @@ Copy-paste commands for running, building and setting up the project. All paths 
 | Web app (dev) | `http://localhost:8210` — or `http://192.168.150.101:8210` on the LAN |
 | Ollama (AI model) | `http://127.0.0.1:11434` (server only) |
 | SearXNG (web search, Phase 5) | `http://127.0.0.1:8220` (server only) |
-| Production (planned, Phase 8) | web `https://universal-stock-advisor.trade`, API `https://api.universal-stock-advisor.trade/api/v1` |
+| Production (planned, Phase 8) | web `https://universal-stock-advisor.trade`, API `https://universal-stock-advisor.trade/api/v1` (same domain) |
 
 ---
 
@@ -137,7 +137,7 @@ Notes
 1. **Google Play Console** account (one-time $25) → *Create app* → name "Universal Stock
    Advisor", app (not game), free.
 2. **Before the first public release** (Play requires these):
-   - Production API over HTTPS at `https://api.universal-stock-advisor.trade` (Phase 8).
+   - Production API over HTTPS at `https://universal-stock-advisor.trade/api/v1` (Phase 8).
    - App icon (still Flutter's default) and store screenshots.
    - Privacy policy URL, e.g. `https://universal-stock-advisor.trade/privacy`.
    - *Data safety* form (we store email, name, investing profile, watchlist/alerts, chats).
@@ -165,7 +165,7 @@ Notes
    ```bash
    cd ~/stock-advisor/stock-advisor-dev/frontend
    nice -n 19 flutter build appbundle --release \
-     --dart-define=API_BASE_URL=https://api.universal-stock-advisor.trade/api/v1 \
+     --dart-define=API_BASE_URL=https://universal-stock-advisor.trade/api/v1 \
      --dart-define=GOOGLE_WEB_CLIENT_ID=501047197481-o8mpb5ijn6ih0r3739amn1imvlb68sik.apps.googleusercontent.com
    ```
    Output: `build/app/outputs/bundle/release/app-release.aab` (signed with the upload key).

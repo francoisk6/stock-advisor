@@ -543,9 +543,11 @@ nice -n 19 flutter build web        # low priority: shared server
   limit keep what they have but can't add more. Stripe / store billing at launch.
 - 2026-10-22 — Phase 8 = invite-only **web** beta, hosted like evolution's production: the VPS
   (164.92.140.58) nginx + certbot terminates HTTPS (and redirects http→https) and forwards over
-  WireGuard to this server — web app via **our own Apache vhost on :8000** (owner's explicit OK;
+  WireGuard to this server. **One domain**: `/api/` → API 10.0.0.2:8250 (WebSocket upgrade +
+  1 h timeouts), everything else → **our own Apache vhost on :8000** (owner's explicit OK;
   installed only through `infra/apache/install_vhost.sh`, which config-tests before a graceful
-  reload), API straight to 10.0.0.2:8250. DNS → the VPS IP. Free data sources (yfinance, Google
+  reload); www → apex. DNS → the VPS IP. Until production is live, the VPS pointed the domain at
+  the dev servers (8200/8210). Free data sources (yfinance, Google
   News) stay for the closed beta only. AI stays on local Ollama. Mobile stores later.
   (`/home/evo/stock-advisor` was world-writable; set to 755.)
 - 2026-10-17 — Phase 4: copilot on qwen3:4b-instruct (non-thinking) for speed on CPU; chat

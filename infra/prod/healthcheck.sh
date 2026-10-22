@@ -6,7 +6,7 @@ set -uo pipefail
 
 PROD="$HOME/stock-advisor/stock-advisor-prod"
 STATE="$HOME/.cache/stock-advisor-health"
-API="https://api.universal-stock-advisor.trade/api/v1"
+API="https://universal-stock-advisor.trade/api/v1"
 WEB="https://universal-stock-advisor.trade/"
 mkdir -p "$(dirname "$STATE")"
 

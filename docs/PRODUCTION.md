@@ -3,9 +3,10 @@
 ```
 Internet ─80/443─▶ VPS 164.92.140.58: nginx + certbot (HTTPS, http→https redirect)
                      │  WireGuard 10.0.0.1 → 10.0.0.2 (this server)
-                     ├─ universal-stock-advisor.trade (+ www) → Apache :8000, our vhost
-                     │                                          → ~/stock-advisor/prod-web (Flutter build)
-                     └─ api.universal-stock-advisor.trade     → 10.0.0.2:8250 API (REST + WebSocket)
+                     ├─ universal-stock-advisor.trade/api/  → 10.0.0.2:8250 API (REST + WebSocket)
+                     └─ universal-stock-advisor.trade/…     → Apache :8000, our vhost
+                                                              → ~/stock-advisor/prod-web (Flutter build)
+                     (www → redirected to the bare domain)
                                                                 systemd stock-advisor-api, user evo,
                                                                 Nice 10, ≤1.5 CPU, ≤1.5 GB
 API ─▶ MySQL stock_advisor_prod (own user)   ·   Ollama 127.0.0.1:11434 (shared with dev)
@@ -19,9 +20,8 @@ out a **tag**. Secrets: `stock-advisor-prod/backend/.env` (chmod 600, never comm
 
 ## What you need first
 
-1. **DNS** (at your domain registrar): `A` records for `universal-stock-advisor.trade`,
-   `www.universal-stock-advisor.trade` and `api.universal-stock-advisor.trade` → **164.92.140.58**
-   (the VPS). No router changes at home.
+1. **DNS** (done): `universal-stock-advisor.trade` and `www.` → **164.92.140.58** (the VPS),
+   certificate issued by certbot. No router changes at home.
 2. **Email:** an address + Gmail app password to send from (the dev one works for the beta),
    and an address for operations alerts.
 3. **Legal texts:** fill every `[TO FILL: …]` in `frontend/assets/legal/en/*.md` (operator
@@ -43,25 +43,25 @@ out a **tag**. Secrets: `stock-advisor-prod/backend/.env` (chmod 600, never comm
 | 7 | `cd ~/stock-advisor/stock-advisor-prod/backend && .venv/bin/python -m app.admin invite add you@example.com` | Lets you create the first account. |
 | 8 | `(crontab -l 2>/dev/null; cat infra/prod/crontab.txt) \| crontab -` | Health check every 5 min (direct + the full public path; emails on down/up), nightly DB backup at 03:30 (keeps 14). |
 
-Quick checks on the home server: `curl -s http://10.0.0.2:8250/api/v1/health` and
+Quick checks on the home server (before switching the VPS): `curl -s http://10.0.0.2:8250/api/v1/health` and
 `curl -sI -H 'Host: universal-stock-advisor.trade' http://10.0.0.2:8000/` (200, our index.html).
 If a firewall (ufw) is active here, allow 10.0.0.1 → port 8250 on `wg0` (8000 already works for evolution).
 
-## One-time setup — VPS (as for evolution-portal.com)
+## Last step — switch the VPS from dev to production
+
+Until now the VPS sends the domain to the **dev** servers (`/api/` → 8200, `/` → 8210). Only
+after steps 1–8 work, replace `/etc/nginx/sites-available/universal-stock-advisor.trade` with
+`infra/nginx/universal-stock-advisor.trade.conf` (its certbot lines are the ones already
+there). Changes: `/api/` → **8250** with WebSocket upgrade + 1 h timeouts; `/` → **Apache
+:8000** (Host = our vhost); www → bare domain.
 
 ```bash
-# copy infra/nginx/universal-stock-advisor.trade.conf to the VPS, then on the VPS:
+sudo cp /etc/nginx/sites-available/universal-stock-advisor.trade ~/usa-nginx-dev.bak   # undo copy
 sudo cp universal-stock-advisor.trade.conf /etc/nginx/sites-available/universal-stock-advisor.trade
-sudo ln -s /etc/nginx/sites-available/universal-stock-advisor.trade /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx          # nginx -t first: evolution's sites live here too
-
-curl -sI http://api.universal-stock-advisor.trade/api/v1/health    # once DNS points here
-sudo certbot --nginx -d universal-stock-advisor.trade -d www.universal-stock-advisor.trade \
-  -d api.universal-stock-advisor.trade                # choose "redirect" (http → https)
+sudo nginx -t && sudo systemctl reload nginx     # nginx -t first: evolution's sites live here too
+curl -s https://universal-stock-advisor.trade/api/v1/health      # {"status":"ok",…,"environment":"prod"}
 ```
-
-Certbot adds the HTTPS blocks and renews automatically (like evolution's certificates). The
-WebSocket settings (Upgrade header, 1-hour timeouts) are in the `location` blocks certbot copies.
+To go back to dev: copy `~/usa-nginx-dev.bak` back, `nginx -t`, reload.
 
 ## Day to day
 

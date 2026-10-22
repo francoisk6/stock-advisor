@@ -8,7 +8,7 @@ set -euo pipefail
 TAG="${1:?usage: bash infra/deploy.sh <tag>}"
 PROD="$HOME/stock-advisor/stock-advisor-prod"
 WEB_DIR="$HOME/stock-advisor/prod-web"
-API_URL="https://api.universal-stock-advisor.trade/api/v1"
+API_URL="https://universal-stock-advisor.trade/api/v1"  # same domain, /api/ on the VPS
 
 load=$(cut -d' ' -f1 /proc/loadavg)
 if [[ -z "${DEPLOY_FORCE:-}" ]] && (( ${load%.*} >= 4 )); then
