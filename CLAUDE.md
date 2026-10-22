@@ -35,7 +35,8 @@ cyberia/idm/sodetel/terranet bot workers, mailbot). Stock Adviser must never deg
 - Ports: never use 80, 8000, 8008, 8080, 8100, 3306. Our range is **8200–8299**:
   backend API `8200`, Flutter web dev `8210`, SearXNG `8220`, e2e API/web `8290`/`8291`,
   **production** API `8250` on the WireGuard address **10.0.0.2 only** (the VPS nginx at
-  10.0.0.1 is the public door, as for evolution); the prod web app is an Apache vhost on :8000
+  10.0.0.1 is the public door, as for evolution); the prod web app is Apache on **our port 8251**
+  (`Listen` in our own vhost file; only 10.0.0.1/10.0.0.2/127.0.0.1 may connect)
   (`infra/apache/`). Nothing of ours listens publicly on this server (docs/PRODUCTION.md).
   Ollama stays on `127.0.0.1:11434`.
   Dev services bind to `127.0.0.1` by default; use `0.0.0.0` only for LAN testing (see
@@ -325,7 +326,7 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
 - [ ] **Phase 8 — Closed web beta:** steps: 1 beta gate + production hardening + legal pages ✓ ·
       2–6 prepared, waiting for the owner (docs/PRODUCTION.md: network/DNS, secrets, the sudo
       steps): prod copy + own DB + `stock-advisor-api` system service on 10.0.0.2:8250,
-      Apache vhost on :8000 for the web app, VPS nginx + certbot (evolution's pattern), email,
+      Apache on our port 8251 for the web app, VPS nginx + certbot (evolution's pattern), email,
       backups + health alerts (cron), `infra/deploy.sh <tag>`.
       Public launch, stores, payments and licensed data come after the beta.
 
@@ -544,9 +545,11 @@ nice -n 19 flutter build web        # low priority: shared server
 - 2026-10-22 — Phase 8 = invite-only **web** beta, hosted like evolution's production: the VPS
   (164.92.140.58) nginx + certbot terminates HTTPS (and redirects http→https) and forwards over
   WireGuard to this server. **One domain**: `/api/` → API 10.0.0.2:8250 (WebSocket upgrade +
-  1 h timeouts), everything else → **our own Apache vhost on :8000** (owner's explicit OK;
-  installed only through `infra/apache/install_vhost.sh`, which config-tests before a graceful
-  reload); www → apex. DNS → the VPS IP. Until production is live, the VPS pointed the domain at
+  1 h timeouts), everything else → **Apache on our own port 8251** (owner's explicit OK; first
+  installed on evolution's :8000, moved the same day — 8000 is evolution's; the `Listen` line is
+  in our vhost file so evolution's ports.conf stays untouched; installed only through
+  `infra/apache/install_vhost.sh`: port-free check, config test before a graceful reload,
+  Apache checked after); www → apex. DNS → the VPS IP. Until production is live, the VPS pointed the domain at
   the dev servers (8200/8210). Free data sources (yfinance, Google
   News) stay for the closed beta only. AI stays on local Ollama. Mobile stores later.
   (`/home/evo/stock-advisor` was world-writable; set to 755.)

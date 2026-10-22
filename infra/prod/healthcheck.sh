@@ -18,7 +18,10 @@ if [[ -z "$problem" ]]; then
     || problem="Public API path failing (VPS nginx, certificate, WireGuard or database)"
 fi
 if [[ -z "$problem" ]]; then
-  curl -fsS -m 15 -o /dev/null "$WEB" || problem="Web app not served (VPS nginx or Apache vhost)"
+  curl -fsS -m 10 -o /dev/null "http://127.0.0.1:8251/" || problem="Web app not served by Apache on 8251"
+fi
+if [[ -z "$problem" ]]; then
+  curl -fsS -m 15 -o /dev/null "$WEB" || problem="Web app not reachable through the VPS (nginx or WireGuard)"
 fi
 
 failures=$(cat "$STATE" 2>/dev/null || echo 0)

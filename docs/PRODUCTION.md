@@ -4,7 +4,7 @@
 Internet ─80/443─▶ VPS 164.92.140.58: nginx + certbot (HTTPS, http→https redirect)
                      │  WireGuard 10.0.0.1 → 10.0.0.2 (this server)
                      ├─ universal-stock-advisor.trade/api/  → 10.0.0.2:8250 API (REST + WebSocket)
-                     └─ universal-stock-advisor.trade/…     → Apache :8000, our vhost
+                     └─ universal-stock-advisor.trade/…     → Apache on our port 8251
                                                               → ~/stock-advisor/prod-web (Flutter build)
                      (www → redirected to the bare domain)
                                                                 systemd stock-advisor-api, user evo,
@@ -38,13 +38,13 @@ out a **tag**. Secrets: `stock-advisor-prod/backend/.env` (chmod 600, never comm
 | 2 | edit `~/stock-advisor/stock-advisor-prod/backend/.env` | `DB_PASSWORD`, `SMTP_*`, `EMAIL_FROM`, `OPS_ALERT_EMAIL` (template: `infra/prod/env.prod.example`). |
 | 3 | `bash infra/prod/create_prod_db.sh` | **`sudo mysql`**: creates database `stock_advisor_prod` and user `stock_advisor_prod` (localhost/127.0.0.1, max 20 connections) with rights on that database only. Nothing else in MySQL. |
 | 4 | `sudo bash infra/prod/install_service.sh` | **sudo**: adds `/etc/systemd/system/stock-advisor-api.service`, `daemon-reload`, `enable`. Doesn't start it. No other service touched. |
-| 5 | `sudo bash infra/apache/install_vhost.sh` | **sudo, evolution's Apache**: adds `/etc/apache2/sites-available/universal-stock-advisor.conf` (a `*:8000` vhost for our domain only), `a2ensite`, then **tests the whole config first** — reloads Apache gracefully only if the test passes, otherwise disables the vhost again and leaves Apache alone. |
+| 5 | `sudo bash infra/apache/install_vhost.sh` | **sudo, evolution's Apache**: adds `/etc/apache2/sites-available/universal-stock-advisor.conf` (our own port **8251**: the `Listen` line is in our file, evolution's `ports.conf` is untouched; only the VPS and this machine may connect), checks the port is free, `a2ensite`, then **tests the whole config first** — reloads Apache gracefully only if the test passes (otherwise disables the site again and leaves Apache alone) and checks Apache afterwards. |
 | 6 | fill legal texts → `git commit` → `git tag v0.1.0-beta` → `bash infra/deploy.sh v0.1.0-beta` | Checks out the tag in prod, migrates the prod DB, builds the web app (low priority), publishes it to `prod-web`, **sudo** restarts `stock-advisor-api` only, waits until healthy. |
 | 7 | `cd ~/stock-advisor/stock-advisor-prod/backend && .venv/bin/python -m app.admin invite add you@example.com` | Lets you create the first account. |
 | 8 | `(crontab -l 2>/dev/null; cat infra/prod/crontab.txt) \| crontab -` | Health check every 5 min (direct + the full public path; emails on down/up), nightly DB backup at 03:30 (keeps 14). |
 
 Quick checks on the home server (before switching the VPS): `curl -s http://10.0.0.2:8250/api/v1/health` and
-`curl -sI -H 'Host: universal-stock-advisor.trade' http://10.0.0.2:8000/` (200, our index.html).
+`curl -sI http://127.0.0.1:8251/` (200 with our index.html after the first deploy; 404 before).
 If a firewall (ufw) is active here, allow 10.0.0.1 → port 8250 on `wg0` (8000 already works for evolution).
 
 ## Last step — switch the VPS from dev to production
@@ -53,7 +53,7 @@ Until now the VPS sends the domain to the **dev** servers (`/api/` → 8200, `/`
 after steps 1–8 work, replace `/etc/nginx/sites-available/universal-stock-advisor.trade` with
 `infra/nginx/universal-stock-advisor.trade.conf` (its certbot lines are the ones already
 there). Changes: `/api/` → **8250** with WebSocket upgrade + 1 h timeouts; `/` → **Apache
-:8000** (Host = our vhost); www → bare domain.
+:8251** (our port); www → bare domain.
 
 ```bash
 sudo cp /etc/nginx/sites-available/universal-stock-advisor.trade ~/usa-nginx-dev.bak   # undo copy
