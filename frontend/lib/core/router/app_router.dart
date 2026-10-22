@@ -27,12 +27,19 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 import 'app_shell.dart';
 import '../../features/plans/presentation/plans_screen.dart';
+import '../../features/legal/presentation/legal_screen.dart';
 
 /// Only for signed-out users; signed-in users are sent home.
 const _guestOnly = {'/login', '/register', '/forgot-password'};
 
-/// Reachable signed in or out (opened from email links).
-const _emailLinks = {'/verify-email', '/reset-password'};
+/// Reachable signed in or out (email links, legal pages).
+const _emailLinks = {
+  '/verify-email',
+  '/reset-password',
+  '/legal/privacy',
+  '/legal/terms',
+  '/legal/disclaimer',
+};
 
 /// Pure redirect rules, kept separate so they are easy to test.
 String? authRedirect(AuthState auth, Uri uri) {
@@ -178,6 +185,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '/legal/:doc',
+        builder: (context, state) =>
+            LegalScreen(doc: state.pathParameters['doc']!),
       ),
       GoRoute(
         path: '/splash',

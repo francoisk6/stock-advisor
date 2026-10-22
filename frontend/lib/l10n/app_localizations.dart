@@ -3039,6 +3039,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See what\'s included and what you\'ve used'**
   String get profilePlanHint;
+
+  /// No description provided for @legalPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get legalPrivacy;
+
+  /// No description provided for @legalTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get legalTerms;
+
+  /// No description provided for @legalDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer'**
+  String get legalDisclaimer;
+
+  /// No description provided for @legalPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy policy'**
+  String get legalPrivacyTitle;
+
+  /// No description provided for @legalTermsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of use'**
+  String get legalTermsTitle;
+
+  /// No description provided for @legalAgree.
+  ///
+  /// In en, this message translates to:
+  /// **'By creating an account you agree to the Terms of use and the Privacy policy.'**
+  String get legalAgree;
+
+  /// No description provided for @legalLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy, terms and disclaimer'**
+  String get legalLinks;
+
+  /// No description provided for @betaBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get betaBadge;
+
+  /// No description provided for @betaNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed beta: new accounts need an invite.'**
+  String get betaNote;
 }
 
 class _AppLocalizationsDelegate

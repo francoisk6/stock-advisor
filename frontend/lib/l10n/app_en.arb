@@ -1317,5 +1317,14 @@
   "plansNotified": "Thanks! We'll let you know when Pro is ready.",
   "seePlans": "See plans",
   "planLimitTitle": "You've reached a limit of your plan",
-  "profilePlanHint": "See what's included and what you've used"
+  "profilePlanHint": "See what's included and what you've used",
+  "legalPrivacy": "Privacy",
+  "legalTerms": "Terms",
+  "legalDisclaimer": "Disclaimer",
+  "legalPrivacyTitle": "Privacy policy",
+  "legalTermsTitle": "Terms of use",
+  "legalAgree": "By creating an account you agree to the Terms of use and the Privacy policy.",
+  "legalLinks": "Privacy, terms and disclaimer",
+  "betaBadge": "Beta",
+  "betaNote": "Closed beta: new accounts need an invite."
 }

@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     email_verify_token_hours: int = 48
     password_reset_token_minutes: int = 60
 
+    # Closed beta: only invited emails can create accounts (python -m app.admin invite add …).
+    invite_only: bool = False
+
     # Google Sign-In: OAuth client IDs accepted as ID-token audience (web + android).
     google_client_ids: list[str] = Field(default_factory=list)
 
@@ -89,8 +92,33 @@ class Settings(BaseSettings):
             f"@{self.db_host}:{self.db_port}/{self.db_name}?charset=utf8mb4"
         )
 
+    @property
+    def is_prod(self) -> bool:
+        return self.environment == "prod"
+
+    def production_problems(self) -> list[str]:
+        """What makes this config unsafe for production (empty = fine)."""
+        problems = []
+        if self.debug:
+            problems.append("DEBUG must be false")
+        if self.email_backend != "smtp":
+            problems.append("EMAIL_BACKEND must be smtp")
+        if not self.frontend_url.startswith("https://"):
+            problems.append("FRONTEND_URL must be an https:// address")
+        if not self.cors_origins or any(
+            not o.startswith("https://") or "localhost" in o for o in self.cors_origins
+        ):
+            problems.append("CORS_ORIGINS must list only the https:// production origins")
+        if self.cors_origin_regex:
+            problems.append("CORS_ORIGIN_REGEX must be empty (it's for LAN testing)")
+        if self.db_name.endswith(("_dev", "_test")):
+            problems.append("DB_NAME must be the production database")
+        return problems
+
 
 settings = Settings()
 
 if len(settings.jwt_secret) < 32:
     raise RuntimeError("JWT_SECRET must be set in backend/.env (at least 32 characters)")
+if settings.is_prod and (problems := settings.production_problems()):
+    raise RuntimeError("Unsafe production settings: " + "; ".join(problems))

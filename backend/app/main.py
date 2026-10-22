@@ -2,7 +2,7 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
@@ -30,9 +30,31 @@ def _show_app_logs() -> None:
         log.setLevel(logging.INFO)
 
 
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+}
+
+
 def create_app() -> FastAPI:
     _show_app_logs()
-    app = FastAPI(title=settings.app_name, debug=settings.debug, lifespan=lifespan)
+    docs = (
+        {} if not settings.is_prod else {"docs_url": None, "redoc_url": None, "openapi_url": None}
+    )
+    app = FastAPI(title=settings.app_name, debug=settings.debug, lifespan=lifespan, **docs)
+
+    @app.middleware("http")
+    async def security_headers(request: Request, call_next) -> Response:
+        response = await call_next(request)
+        for name, value in SECURITY_HEADERS.items():
+            response.headers.setdefault(name, value)
+        if settings.is_prod:
+            response.headers.setdefault(
+                "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
+            )
+        return response
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

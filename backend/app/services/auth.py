@@ -13,6 +13,7 @@ from app.db.models import EmailToken, OAuthAccount, RefreshToken, User
 from app.repositories import tokens as tokens_repo
 from app.repositories import users as users_repo
 from app.services import email as email_service
+from app.services import invites
 from app.services.google_auth import GoogleIdentity
 from app.services.users import create_user
 
@@ -103,6 +104,7 @@ async def register(
 ) -> AuthResult:
     if await users_repo.get_by_email(session, email):
         raise ConflictError("An account with this email already exists. Try signing in.")
+    await invites.check_and_use(session, email)
     user = await create_user(
         session,
         email=email,
@@ -136,6 +138,7 @@ async def login_with_google(
             raise AuthError("Your Google email address is not verified.")
         user = await users_repo.get_by_email(session, identity.email)
         if user is None:
+            await invites.check_and_use(session, identity.email)
             user = await create_user(
                 session, email=identity.email, full_name=identity.name, password_hash=None
             )

@@ -112,8 +112,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         GoogleSection(onError: _showError),
         const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        // Wraps instead of overflowing with large text or longer translations.
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(l10n.loginNoAccount),
             TextButton(

@@ -319,8 +319,10 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       usage API ✓ · 3 plans screen, upgrade prompts, interest sign-up ✓ · 4 grant Pro to testers ✓
       (`python -m app.admin grant-pro|revoke-pro|pro-interest`, see RUNBOOK).
       Stripe + in-app purchases move to launch.
-- [ ] **Phase 8 — Launch:** production deploy, domain **universal-stock-advisor.trade**
-      (web app at the apex, API at `api.` — planned), HTTPS, monitoring, store releases.
+- [ ] **Phase 8 — Closed web beta:** steps: 1 beta gate + production hardening + legal pages ✓ ·
+      2 prod copy (own DB, API service on 127.0.0.1:8250) · 3 HTTPS (Caddy on 443, DNS) ·
+      4 email · 5 backups + monitoring · 6 deploy script. Public launch, stores, payments and
+      licensed data come after the beta.
 
 ## Repository layout
 
@@ -365,6 +367,13 @@ stock-advisor-dev/
   prices, "Tell me when Pro is ready"); limit errors (`isPlanLimit(e)`, from the API's
   `code: plan_limit`) show `showPlanLimit` (watchlist star) or `SeePlansButton` (alert and
   holding sheets, copilot daily limit via `CopilotMessage.errorCode`).
+- Beta & production: `INVITE_ONLY` + `invites` table (`app/services/invites.py`; checked at
+  registration and Google sign-up of a new account; `python -m app.admin invite add|remove|list`;
+  refusal code `invite_only`). `ENVIRONMENT=prod` → `Settings.production_problems()` must be
+  empty or the API won't start; no /docs; HSTS. Security headers on every response. Legal pages:
+  `frontend/assets/legal/en/*.md` at `/legal/privacy|terms|disclaimer` (public routes) — they
+  contain `[TO FILL: …]` placeholders the owner must complete before inviting anyone (the deploy
+  script refuses while any remain). Beta builds: `--dart-define=BETA=true` (label + note).
 - Tests that change plan limits use the `free_limits(**changes)` fixture (restores the exact
   previous limits): plans aren't cleared between tests, and hard-coded "restores" once left the
   test DB on old limits.
@@ -525,6 +534,11 @@ nice -n 19 flutter build web        # low priority: shared server
   yet. Free: 3 watchlist assets, 5 copilot questions/day (were 25/30); Pro: unlimited both (the
   one-at-a-time model queue stays; revisit when the AI moves off this server). Users over a new
   limit keep what they have but can't add more. Stripe / store billing at launch.
+- 2026-10-22 — Phase 8 = invite-only **web** beta on this server: own HTTPS proxy (Caddy) on
+  port 443 (Apache keeps 80, untouched) → 443 is the one deliberate public port (exception to
+  the 127.0.0.1 rule); `http://` on the bare domain still reaches evolution's Apache, so only
+  share `https://` links until a redirect or a move. Free data sources (yfinance, Google News)
+  stay for the closed beta only. AI stays on local Ollama. Mobile stores later.
 - 2026-10-17 — Phase 4: copilot on qwen3:4b-instruct (non-thinking) for speed on CPU; chat
   streamed over the existing WebSocket; app actions run immediately with undo cards; web and
   news search deferred to Phase 5.

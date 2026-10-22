@@ -6,6 +6,7 @@ from app.db.models.chat import ChatConversation, ChatMessageRow
 from app.db.models.daily import JobRun, PriceBarDaily
 from app.db.models.digest import Digest
 from app.db.models.insight import AssetInsight
+from app.db.models.invite import Invite
 from app.db.models.lesson import LessonProgress
 from app.db.models.news import NewsArticle, NewsArticleAsset
 from app.db.models.plan import Plan, UserPlan
@@ -25,6 +26,7 @@ __all__ = [
     "Digest",
     "EmailToken",
     "Holding",
+    "Invite",
     "JobRun",
     "LessonProgress",
     "NewsArticle",

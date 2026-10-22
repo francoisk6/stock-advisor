@@ -32,6 +32,7 @@ assert settings.db_name == "stock_advisor_test", "tests must never touch the dev
 
 # Tables reset between tests (children first); plans keep their migration seed data.
 _RESET_TABLES = [
+    "invites",
     "lesson_progress",
     "holdings",
     "practice_orders",
@@ -203,3 +204,28 @@ def fakes(monkeypatch: pytest.MonkeyPatch):
     market.cache.clear()
     yield providers
     market.cache.clear()
+
+
+GOOGLE_TOKEN = "fake-google-id-token-123456"
+
+
+@pytest.fixture
+def google_identity(monkeypatch: pytest.MonkeyPatch) -> dict:
+    """Replaces Google's token verification; mutate the returned dict to change the identity."""
+    from app.api.v1 import auth as auth_routes
+    from app.services.google_auth import GoogleAuthError, GoogleIdentity
+
+    identity = {
+        "subject": "g-123",
+        "email": "ana@example.com",
+        "email_verified": True,
+        "name": "Ana Google",
+    }
+
+    async def fake_verify(token: str) -> GoogleIdentity:
+        if token != GOOGLE_TOKEN:
+            raise GoogleAuthError("Invalid Google token")
+        return GoogleIdentity(**identity)
+
+    monkeypatch.setattr(auth_routes, "verify_google_id_token", fake_verify)
+    return identity

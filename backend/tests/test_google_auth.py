@@ -1,30 +1,6 @@
-import pytest
 from httpx import AsyncClient
 
-from app.api.v1 import auth as auth_routes
-from app.services.google_auth import GoogleAuthError, GoogleIdentity
-from tests.conftest import PASSWORD, register, token_from_last_email
-
-GOOGLE_TOKEN = "fake-google-id-token-123456"
-
-
-@pytest.fixture
-def google_identity(monkeypatch: pytest.MonkeyPatch) -> dict:
-    """Replaces Google's token verification; mutate the returned dict to change the identity."""
-    identity = {
-        "subject": "g-123",
-        "email": "ana@example.com",
-        "email_verified": True,
-        "name": "Ana Google",
-    }
-
-    async def fake_verify(token: str) -> GoogleIdentity:
-        if token != GOOGLE_TOKEN:
-            raise GoogleAuthError("Invalid Google token")
-        return GoogleIdentity(**identity)
-
-    monkeypatch.setattr(auth_routes, "verify_google_id_token", fake_verify)
-    return identity
+from tests.conftest import GOOGLE_TOKEN, PASSWORD, register, token_from_last_email
 
 
 async def google_login(client: AsyncClient, token: str = GOOGLE_TOKEN):

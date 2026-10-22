@@ -4,6 +4,9 @@
     .venv/bin/python -m app.admin grant-pro someone@example.com --forever
     .venv/bin/python -m app.admin revoke-pro someone@example.com
     .venv/bin/python -m app.admin pro-interest        # who asked to hear about Pro
+    .venv/bin/python -m app.admin invite add someone@example.com --note "friend of Ana"
+    .venv/bin/python -m app.admin invite remove someone@example.com
+    .venv/bin/python -m app.admin invite list         # closed beta (INVITE_ONLY=true)
 
 Payments come at launch; until then Pro is granted by hand to testers.
 """
@@ -16,7 +19,7 @@ from sqlalchemy import func, select
 
 from app.db.models import User
 from app.db.session import SessionLocal, engine
-from app.services import plans
+from app.services import invites, plans
 
 
 async def _user(session, email: str) -> User:
@@ -39,6 +42,13 @@ async def main(argv: list[str] | None = None) -> None:
     revoke = commands.add_parser("revoke-pro", help="end a tester's Pro now")
     revoke.add_argument("email")
     commands.add_parser("pro-interest", help="list who asked to hear when Pro is ready")
+    invite = commands.add_parser("invite", help="closed beta: who may create an account")
+    invite_commands = invite.add_subparsers(dest="action", required=True)
+    invite_add = invite_commands.add_parser("add")
+    invite_add.add_argument("email")
+    invite_add.add_argument("--note")
+    invite_commands.add_parser("remove").add_argument("email")
+    invite_commands.add_parser("list")
     args = parser.parse_args(argv)
 
     try:
@@ -55,6 +65,19 @@ async def main(argv: list[str] | None = None) -> None:
                 user = await _user(session, args.email)
                 ended = await plans.revoke_pro(session, user)
                 print(f"Ended {ended} Pro grant(s) for {user.email}.")
+            elif args.command == "invite":
+                if args.action == "add":
+                    added = await invites.add(session, args.email, args.note)
+                    print(f"Invited {added.email}.")
+                elif args.action == "remove":
+                    removed = await invites.remove(session, args.email)
+                    print("Removed." if removed else "That email wasn't invited.")
+                else:
+                    rows = await invites.all_invites(session)
+                    for i in rows:
+                        used = f"joined {i.used_at:%Y-%m-%d}" if i.used_at else "not joined yet"
+                        print(f"{i.created_at:%Y-%m-%d}  {i.email}  ({used})  {i.note or ''}")
+                    print(f"{len(rows)} invites.")
             else:
                 rows = await plans.pro_interest(session)
                 for email, name, when in rows:

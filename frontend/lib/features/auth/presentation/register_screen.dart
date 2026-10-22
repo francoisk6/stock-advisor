@@ -66,6 +66,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return AuthScaffold(
+      footerNote: l10n.legalAgree,
       title: l10n.registerTitle,
       subtitle: l10n.registerSubtitle,
       children: [
@@ -132,8 +133,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         GoogleSection(onError: _showError),
         const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        // Wraps instead of overflowing with large text or longer translations.
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(l10n.registerHaveAccount),
             TextButton(

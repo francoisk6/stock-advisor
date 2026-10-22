@@ -36,6 +36,8 @@ void main() {
     for (final state in [signedOut, newUser, member]) {
       expect(go(state, '/verify-email?token=abc'), isNull);
       expect(go(state, '/reset-password?token=abc'), isNull);
+      expect(go(state, '/legal/privacy'), isNull);
+      expect(go(state, '/legal/terms'), isNull);
     }
   });
 

@@ -74,6 +74,12 @@ class ProfileScreen extends ConsumerWidget {
                     onTap: () => context.go('/plans'),
                   ),
                   ListTile(
+                    leading: const Icon(Icons.policy_outlined),
+                    title: Text(l10n.legalLinks),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/legal/privacy'),
+                  ),
+                  ListTile(
                     leading: const Icon(Icons.key_outlined),
                     title: Text(l10n.profileSignInMethods),
                     subtitle: Text(

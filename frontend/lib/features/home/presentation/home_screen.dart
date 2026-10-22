@@ -14,6 +14,7 @@ import '../../notifications/data/notifications_api.dart';
 import '../../watchlist/data/watchlist_api.dart';
 import '../../market/presentation/labels.dart';
 import '../../market/presentation/widgets/asset_tile.dart';
+import '../../../core/config/beta.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -41,7 +42,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.appTitle),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(l10n.appTitle, overflow: TextOverflow.ellipsis),
+            ),
+            if (isBeta) ...[
+              const SizedBox(width: 8),
+              Chip(
+                label: Text(l10n.betaBadge),
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: l10n.copilotTitle,

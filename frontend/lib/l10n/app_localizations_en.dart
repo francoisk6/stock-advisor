@@ -1792,4 +1792,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profilePlanHint => 'See what\'s included and what you\'ve used';
+
+  @override
+  String get legalPrivacy => 'Privacy';
+
+  @override
+  String get legalTerms => 'Terms';
+
+  @override
+  String get legalDisclaimer => 'Disclaimer';
+
+  @override
+  String get legalPrivacyTitle => 'Privacy policy';
+
+  @override
+  String get legalTermsTitle => 'Terms of use';
+
+  @override
+  String get legalAgree =>
+      'By creating an account you agree to the Terms of use and the Privacy policy.';
+
+  @override
+  String get legalLinks => 'Privacy, terms and disclaimer';
+
+  @override
+  String get betaBadge => 'Beta';
+
+  @override
+  String get betaNote => 'Closed beta: new accounts need an invite.';
 }
