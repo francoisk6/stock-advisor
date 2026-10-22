@@ -20,7 +20,11 @@ install -m 644 "$SRC" "/etc/apache2/sites-available/$NAME.conf"
 a2ensite -q "$NAME"
 if apache2ctl configtest; then
   systemctl reload apache2
-  sleep 2
+  # A graceful reload opens new ports after a few seconds (2 s was too short: false warning).
+  for _ in $(seq 1 20); do
+    systemctl is-active --quiet apache2 && ss -tln | grep -q ':8251 ' && break
+    sleep 1
+  done
   if systemctl is-active --quiet apache2 && ss -tln | grep -q ':8251 '; then
     echo "OK: $NAME enabled on our port 8251 and Apache reloaded gracefully."
   else
