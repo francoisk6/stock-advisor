@@ -1,0 +1,49 @@
+# Universal Stock Advisor — HTTPS front door (the only public listener: port 443).
+# Apache (evolution) owns port 80, so Caddy never binds it: certificates are obtained with the
+# TLS-ALPN challenge on 443, and there are no http→https redirects from here.
+{
+	email {$ACME_EMAIL}
+	http_port 8298
+	auto_https disable_redirects
+	servers {
+		protocols h1 h2
+	}
+}
+
+(security) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}
+
+universal-stock-advisor.trade {
+	tls {
+		issuer acme {
+			disable_http_challenge
+		}
+	}
+	import security
+	header X-Frame-Options DENY
+	encode zstd gzip
+	root * /srv/web
+	# Flutter web app: unknown paths (/learn/…, email links) fall back to index.html.
+	try_files {path} /index.html
+	@html path / /index.html
+	header @html Cache-Control "no-cache"
+	file_server
+}
+
+api.universal-stock-advisor.trade {
+	tls {
+		issuer acme {
+			disable_http_challenge
+		}
+	}
+	import security
+	encode zstd gzip
+	# REST + the live-updates WebSocket (/api/v1/ws).
+	reverse_proxy 127.0.0.1:8250
+}

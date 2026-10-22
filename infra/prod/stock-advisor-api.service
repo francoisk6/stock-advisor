@@ -1,0 +1,24 @@
+# Production API (closed web beta) as a system service running as user evo.
+# Installed by infra/prod/install_service.sh (sudo). Evolution has priority: low CPU priority,
+# capped CPU and memory, one worker, listening on 127.0.0.1 only (Caddy is the public door).
+#   sudo systemctl {status,restart} stock-advisor-api     journalctl -u stock-advisor-api
+[Unit]
+Description=Universal Stock Advisor API (production, 127.0.0.1:8250)
+After=network-online.target mysql.service
+Wants=network-online.target
+
+[Service]
+User=evo
+Group=evo
+WorkingDirectory=/home/evo/stock-advisor/stock-advisor-prod/backend
+ExecStart=/home/evo/stock-advisor/stock-advisor-prod/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8250 --workers 1 --proxy-headers --forwarded-allow-ips 127.0.0.1 --no-server-header
+Nice=10
+CPUQuota=150%
+MemoryMax=1500M
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

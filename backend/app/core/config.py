@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     email_verify_token_hours: int = 48
     password_reset_token_minutes: int = 60
 
+    # Where operations alerts go (site down / back up, failed backups): python -m app.ops alert
+    ops_alert_email: str | None = None
+
     # Closed beta: only invited emails can create accounts (python -m app.admin invite add …).
     invite_only: bool = False
 

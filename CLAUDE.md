@@ -33,7 +33,9 @@ cyberia/idm/sodetel/terranet bot workers, mailbot). Stock Adviser must never deg
 - MySQL: use **own databases only** (`stock_advisor_dev`, later `stock_advisor_prod`) with a
   **dedicated MySQL user** granted on those DBs only. Never touch other schemas or global config.
 - Ports: never use 80, 8000, 8008, 8080, 8100, 3306. Our range is **8200–8299**:
-  backend API `8200`, Flutter web dev `8210`, SearXNG `8220`, e2e API/web `8290`/`8291`.
+  backend API `8200`, Flutter web dev `8210`, SearXNG `8220`, e2e API/web `8290`/`8291`,
+  **production** API `8250` (127.0.0.1), Caddy's unused HTTP port `8298`. Public: **443 only**
+  (Caddy, production beta; see docs/PRODUCTION.md).
   Ollama stays on `127.0.0.1:11434`.
   Dev services bind to `127.0.0.1` by default; use `0.0.0.0` only for LAN testing (see
   "LAN access"). `0.0.0.0` also exposes them on the WireGuard interface (10.0.0.2).
@@ -320,9 +322,10 @@ Handle multiple currencies, exchange time zones, and trading hours/holidays (cry
       (`python -m app.admin grant-pro|revoke-pro|pro-interest`, see RUNBOOK).
       Stripe + in-app purchases move to launch.
 - [ ] **Phase 8 — Closed web beta:** steps: 1 beta gate + production hardening + legal pages ✓ ·
-      2 prod copy (own DB, API service on 127.0.0.1:8250) · 3 HTTPS (Caddy on 443, DNS) ·
-      4 email · 5 backups + monitoring · 6 deploy script. Public launch, stores, payments and
-      licensed data come after the beta.
+      2–6 prepared, waiting for the owner (docs/PRODUCTION.md: network/DNS, secrets, the sudo
+      steps): prod copy + own DB + `stock-advisor-api` system service on 127.0.0.1:8250,
+      Caddy HTTPS on 443, email, backups + health alerts (cron), `infra/deploy.sh <tag>`.
+      Public launch, stores, payments and licensed data come after the beta.
 
 ## Repository layout
 
@@ -335,7 +338,8 @@ stock-advisor-dev/
 ├── frontend/           Flutter app — web + android (lib/core, lib/features, lib/l10n, test/)
 ├── e2e/                Playwright browser flows (run.sh starts backend + web build, cleans up)
 ├── infra/              mysql/ · ollama/ · docker/ install scripts · searxng/ (compose + settings)
-└── docs/               RUNBOOK.md (run/build/release/setup commands), decision notes
+│                       · prod/ (DB, service, backup, health, setup) · caddy/ · deploy.sh
+└── docs/               RUNBOOK.md (run/build/release/setup), PRODUCTION.md (beta deploy)
 ```
 
 ## Conventions

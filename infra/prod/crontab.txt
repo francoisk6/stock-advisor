@@ -1,0 +1,4 @@
+# Install with:  (crontab -l 2>/dev/null; cat infra/prod/crontab.txt) | crontab -
+# Universal Stock Advisor (production). Times are the server's local time.
+*/5 * * * * bash $HOME/stock-advisor/stock-advisor-prod/infra/prod/healthcheck.sh >/dev/null 2>&1
+30 3 * * * bash $HOME/stock-advisor/stock-advisor-prod/infra/prod/backup.sh >> $HOME/backups/stock-advisor/backup.log 2>&1
